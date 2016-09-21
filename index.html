@@ -4,7 +4,7 @@
   <title>The Message</title>
  	<script src="js/cytoscape.js/dist/cytoscape.min.js"></script>
   <style>
-  	html,body{padding: 0;margin: 0;height: 100%;overflow: hidden;}
+  	html,body{padding: 0;margin: 0;height: 100%;}
   </style>
 </head>
 <body>
@@ -76,7 +76,8 @@
       function listAllEvents() {
         var request = gapi.client.calendar.events.list({
           'calendarId': 'primary',
-          'timeMin': (new Date("01 Jan 2012")).toISOString(),
+          'timeMin': (new Date("01 Jan 2014")).toISOString(),
+          'timeMax': (new Date()).toISOString(),
           'showDeleted': false,
           'singleEvents': true,
           'maxResults': 999999,
@@ -90,11 +91,14 @@
           if (events.length > 0) {
             for (i = 0; i < events.length; i++) {
               var event = events[i];
-              var when = event.start.dateTime;
-              if (!when) {
-                when = event.start.date;
-              }
-              appendPre(event.summary + ' (' + when + ')')
+              //console.log(event);
+              if(event.summary && event.summary.indexOf("O'Clock")>=0){
+	              var when = event.start.dateTime;
+	              if (!when) {
+	                when = event.start.date;
+	              }
+	              appendPre(event.summary + ' (' + when + ')')
+	          }
             }
           } else {
             appendPre('No upcoming events found.');
