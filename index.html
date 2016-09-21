@@ -2,7 +2,23 @@
 <html lang="en">
 <head>
   <title>The Message</title>
-  <script type="text/javascript">
+ 	<script src="js/cytoscape.js/dist/cytoscape.min.js"></script>
+  <style>
+  	html,body{padding: 0;margin: 0;height: 100%;overflow: hidden;}
+  </style>
+</head>
+<body>
+	
+  	<div id="cy"></div>
+  	<div id="authorize-div" style="display: none">
+      <span>Authorize access to Google Calendar API</span>
+      <!--Button for the user to click to initiate auth sequence -->
+      <button id="authorize-button" onclick="handleAuthClick(event)">
+        Authorize
+      </button>
+    </div>
+    <pre id="output"></pre>
+    <script type="text/javascript">
       // Your Client ID can be retrieved from your project in the Google
       // Developer Console, https://console.developers.google.com
       var CLIENT_ID = '169881026239-62ks55c662hlrf6hnkui6uspmom0mj9i.apps.googleusercontent.com';
@@ -31,7 +47,7 @@
         if (authResult && !authResult.error) {
           // Hide auth UI, then load client library.
           authorizeDiv.style.display = 'none';
-          loadCalendarApi();
+          gapi.client.load('calendar', 'v3', listAllEvents);
         } else {
           // Show auth UI, allowing the user to initiate authorization by
           // clicking authorize button.
@@ -51,13 +67,6 @@
         return false;
       }
 
-      /**
-       * Load Google Calendar client library. List upcoming events
-       * once client library is loaded.
-       */
-      function loadCalendarApi() {
-        gapi.client.load('calendar', 'v3', listAllEvents);
-      }
 
       /**
        * Print the summary and start datetime/date of the next ten events in
@@ -109,21 +118,6 @@
     </script>
     <script src="https://apis.google.com/js/client.js?onload=checkAuth">
     </script>
-  <style>
-  	html,body{padding: 0;margin: 0;height: 100%;overflow: hidden;}
-  </style>
-</head>
-<body>
-	<script src="js/cytoscape.js/dist/cytoscape.min.js"></script>
-  	<script src="js/logic.js"></script>
-  	<div id="cy"></div>
-  	<div id="authorize-div" style="display: none">
-      <span>Authorize access to Google Calendar API</span>
-      <!--Button for the user to click to initiate auth sequence -->
-      <button id="authorize-button" onclick="handleAuthClick(event)">
-        Authorize
-      </button>
-    </div>
-    <pre id="output"></pre>
+    <script src="js/logic.js"></script>
 </body>
 </html>
