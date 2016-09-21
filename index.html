@@ -56,7 +56,7 @@
        * once client library is loaded.
        */
       function loadCalendarApi() {
-        gapi.client.load('calendar', 'v3', listUpcomingEvents);
+        gapi.client.load('calendar', 'v3', listAllEvents);
       }
 
       /**
@@ -64,13 +64,13 @@
        * the authorized user's calendar. If no events are found an
        * appropriate message is printed.
        */
-      function listUpcomingEvents() {
+      function listAllEvents() {
         var request = gapi.client.calendar.events.list({
           'calendarId': 'primary',
-          'timeMin': (new Date()).toISOString(),
+          'timeMin': (new Date("01 Jan 2012")).toISOString(),
           'showDeleted': false,
           'singleEvents': true,
-          'maxResults': 10,
+          'maxResults': 999999,
           'orderBy': 'startTime'
         });
 
