@@ -1,0 +1,26 @@
+{
+  "name": "calendar-event-11",
+  "version": "1.0.0",
+  "description": "![alt text](https://api.travis-ci.org/titosust/Calendar.Event.11.svg?branch=master\"Build status\")\r # Calendar.Event.11",
+  "main": "index.js",
+  "devDependencies" : {
+    "minifier": "^0.8.0"
+  },
+  "scripts": {
+    "build":"minify --output js/dist/logic.js js/logic.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/titosust/Calendar.Event.11.git"
+  },
+  "keywords": [
+    "js",
+    "chart"
+  ],
+  "author": "Rezaul Karim <titosust@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/titosust/Calendar.Event.11/issues"
+  },
+  "homepage": "https://github.com/titosust/Calendar.Event.11#readme"
+}
