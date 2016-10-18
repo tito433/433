@@ -1,3 +1,6 @@
 [submodule "js/cytoscape.js"]
 	path = js/cytoscape.js
 	url = https://github.com/cytoscape/cytoscape.js.git
+[submodule "js/list.js"]
+	path = js/list.js
+	url = https://github.com/javve/list.js.git
