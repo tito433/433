@@ -11,14 +11,13 @@ window.onload =function(){
 function processData(data){
 	// document.open("text/html", "replace");
 	if (data.length > 0) {
-      var options = {
-        valueNames: [ 'summary', 'dateTime' ],
-        item: '<li><h3 class="summary"></h3><p class="dateTime"></p></li>'
-      };
-		  var userList = new List('list', options, data);
-      userList.on('searchComplete',function(list){
-        console.log(list.items);
-      })
+
+      var datakey = [ 'summary', 'start.dateTime' ],
+          option={childTemplate:'<li><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></li>'};
+
+      var list=new List(document.getElementById('list'),option);
+      list.draw(data,datakey);
+
     } else {
       document.write("No events found!");
     }
