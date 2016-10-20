@@ -1,4 +1,22 @@
 var DataFetcher=function(argument) {
+	var getValue=function(data,key){
+    	var args = key.split('.');
+		for (var i = 0; i < args.length; i++) {
+		    if (!data || !data.hasOwnProperty(args[i])) {
+		      return data[args[i]];
+		    }
+		    data = data[args[i]];
+		  }
+
+		  return data;
+    };
+
+	var self={getValue:getValue};
+
+	if (!(this instanceof DataFetcher)){
+         return self;
+    }
+
 	this._DataCallabk=false;
 
 	this.addGoogleAPI=function(callBack){

@@ -1,18 +1,34 @@
-var List=function function_name(domElem,opt) {
+var List=function(domElem,opt) {
 	if (!(this instanceof List)){
-         return new List(domElem);
+         return new List(domElem,opt);
      }
     if(undefined === domElem){
     	throw "Undefined domElem!!!! Nothing for display!!!";
     }
-    var options={elemClass:'list',childTemplate:'<li><li>'};
+    var options={
+        elemClass:'list',
+        filterClass:'search',
+        childTemplate:'<li><li>',
+        filter:false
+    };
+    var self={
+
+    }
     this.opt=extend(options,(opt||{}));
-    this.elem={'parent':domElem,'ul':false};
+    this.elem={'parent':domElem,'ul':false,'filter':false};
     this._isInit=false;
+    this.data=false;
 
     this.init=function(){
     	if(this._isInit) return false;
-
+        if(this.opt['filter']){
+            this.elem['filter']=document.createElement('input');
+            this.elem['parent'].appendChild(this.elem['filter']);
+            this.elem['filter'].className = this.opt['filterClass'];
+            this.elem['filter'].placeholder = "Search now";
+            this.elem['filter'].addEventListener("keyup", this.filter.bind(this), true);
+    
+        }
     	this.elem['ul']=document.createElement('ul');
     	this.elem['ul'].className = this.opt['elemClass'];
     	this.elem['parent'].appendChild(this.elem['ul']);
@@ -21,6 +37,13 @@ var List=function function_name(domElem,opt) {
     }
     this.draw=function(data,keyset){
     	this.init();
+        var isFilter=[].slice.call(arguments,2)[0]?true:false||false;
+        if(!isFilter){
+            this.data={raw:data,keys:keyset};
+        }
+
+        this.elem['ul'].innerHTML = "";
+
     	keyset=keyset||[];
     	for(var id=0,lnd=data.length;id<lnd;id++){
     		var item=data[id],
@@ -28,13 +51,33 @@ var List=function function_name(domElem,opt) {
     		for(var i=0,ln=keyset.length;i<ln;i++){
 	    		var cel=keyset[i];
 
-	    		food[cel]=this.getData(item,cel);
+	    		food[cel]=DataFetcher().getValue(item,cel);
 	    	}
 	    	if(Object.keys(food).length){
-	    		this.addChild(this.getChildTemplate(food));
+                var template=this.getChildTemplate(food);
+                this.elem['ul'].innerHTML+=template;
 	    	}	
     	}
     	
+    }
+    this.filter=function(event){
+        if(event.code=='Enter'){
+            var txt=this.elem['filter'].value;
+            if(txt.trim()!=''){
+                var keyset=this.data.keys,
+                    data=this.data.raw.filter(function(item){
+                    for(var i=0,ln=keyset.length;i<ln;i++){
+                        var cel=keyset[i];
+                        var value=DataFetcher().getValue(item,cel);
+                        var str=""+value;
+                        if(str.toLowerCase().search(txt.toLowerCase())!=-1) return true;
+                    }
+                    return false;
+                });
+                this.draw(data,keyset,true);
+                
+            }
+        }
     }
     this.getChildTemplate=function(food){
     	var re =/\{(.+?(?=\}))\}/g;
@@ -51,24 +94,8 @@ var List=function function_name(domElem,opt) {
     	}
     	return template;
     }
-    this.addChild=function(str){
-    	var child = document.createElement('div');
-		child.innerHTML = str;
-		child = child.firstChild;
-		this.elem['ul'].appendChild(child);
 
-    }
-    this.getData=function(obj){
-    	var args = arguments[1].split('.');
-		for (var i = 0; i < args.length; i++) {
-		    if (!obj || !obj.hasOwnProperty(args[i])) {
-		      return obj[args[i]];
-		    }
-		    obj = obj[args[i]];
-		  }
-
-		  return obj;
-    }
+    
     this.getAllMatches=function(str,exp){
     	var re =exp||/\{(.+?(?=\}))\}/g,
     		result=[],
@@ -79,6 +106,7 @@ var List=function function_name(domElem,opt) {
 		}
 		return result;
     }
+
 }
 
 function extend(){
