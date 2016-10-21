@@ -75,7 +75,7 @@ var List=function(domElem,opt) {
                     return false;
                 });
                 this.draw(data,keyset,true);
-                
+                this.opt['filter'](data);
             }
         }
     }

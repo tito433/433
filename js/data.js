@@ -43,7 +43,7 @@ var DataFetcher=function(argument) {
  	this.glAuthorizeMe=function() {
  		var self=this;
 	    gapi.auth.authorize({
-	        'client_id': CLIENT_ID,
+	        'client_id': '169881026239-62ks55c662hlrf6hnkui6uspmom0mj9i.apps.googleusercontent.com',
 	        'scope': "https://www.googleapis.com/auth/calendar.readonly",
 	        'immediate': true
 	    }, function(authResult) {
@@ -76,13 +76,15 @@ var DataFetcher=function(argument) {
 
 	    });
 	};
-	this.getData=function(){
+	this.getData=function(callBack){
 	    if (typeof(Storage) !== "undefined") {
 	        var data=localStorage.getItem("events");
 	        if(data){
-	        	return JSON.parse(data);
+	        	if(undefined!=callBack)
+	        	return  callBack(JSON.parse(data));
 	        }
 	    }
+	    this.addGoogleAPI(callBack);
 	    return false;
 	}
 
