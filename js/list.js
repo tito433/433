@@ -37,44 +37,31 @@ var List=function(domElem,opt) {
     }
     this.draw=function(data,keyset){
     	this.init();
-        var isFilter=[].slice.call(arguments,2)[0]?true:false||false;
-        if(!isFilter){
-            this.data={raw:data,keys:keyset};
-        }
-
+        this.data=data;
         this.elem['ul'].innerHTML = "";
+        
 
     	keyset=keyset||[];
-    	for(var id=0,lnd=data.length;id<lnd;id++){
-    		var item=data[id],
-    			food=[];
-    		for(var i=0,ln=keyset.length;i<ln;i++){
-	    		var cel=keyset[i];
+        for(var id=0,sz=this.data.length;id<sz;id++){
+            var item=this.data[id],food=[];
 
-	    		food[cel]=DataFetcher().getValue(item,cel);
-	    	}
-	    	if(Object.keys(food).length){
+            for(var i=0,ln=keyset.length;i<ln;i++){
+                var cel=keyset[i];
+                food[cel]=DataFetcher.getValue(item,cel);
+            }
+            if(Object.keys(food).length){
                 var template=this.getChildTemplate(food);
                 this.elem['ul'].innerHTML+=template;
-	    	}	
-    	}
-    	
+            }
+        }
     }
     this.filter=function(event){
         if(event.code=='Enter'){
             var txt=this.elem['filter'].value;
             if(txt.trim()!=''){
-                var keyset=this.data.keys,
-                    data=this.data.raw.filter(function(item){
-                    for(var i=0,ln=keyset.length;i<ln;i++){
-                        var cel=keyset[i];
-                        var value=DataFetcher().getValue(item,cel);
-                        var str=""+value;
-                        if(str.toLowerCase().search(txt.toLowerCase())!=-1) return true;
-                    }
-                    return false;
+                var data=this.data.filter(function(item){
+                    return DataFetcher.hasValue(item,txt)!=undefined;
                 });
-                this.draw(data,keyset,true);
                 this.opt['filter'](data);
             }
         }

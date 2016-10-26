@@ -1,21 +1,4 @@
 var DataFetcher=function(argument) {
-	var getValue=function(data,key){
-    	var args = key.split('.');
-		for (var i = 0; i < args.length; i++) {
-		    if (!data || !data.hasOwnProperty(args[i])) {
-		      return data[args[i]];
-		    }
-		    data = data[args[i]];
-		  }
-
-		  return data;
-    };
-
-	var self={getValue:getValue};
-
-	if (!(this instanceof DataFetcher)){
-         return self;
-    }
 
 	this._DataCallabk=false;
 
@@ -93,4 +76,32 @@ var DataFetcher=function(argument) {
 	        localStorage.setItem("events", JSON.stringify(data));
 	    }
 	 }
+}
+DataFetcher.getValue=function(data,key){
+	var args = key.split('.');
+	for (var i = 0; i < args.length; i++) {
+	    if (!data || !data.hasOwnProperty(args[i])) {
+	      return data[args[i]];
+	    }
+	    data = data[args[i]];
+	  }
+
+	  return data;
+}
+DataFetcher.hasValue=function(data,findValue){
+	var regx=new RegExp(findValue,"i");
+
+    switch(typeof data) {
+        case "boolean":
+        case "number":
+        case "string":
+            if(match = regx.exec(''+data))  return data;
+            break;
+        case "object":
+        case "array":
+            for (var item in data) {
+                var r=DataFetcher.hasValue(data[item],findValue);
+                if(r!=undefined)  return r;
+            }
+    }
 }

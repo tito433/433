@@ -2,15 +2,13 @@
 
 function Application(){
   Canvas.call(this,document.getElementById('output'));
+  this.dataFetcher=new DataFetcher();
+  this.dataKeyset=[ 'summary', 'start.dateTime' ];
+  
+
   this.processData=function(data){
     if (data.length > 0) {
-        var option={
-          filter:this.display.bind(this),
-          childTemplate:'<li><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></li>'
-        };
-
-        new List(document.getElementById('list'),option)
-                .draw(data,[ 'summary', 'start.dateTime' ]);
+        this.list.draw(data,this.dataKeyset);
         //draw now
         this.display(data);
       }
@@ -20,8 +18,12 @@ function Application(){
       var w=50,h=50,x=0,y=0;
       this.drawables=[];
       for(var i=0,ln=data.length;i<ln;i++){
-        var evt=data[i];
-        this.addDrawable(new CanvasRect(evt.summary).size(w,h).position(x,y));
+        var evt=data[i],
+            st=new Date(evt.start.dateTime);
+
+        var label=st.getDate()+'-'+st.getMonth()+':'+st.getHours();
+
+        this.addDrawable(new CanvasRect(label).size(w,h).position(x,y));
         x+=w+10;
         if(x>this.width||x+w>this.width){
           x=0;y+=h+10;
@@ -33,7 +35,11 @@ function Application(){
     }
   }
 
-  new DataFetcher().getData(this.processData.bind(this));
+  this.list=new List(document.getElementById('list'),{
+          filter:this.processData.bind(this),
+          childTemplate:'<li><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></li>'
+  });
+  this.dataFetcher.getData(this.processData.bind(this));
   
 
 }
