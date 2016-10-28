@@ -92,16 +92,14 @@ DataFetcher.hasValue=function(data,findValue){
 	var regx=new RegExp(findValue,"i");
 
     switch(typeof data) {
-        case "boolean":
-        case "number":
-        case "string":
-            if(match = regx.exec(''+data))  return data;
-            break;
         case "object":
         case "array":
             for (var item in data) {
                 var r=DataFetcher.hasValue(data[item],findValue);
                 if(r!=undefined)  return r;
             }
+            break;
+        default:
+        	if(match = regx.exec(''+data))  return data;   
     }
 }
