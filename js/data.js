@@ -88,18 +88,29 @@ DataFetcher.getValue=function(data,key){
 
 	  return data;
 }
-DataFetcher.hasValue=function(data,findValue){
-	var regx=new RegExp(findValue,"i");
-
+DataFetcher.hasValue=function(data,findValue,index){
     switch(typeof data) {
         case "object":
         case "array":
             for (var item in data) {
-                var r=DataFetcher.hasValue(data[item],findValue);
+                var r=hasValue(data[item],findValue,item);
                 if(r!=undefined)  return r;
             }
             break;
         default:
-        	if(match = regx.exec(''+data))  return data;   
+        	var args=findValue.split(':'),key=false,value=args[0];
+
+			if(args.length>1){
+				key=args[0];
+				value=args[1];
+			}
+			
+
+			var regx=new RegExp(value,"i"),match = regx.exec(''+data);
+
+			if(key!=false && key==index && match)
+				return data;
+        	if(!key && match)  
+        		return data;
     }
 }
