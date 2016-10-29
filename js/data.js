@@ -93,7 +93,7 @@ DataFetcher.hasValue=function(data,findValue,index){
         case "object":
         case "array":
             for (var item in data) {
-                var r=hasValue(data[item],findValue,item);
+                var r=DataFetcher.hasValue(data[item],findValue,item);
                 if(r!=undefined)  return r;
             }
             break;

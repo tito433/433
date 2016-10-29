@@ -61,7 +61,7 @@ function CanvasDate(strDate){
       hour=date.getHours(),
       mins=date.getMinutes();
 
-  this.label=[day+'-'+month+'-'+year,month,day,hour+':'+mins];
+  this.label=[month,day,hour+':'+mins];
 
   this.draw=function(ctx){
     ctx.save();
