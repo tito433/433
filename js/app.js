@@ -1,4 +1,9 @@
 "use strict";
+Rectangle.prototype.onClick=function(x,y){
+  var x=this.bgColor;
+  this.bgColor=this.fontColor;
+  this.fontColor=x;
+}
 
 function Application(){
   Canvas.call(this,document.getElementById('output'));
@@ -25,7 +30,7 @@ function Application(){
       });
 
       this.drawables=[];
-      
+
       for(var i=0,ln=data.length;i<ln;i++){
         var date=new Date(data[i].start.dateTime),
             year=date.getFullYear(),
@@ -51,6 +56,5 @@ function Application(){
           childTemplate:'<li><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></li>'
   });
   this.dataFetcher.getData(this.processData.bind(this));
-  
 
 }
