@@ -1,15 +1,18 @@
 "use strict";
 Rectangle.prototype.onClick=function(x,y){
-  var x=this.bgColor;
-  this.bgColor=this.fontColor;
+  var x=this.fillStyle;
+  this.fillStyle=this.fontColor;
   this.fontColor=x;
 }
 
-function Application(){
-  Canvas.call(this,document.getElementById('output'));
+function Application(menu,display){
+  Canvas.call(this,display);
+
+
   this.dataFetcher=new DataFetcher();
   this.dataKeyset=[ 'summary', 'start.dateTime' ];
   this.layout=new Layout(this.width,this.height);
+
 
   this.processData=function(data){
     if (data.length > 0) {
@@ -42,6 +45,7 @@ function Application(){
         var rect=new Rectangle().size(500,500);
             rect.label=[month,day,hour+':'+mins];
             rect.fontSize=18;
+            rect.fillStyle='#888';
 
         this.drawables.push(rect);
       }
@@ -51,10 +55,18 @@ function Application(){
     }
   }
 
-  this.list=new List(document.getElementById('list'),{
-          filter:this.processData.bind(this),
-          childTemplate:'<li><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></li>'
+  this.list=new List(menu,{
+          filter:{input:'#filter',output:this.processData.bind(this)},
+          childTemplate:'<div><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></div>'
   });
   this.dataFetcher.getData(this.processData.bind(this));
 
+}
+
+function extend(){
+    for(var i=1; i<arguments.length; i++)
+        for(var key in arguments[i])
+            if(arguments[i].hasOwnProperty(key))
+                arguments[0][key] = arguments[i][key];
+    return arguments[0];
 }

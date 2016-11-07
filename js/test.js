@@ -237,3 +237,93 @@ data=input.filter(function(item){
 console.log('null',data)
 
 */
+
+
+// 04-Nov-16 9:35AM
+
+function devideHalf(strNum){
+
+    var result='',
+        idx=strNum.length-1,
+        backup=1,inhand=0,dot=0;
+
+
+        var idot=strNum.indexOf('.');
+        if(idot!=-1){
+            strNum=strNum.replace('.','');
+            dot=strNum.length-idot;
+        }
+        
+
+    while(idx>=0){
+        var chr=strNum[idx],
+            n=parseInt(chr);
+
+        n*=backup;
+        
+        if(n==0){
+            backup=10;
+        }else if(n%2==0){
+
+            var n1=n/2;
+            if(n1>9){
+                var fd=(''+n1).split('');
+                var fn0=parseInt(fd[0]),
+                    fn1=parseInt(fd[1]);
+                result=''+(fn1+inhand)+result;
+                inhand=fn0;
+            }else{
+                result=''+(n1+inhand)+result;
+                inhand=0;
+            }
+            backup=1;
+        }else{
+            n*=10;
+
+            var n1=n/2;
+            if(idx==strNum.length-1){
+                result=''+n1;
+                dot++;
+
+            }else{
+                n1=parseInt(result[0])+n1;
+                if(n1>9){
+                    var fd=(''+n1).split('');
+                    var fn0=parseInt(fd[0]),
+                        fn1=parseInt(fd[1]);
+                    result=''+(fn1+inhand)+result;
+                    inhand=fn0;
+                }else{
+                    result=''+(n1+inhand)+result;
+                    inhand=0;
+                }  
+            } 
+            
+        }
+            
+        
+        idx--;
+    }
+    if(inhand>0){
+        result=''+inhand+result;
+    }
+
+    // if(dot>0){
+    //     var pos=result.length-dot;
+    //     var pr=result.substring(0,pos),
+    //         af=result.substring(pos);
+    //     result=pr+'.'+af;
+    // }
+    return result;
+}
+
+var num='10';
+var loop=10;
+while(loop--){
+    var x=devideHalf(num);
+    console.log(x,num/2);
+    num=x;
+
+}
+
+// console.log(devideHalf('1.25'));
