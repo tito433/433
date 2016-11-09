@@ -42,6 +42,7 @@ div#menu {
   background: #fff;
   width: 100%;
   padding: 3px 10px;
+  margin-bottom:10px;
 }
 #menu .list {
   height: 100%;
