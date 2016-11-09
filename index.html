@@ -12,12 +12,27 @@
     <div class="container">
       <div id="menu">
         <div class="list">
+         <fieldset>
+            <legend>Control:</legend>
+            <ul id="settings">
+              <li>
+                <p>Size</p>
+                <div class="input-group">
+                  <input type="number" name="size" class="form-control" value="100" />
+                  <span class="input-group-addon">px</span>
+                </div>
+              </li>
+            </ul>
+            <buttongroup>
+              <button id="reset">Reset</button>
+            </buttongroup>
+          </fieldset>
           <fieldset>
             <legend>Filter:</legend>
             <input type="text" placeholder="Search" id="filter"/>
           </fieldset>
           <div class="result">
-            
+            <div><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></div>
           </div>
         </div>
       </div>
@@ -25,8 +40,21 @@
     </div>
     <script type="text/javascript">
       window.onload =function(){
-        new Application(document.querySelector('#menu .list .result'),
+        var app=new Application(document.querySelector('#menu .list .result'),
                         document.getElementById('output'));
+        
+        document.getElementById('reset').onclick=function(e){ app.reset(); }
+
+        document.querySelectorAll('#settings input').forEach(function(){
+          this.onchange=function(ev){
+            var el=ev.target,name=el.name,val=el.value;
+            if(el.type=='checkbox'){
+              val=el.checked;
+            }
+            app.setting(name,val);
+          }
+        });
+
       }
     </script>
 </body>

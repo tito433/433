@@ -1,4 +1,4 @@
-var DataFetcher=function(argument) {
+var DataFetcher=function() {
 
 	this._DataCallabk=false;
 
@@ -9,10 +9,10 @@ var DataFetcher=function(argument) {
 		iDiv.id = 'authorize-div';
 		document.getElementsByTagName('body')[0].appendChild(iDiv);
 
-		var span = document.createElement("span");
+		var p = document.createElement("p");
 		var node = document.createTextNode("Authorize access to Google Calendar API");
-		span.appendChild(node);
-		iDiv.appendChild(span);
+		p.appendChild(node);
+		iDiv.appendChild(p);
 
 		var btn = document.createElement("button");        
 		btn.appendChild(document.createTextNode("Authorize"));                               
@@ -70,7 +70,11 @@ var DataFetcher=function(argument) {
 	    this.addGoogleAPI(callBack);
 	    return false;
 	}
-
+	this.clear=function(){
+		if (typeof(Storage) !== "undefined") {
+	        localStorage.clear();
+	    }
+	}
 	this.setData=function(data){
 	 	if (typeof(Storage) !== "undefined") {
 	        localStorage.setItem("events", JSON.stringify(data));

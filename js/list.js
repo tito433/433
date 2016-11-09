@@ -5,10 +5,11 @@ var List=function(domElem,opt) {
     if(undefined === domElem){	throw "Undefined domElem!!!! Nothing for display!!!"; }
     
     var options={
-        childTemplate:'<li><li>',
+        childTemplate:domElem.innerHTML,
         filter:false
     };
     
+    domElem.innerHTML='';
     this.opt=extend(options,(opt||{}));
     this.elem=domElem;
 
@@ -77,7 +78,9 @@ var List=function(domElem,opt) {
     	return template;
     }
 
-    
+    this.reset=function(){
+        this.elem.innerHTML='';
+    }
     this.getAllMatches=function(str,exp){
     	var re =exp||/\{(.+?(?=\}))\}/g,
     		result=[],

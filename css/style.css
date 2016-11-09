@@ -1,7 +1,7 @@
 html,body{padding: 0;margin: 0;height: 100%;    width: 100%;
     display: block;}
  body {
-    padding: 0;
+    padding: 0 0 0 15px;
     margin: 0;
     height: 100%;
     color: #444;
@@ -62,6 +62,20 @@ h3{
   margin: 0 0 5px;
   font-size: 12px;
 }
+#output{
+  padding: 15px;
+}
+#authorize-div {
+    position: absolute;
+    top: 300px;
+    left: 50%;
+    border: 1px solid #433;
+    padding: 20px;
+    width: 360px;
+    text-align: center;
+    background: #f0f0f0;
+    margin-left: -200px;
+}
 
 button {
       display: block;
@@ -98,6 +112,11 @@ li p{margin: 0px;display: inline-block;}
   position: relative;
   display: table;
   border-collapse: separate;
+  float: right;
+  
+}
+.input-group *{
+  box-sizing: content-box;
 }
 .input-group .form-control{
   
@@ -161,6 +180,7 @@ li p{margin: 0px;display: inline-block;}
   background: #fff;
   content: "";
   border-radius: 1em;
+  float: right;
 }
 .tgl + label:after{
   position: relative;
