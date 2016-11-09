@@ -53,7 +53,16 @@
         var app=new Application(infoPanel, document.getElementById('output'));
         
         document.getElementById('reset').onclick=function(e){ app.reset(); }
-        document.getElementById('export').onclick=function(e){infoPanel.innerHTML=app.data();}
+        document.getElementById('export').onclick=function(e){
+          var txt=document.createElement('textarea');
+          txt.innerHTML=app.data();
+          document.body.appendChild(txt);
+          txt.focus();
+          txt.setSelectionRange(0, txt.value.length);
+          document.execCommand("copy");
+          infoPanel.innerHTML='RLE data copied to clipboard.';
+          document.body.removeChild(txt);
+        }
 
         document.querySelectorAll('#settings input').forEach(function(input){
           var name=input.name,val=input.value;
