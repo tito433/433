@@ -20,7 +20,7 @@ function Day(date){
         ctx.rect(this.x,this.y,this.w,this.h);
         ctx.stroke();
         ctx.fill();
-        Drawable.draw.call(this,ctx);
+        Drawable.prototype.draw.call(this,ctx);
         ctx.restore();
     }
     this.events=function(){
@@ -108,8 +108,9 @@ function Application(menu,display){
     var ln=this._data.length,i=0;
 
     if(ln){
-      this.drawables=[];
-      var date=new Date(this._data[0].start.dateTime),
+      this.clear();
+      var rects=[],
+          date=new Date(this._data[0].start.dateTime),
           eDate=new Date(this._data[ln-1].end.dateTime);
 
       while(date<eDate){
@@ -125,11 +126,11 @@ function Application(menu,display){
           i++;
         }
             
-
-        this.drawables.push(rect);
+        rects.push(rect);
+        this.add(rect);
         date.setDate(date.getDate() + 1);
       }
-      this.layout.flowLeft(this.drawables);
+      this.layout.flowLeft(rects);
       this.draw();
     }
   }
@@ -137,8 +138,7 @@ function Application(menu,display){
   this.dataFetcher.getData(this.processData.bind(this));
   
   this.reset=function(){
-    this.drawables=[];
-    this.draw();
+    this.clear();
     this.list.reset();
     this.dataFetcher.clear();
     this.dataFetcher.getData(this.processData.bind(this));

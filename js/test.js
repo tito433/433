@@ -241,89 +241,125 @@ console.log('null',data)
 
 // 04-Nov-16 9:35AM
 
-function devideHalf(strNum){
+// function devideHalf(strNum){
 
-    var result='',
-        idx=strNum.length-1,
-        backup=1,inhand=0,dot=0;
+//     var result='',
+//         idx=strNum.length-1,
+//         backup=1,inhand=0,dot=0;
 
 
-        var idot=strNum.indexOf('.');
-        if(idot!=-1){
-            strNum=strNum.replace('.','');
-            dot=strNum.length-idot;
-        }
+//         var idot=strNum.indexOf('.');
+//         if(idot!=-1){
+//             strNum=strNum.replace('.','');
+//             dot=strNum.length-idot;
+//         }
         
 
-    while(idx>=0){
-        var chr=strNum[idx],
-            n=parseInt(chr);
+//     while(idx>=0){
+//         var chr=strNum[idx],
+//             n=parseInt(chr);
 
-        n*=backup;
+//         n*=backup;
         
-        if(n==0){
-            backup=10;
-        }else if(n%2==0){
+//         if(n==0){
+//             backup=10;
+//         }else if(n%2==0){
 
-            var n1=n/2;
-            if(n1>9){
-                var fd=(''+n1).split('');
-                var fn0=parseInt(fd[0]),
-                    fn1=parseInt(fd[1]);
-                result=''+(fn1+inhand)+result;
-                inhand=fn0;
-            }else{
-                result=''+(n1+inhand)+result;
-                inhand=0;
-            }
-            backup=1;
-        }else{
-            n*=10;
+//             var n1=n/2;
+//             if(n1>9){
+//                 var fd=(''+n1).split('');
+//                 var fn0=parseInt(fd[0]),
+//                     fn1=parseInt(fd[1]);
+//                 result=''+(fn1+inhand)+result;
+//                 inhand=fn0;
+//             }else{
+//                 result=''+(n1+inhand)+result;
+//                 inhand=0;
+//             }
+//             backup=1;
+//         }else{
+//             n*=10;
 
-            var n1=n/2;
-            if(idx==strNum.length-1){
-                result=''+n1;
-                dot++;
+//             var n1=n/2;
+//             if(idx==strNum.length-1){
+//                 result=''+n1;
+//                 dot++;
 
-            }else{
-                n1=parseInt(result[0])+n1;
-                if(n1>9){
-                    var fd=(''+n1).split('');
-                    var fn0=parseInt(fd[0]),
-                        fn1=parseInt(fd[1]);
-                    result=''+(fn1+inhand)+result;
-                    inhand=fn0;
-                }else{
-                    result=''+(n1+inhand)+result;
-                    inhand=0;
-                }  
-            } 
+//             }else{
+//                 n1=parseInt(result[0])+n1;
+//                 if(n1>9){
+//                     var fd=(''+n1).split('');
+//                     var fn0=parseInt(fd[0]),
+//                         fn1=parseInt(fd[1]);
+//                     result=''+(fn1+inhand)+result;
+//                     inhand=fn0;
+//                 }else{
+//                     result=''+(n1+inhand)+result;
+//                     inhand=0;
+//                 }  
+//             } 
             
-        }
+//         }
             
         
-        idx--;
-    }
-    if(inhand>0){
-        result=''+inhand+result;
-    }
+//         idx--;
+//     }
+//     if(inhand>0){
+//         result=''+inhand+result;
+//     }
 
-    // if(dot>0){
-    //     var pos=result.length-dot;
-    //     var pr=result.substring(0,pos),
-    //         af=result.substring(pos);
-    //     result=pr+'.'+af;
-    // }
-    return result;
-}
+//     // if(dot>0){
+//     //     var pos=result.length-dot;
+//     //     var pr=result.substring(0,pos),
+//     //         af=result.substring(pos);
+//     //     result=pr+'.'+af;
+//     // }
+//     return result;
+// }
 
-var num='10';
-var loop=10;
-while(loop--){
-    var x=devideHalf(num);
-    console.log(x,num/2);
-    num=x;
+// var num='10';
+// var loop=10;
+// while(loop--){
+//     var x=devideHalf(num);
+//     console.log(x,num/2);
+//     num=x;
 
-}
+// }
 
 // console.log(devideHalf('1.25'));
+
+//14 nov 2016
+
+// var v=new String("body .canvas");
+// var w=new String("body .canvas");
+
+// var v1="body .canvas";
+// var w1="body .canvas";
+
+// console.log(Object.prototype.toString.call(v1),typeof v1,v1 instanceof String,v1 instanceof Date,v1 instanceof Object)
+alert('attach')
+window.onload=function(){
+
+    console.log('loaded')
+    var bd='body #canvas';
+    var parent = document.querySelector(bd);
+
+    if(!parent){
+        parent=document.body;
+    }
+
+    if(parent instanceof HTMLCanvasElement){
+
+    }else{
+        
+    }
+
+    console.log(parent,typeof parent,Object.prototype.toString.call(parent),parent instanceof HTMLBodyElement);
+
+    console.log('HTMLUListElement',parent instanceof HTMLUListElement)
+    console.log('HTMLElement',parent instanceof HTMLElement)
+    console.log('Element',parent instanceof Element)
+    console.log('HTMLCanvasElement',parent instanceof HTMLCanvasElement)
+    
+
+}
