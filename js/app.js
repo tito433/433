@@ -101,9 +101,36 @@ function Application(menu,display){
     if (data.length > 0) {
         this.list.draw(data,this.dataKeyset);
         this.data(data);
+        this.analise(data);
       }
   };
+  this.analise=function(data){
+      var net = new brain.NeuralNetwork();
+      var input=data.filter(function(evt){
+        var str=''+evt.summary;
+        return str.indexOf("o'clock")!=-1;
+      }).map(function(evt){
+        var date= new Date(evt.start.dateTime),
+            year=date.getFullYear(),
+            month=date.getMonth(),
+            day=date.getDate(),
+            hour=date.getHours(),
+            min=date.getMinutes();
+        return {'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:1}};
 
+      });
+      net.train(input);
+
+      var today=new Date(),
+        year=today.getFullYear(),
+        month=today.getMonth(),
+        day=today.getDate(),
+        hour=today.getHours(),
+        min=today.getMinutes();
+
+      console.log('Has today?',today,net.run({'year':year,'month':month,'day':day,'hour':hour,'minute':min}))
+
+  }
   this.redraw=function(){
     var ln=this._data.length,i=0;
 
