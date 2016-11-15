@@ -57,14 +57,14 @@ function Application(menu,display){
   
   this.data=function(){
     if(arguments.length==0){
-      if(this.drawables.length<1) return [];
+      if(this._data.length<1) return [];
 
-      var y=this.drawables[0].y,prev='',run=0,
+      var y=this._data[0].y,prev='',run=0,
           yc=1,xc=false,result='',typ='',counter=0;
       
-      for(var idx in this.drawables){
+      for(var idx in this._data){
         counter++;
-        var ev=this.drawables[idx];
+        var ev=this._data[idx];
         typ=ev.marked?'o':'b';
 
         if(y==ev.y){
