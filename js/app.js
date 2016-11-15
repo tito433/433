@@ -101,32 +101,52 @@ function Application(menu,display){
     if (data.length > 0) {
         this.list.draw(data,this.dataKeyset);
         this.data(data);
-        this.analise(data);
+        setTimeout(this.analise.bind(this,data),100);
       }
   };
   this.analise=function(data){
+
       var net = new brain.NeuralNetwork();
+      //filter O'Clock onlys
       var input=data.filter(function(evt){
-        var str=''+evt.summary;
-        return str.indexOf("o'clock")!=-1;
-      }).map(function(evt){
-        var date= new Date(evt.start.dateTime),
-            year=date.getFullYear(),
+        return evt.summary.toLowerCase().indexOf("o'clock")!=-1;
+      });
+      
+      var rects=[],i=0,date=new Date(input[0].start.dateTime),
+          eDate=new Date(input[input.length-1].end.dateTime);
+
+      while(date<eDate){
+        var evDate=new Date(input[i].start.dateTime);
+
+        var year=date.getFullYear(),
             month=date.getMonth(),
             day=date.getDate(),
             hour=date.getHours(),
             min=date.getMinutes();
-        return {'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:1}};
 
-      });
-      net.train(input);
+        if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
+          hour=evDate.getHours();
+          min=evDate.getMinutes();
+          rects.push({'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:1}});
+          i++;
+        }else{
+          rects.push({'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:0}});
+        }
+
+        date.setDate(date.getDate() + 1);
+      }
+
+
+     
+      console.log(rects)
+      net.train(rects);
 
       var today=new Date(),
         year=today.getFullYear(),
         month=today.getMonth(),
         day=today.getDate(),
         hour=today.getHours(),
-        min=today.getMinutes();
+        min=today.setMinutes(11);
 
       console.log('Has today?',today,net.run({'year':year,'month':month,'day':day,'hour':hour,'minute':min}))
 
