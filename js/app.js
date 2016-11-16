@@ -5,25 +5,25 @@ function Day(date){
 
     this.date=date;
     this.fillStyle='#fff';
-    this.fontColor='#888';
+    this.fontColor='#000';
     this.evts=[];
     this.marked=false;
 
     var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
-    this.label=[];
-    // this.label=[year,month,day];
+    this.label=[year,month,day];
 
 
     this.draw=function(ctx){
-        ctx.save();
+        //ctx.save();
         ctx.beginPath();
-        Drawable.prototype.draw.call(this,ctx);
+        // Drawable.prototype.draw.call(this,ctx);
         ctx.fillStyle=this.fillStyle;
         ctx.rect(this.x,this.y,this.w,this.h);
+        ctx.closePath();
         ctx.stroke();
         if(this.marked) ctx.fill();
-        ctx.closePath();
-        ctx.restore();
+        
+        //ctx.restore();
     }
     this.events=function(){
       if(arguments.length==0){
