@@ -5,7 +5,7 @@ function Day(date){
 
     this.date=date;
     this.fillStyle='#fff';
-    this.fontColor='#000';
+    this.fontColor='#888';
     this.evts=[];
     this.marked=false;
 
@@ -14,16 +14,15 @@ function Day(date){
 
 
     this.draw=function(ctx){
-        //ctx.save();
+        ctx.save();
         ctx.beginPath();
-        // Drawable.prototype.draw.call(this,ctx);
         ctx.fillStyle=this.fillStyle;
         ctx.rect(this.x,this.y,this.w,this.h);
         ctx.closePath();
         ctx.stroke();
         if(this.marked) ctx.fill();
-        
-        //ctx.restore();
+        Drawable.prototype.draw.call(this,ctx);
+        ctx.restore();
     }
     this.events=function(){
       if(arguments.length==0){
@@ -54,36 +53,13 @@ function Application(menu,display,sett){
   this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
   sett=sett==undefined?{}:sett;
-  this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extendEx(sett);
+  this._settings=extendEx({size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]},sett);
   this._data=[];
-  console.log(this._settings)
+  this._box=[];
+
   this.data=function(){
     if(arguments.length==0){
-      if(this._data.length<1) return [];
-
-      var y=this._data[0].y,prev='',run=0,
-          yc=1,xc=false,result='',typ='',counter=0;
-      
-      for(var idx in this._data){
-        counter++;
-        var ev=this._data[idx];
-        typ=ev.marked?'o':'b';
-
-        if(y==ev.y){
-          if(prev!='' && prev!=typ){
-            result+=(run<2)?prev:run+prev;
-            run=-1;
-          }
-          run++;
-        }else{
-          if(false===xc){xc=counter-1;}
-          result+=run+prev+'$';
-          yc++;run=0;y=ev.y;
-        }
-        prev=typ;
-      }
-
-      return 'x = '+xc+', y = '+yc+', rule = B3/S23'+"\n"+result+'!';
+      return this.getRLE();
     }else{
         var data=arguments[0];
         if(data && data.length){
@@ -106,123 +82,122 @@ function Application(menu,display,sett){
         
       }
   };
-  this.analyze=function(output){
-      if(this._data.length==0){
-        output.innerHTML+='Not engough data.';
-        return false;
-      }
+  this.analyze=function(callback){
+    if(this._data.length==0){
+      return 'Not engough data.';
+    }
 
-      var net = new brain.NeuralNetwork();
-      var input=this._data;
+    var response='',
+        net = new brain.NeuralNetwork(), 
+        input=this._box.map(function(obj){
+          var d=obj.date;
+          return {'input':{'year':d.getFullYear(),'month':d.getMonth(),'day':d.getDate(),'hour':d.getHours(),'minute':d.getMinutes()},'output':{'event':obj.marked?1:0}};
+        });
       
-      var rects=[],i=0,ln=input.length,
-          date=new Date(input[0].start.dateTime),
-          eDate=new Date(input[ln-1].end.dateTime);
-        date.setHours(0);
-        date.setMinutes(0);
-        eDate.setHours(23);
-        eDate.setMinutes(59);
-
-      while(date<eDate){
-        var evDate=new Date(input[i].start.dateTime);
-
-        var year=date.getFullYear(),
-            month=date.getMonth(),
-            day=date.getDate(),
-            hour=date.getHours(),
-            min=date.getMinutes();
-
-        if(evDate.getFullYear()==year && evDate.getMonth()==month && evDate.getDate()==day){
-          hour=evDate.getHours();
-          min=evDate.getMinutes();
-          rects.push({'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:1}});
-          i++;
-        }else{
-          rects.push({'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:0}});
-        }
-
-        date.setDate(date.getDate() + 1);
-      }
-
-      output.innerHTML+='Training data prepared.<br/>';
-
-      net.train(rects);
-      output.innerHTML+='Training complete.<br/>';
+      net.train(input);
+      console.log('Training complete.<br/>');
 
       //predict?
-      output.innerHTML+='Lets predict some.<br/>';
-      var startDate=new Date(),
-          maxDate=new Date();
-
-          startDate.setDate(eDate.getDate()-21);
-          maxDate.setDate(startDate.getDate()+4);
-      
-      console.log(startDate,maxDate);
-      var counter=0;
+      var counter=0,lastDay=this._box[this._box.length-1].date,
+          startDate=new Date(lastDay.getFullYear(),lastDay.getMonth(),lastDay.getDate(),0,0), 
+          endDate=new Date();
+          endDate.setDate(startDate.getDate()+30);
+          
 
       var timer=setInterval(function(){
-        if(startDate>maxDate){
-          output.innerHTML+='Analyze completed:'+counter;
+        if(startDate>endDate){
+          console.log('Analyze completed:'+counter+' days',response);
           clearInterval(timer);
+          if(callback) callback(response);
+
         }else{
           var hour=0,min=0;
-            counter++;
-            while(hour<=23){
-              var curDate=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate(),hour,min);
-              var result=net.run({'year':curDate.getFullYear(),'month':curDate.getMonth(),'day':curDate.getDate(),'hour':hour,'minute':min});
-              console.log(curDate,result.event);
-              if(result.event>0.95){
-                output.innerHTML+='Found:'+curDate+'<br/>';
-              }
-              min++;
-              if(min==60){  hour++; min=0; }
+          counter++;
+          while(hour<=23){
+            var sample={'year':startDate.getFullYear(),'month':startDate.getMonth(),'day':startDate.getDate(),'hour':hour,'minute':min};
+            var result=net.run(sample);
+            if(result.event>0.95){
+              response+=startDate+'<br/>';
+              console.log('Found:'+startDate+'<br/>');
             }
+            min++;
+            if(min==60){  hour++; min=0; }
+          }
           startDate.setDate(startDate.getDate()+1);
 
         }
       },1000);
-      
-
+      //sending incomplete data!!!
+      return response;
   }
   this.redraw=function(){
     var ln=this._data.length,i=0;
 
     if(ln){
       this.clear();
-      var rects=[],
-          date=new Date(this._data[0].start.dateTime),
+      this._box=[];
+      var date=new Date(this._data[0].start.dateTime),
           eDate=new Date(this._data[ln-1].end.dateTime);
 
       while(date<eDate){
         var size=parseInt(this._settings.size),
             evDate=new Date(this._data[i].start.dateTime);
 
-        var rect=new Day(date).size(size,size);
+        var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
             rect.fontSize=this._settings.font;
 
         if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
           var hour=evDate.getHours(),mins=evDate.getMinutes();
+          rect.date.setHours(hour);
+          rect.date.setMinutes(mins);
           rect.events(hour+':'+mins);
           i++;
         }
             
-        rects.push(rect);
+        this._box.push(rect);
         this.add(rect);
         date.setDate(date.getDate() + 1);
       }
-      this.layout.flowLeft(rects);
+      this.layout.flowLeft(this._box);
       this.draw();
     }
   }
   this.list=new List(menu,{ filter:{input:'#filter',output:this.processData.bind(this)}});
   this.dataFetcher.getData(this.processData.bind(this));
   
+  this.getRLE=function(){
+    if(this._box.length<1) return "";
+
+      var ev=this._box[0],y=ev.y,prev=ev.marked?'o':'b',run=1,yc=1,xc=1,result='';
+      for(var i =1,lb=this._box.length;i<lb;i++){
+          ev=this._box[i];
+          var typ=ev.marked?'o':'b';
+          if(y==ev.y){
+            if(typ===prev){
+                run++;
+            }else{
+              result+=(run==1)?prev:run+prev;
+              run=1;
+              prev=typ;
+            }
+            if(1===yc){xc++;}
+          }else{
+            result+=run+prev+'$';
+            yc++;
+            run=1;
+            y=ev.y;
+          }
+          prev=typ;
+      }
+
+      return 'x = '+xc+', y = '+yc+', rule = B3/S23'+"\n"+result+'!';
+  };
   this.reset=function(){
     this.clear();
     this.list.reset();
     this.dataFetcher.clear();
     this.dataFetcher.getData(this.processData.bind(this));
-  }
+  };
   this.setting=function(key,val){
     if(undefined==val){
       return this._settings[key];
@@ -230,15 +205,14 @@ function Application(menu,display,sett){
       this._settings[key]=val;
       this.redraw();
     }
-  }
+  };
 
 }
 
-Object.prototype.extendEx=function(){
-  var dst=this;
-    for(var i=0; i<arguments.length; i++)
+function extendEx(){
+    for(var i=1; i<arguments.length; i++)
         for(var key in arguments[i])
             if(arguments[i].hasOwnProperty(key))
-                dst[key] = arguments[i][key];
-    return dst;
+                arguments[0][key] = arguments[i][key];
+    return arguments[0];
 }

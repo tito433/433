@@ -3,8 +3,8 @@
 <head>
   <title>Data graber from google calendar</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/html5.canvas/dist/canvas.min.js"></script>
-  <!-- <script src="js/brain-0.6.0.js"></script> -->
+  <script src="js/html5.canvas/lib/canvas.js"></script>
+  <script src="js/brain-0.6.0.js"></script>
   <script src="js/data.js"></script>
   <script src="js/list.js"></script>
   <script src="js/app.js"></script>
@@ -21,7 +21,7 @@
               <li>
                 <p>Size</p>
                 <div class="input-group">
-                  <input type="number" name="size" class="form-control" value="43" />
+                  <input type="number" name="size" class="form-control" value="36" />
                   <span class="input-group-addon">px</span>
                 </div>
               </li>
@@ -35,7 +35,7 @@
             </ul>
             <buttongroup>
               <button id="reset">Reset</button>
-              <button id="export">Export</button>
+              <button id="export">Exp. RLE</button>
               <button id="analyze">Analyze</button>
             </buttongroup>
           </fieldset>
@@ -57,19 +57,18 @@
         document.getElementById('reset').onclick=function(e){ app.reset(); }
         document.getElementById('export').onclick=function(e){
           var txt=document.createElement('textarea');
-          txt.innerHTML=app.data();
+          txt.innerHTML=app.getRLE();
           document.body.appendChild(txt);
           txt.focus();
           txt.setSelectionRange(0, txt.value.length);
           document.execCommand("copy");
-          infoPanel.innerHTML='RLE data copied to clipboard.';
+          infoPanel.innerHTML='RLE data copied to clipboard.<br/>Hint: Use Ctrl+v to get';
           document.body.removeChild(txt);
         }
 
-        var settings_input=document.querySelectorAll('#settings input'),
-            settings_vars={};
+        var settings_vars={};
 
-        settings_input.forEach(function(input){
+        document.querySelectorAll('#settings input').forEach(function(input){
           var name=input.name,val=input.value;
           settings_vars[name]=val;
           
@@ -83,7 +82,9 @@
         });
         document.getElementById('analyze').onclick=function(e){
           infoPanel.innerHTML='Analyzing started...<br/>';
-          setTimeout(app.analyze.bind(app,infoPanel),1);
+          infoPanel.innerHTML+=app.analyze(function(resp){
+            infoPanel.innerHTML+=resp;
+          });
         }
         app=new Application(infoPanel, document.getElementById('output'),settings_vars);
       }
