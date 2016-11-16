@@ -10,17 +10,19 @@ function Day(date){
     this.marked=false;
 
     var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
-    this.label=[year,month,day];
+    this.label=[];
+    // this.label=[year,month,day];
 
 
     this.draw=function(ctx){
         ctx.save();
         ctx.beginPath();
+        Drawable.prototype.draw.call(this,ctx);
         ctx.fillStyle=this.fillStyle;
         ctx.rect(this.x,this.y,this.w,this.h);
         ctx.stroke();
-        ctx.fill();
-        Drawable.prototype.draw.call(this,ctx);
+        if(this.marked) ctx.fill();
+        ctx.closePath();
         ctx.restore();
     }
     this.events=function(){
@@ -52,7 +54,7 @@ function Application(menu,display,sett){
   this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
   sett=sett==undefined?{}:sett;
-  this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extend(sett);
+  this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extendEx(sett);
   this._data=[];
   console.log(this._settings)
   this.data=function(){
@@ -232,7 +234,7 @@ function Application(menu,display,sett){
 
 }
 
-Object.prototype.extend=function(){
+Object.prototype.extendEx=function(){
   var dst=this;
     for(var i=0; i<arguments.length; i++)
         for(var key in arguments[i])

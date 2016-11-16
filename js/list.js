@@ -10,7 +10,7 @@ var List=function(domElem,opt) {
     };
     
     domElem.innerHTML='';
-    this.opt=options.extend((opt==undefined?{}:opt));
+    this.opt=options.extendEx((opt==undefined?{}:opt));
     this.elem=domElem;
 
     this._isInit=false;
