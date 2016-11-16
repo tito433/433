@@ -10,7 +10,7 @@ function Day(date){
     this.marked=false;
 
     var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
-    this.label=[month,day];
+    this.label=[year,month,day];
 
 
     this.draw=function(ctx){
@@ -46,15 +46,15 @@ function Day(date){
 Day.prototype = Object.create(Drawable.prototype);
 Day.prototype.constructor = Day;
 
-function Application(menu,display){
+function Application(menu,display,sett){
   Canvas.call(this,display);
 
   this.dataFetcher=new DataFetcher();
-  this.dataKeyset=[ 'summary', 'start.dateTime' ];
   this.layout=new Layout(this.width,this.height);
-  this._settings={size:50,font:16};
+  sett=sett==undefined?{}:sett;
+  this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extend(sett);
   this._data=[];
-  
+  console.log(this._settings)
   this.data=function(){
     if(arguments.length==0){
       if(this._data.length<1) return [];
@@ -99,21 +99,27 @@ function Application(menu,display){
 
   this.processData=function(data){
     if (data.length > 0) {
-        this.list.draw(data,this.dataKeyset);
+        this.list.draw(data,this._settings.dataKeyset);
         this.data(data);
-        setTimeout(this.analise.bind(this,data),100);
+        
       }
   };
-  this.analise=function(data){
+  this.analyze=function(output){
+      if(this._data.length==0){
+        output.innerHTML+='Not engough data.';
+        return false;
+      }
 
       var net = new brain.NeuralNetwork();
-      //filter O'Clock onlys
-      var input=data.filter(function(evt){
-        return evt.summary.toLowerCase().indexOf("o'clock")!=-1;
-      });
+      var input=this._data;
       
-      var rects=[],i=0,date=new Date(input[0].start.dateTime),
-          eDate=new Date(input[input.length-1].end.dateTime);
+      var rects=[],i=0,ln=input.length,
+          date=new Date(input[0].start.dateTime),
+          eDate=new Date(input[ln-1].end.dateTime);
+        date.setHours(0);
+        date.setMinutes(0);
+        eDate.setHours(23);
+        eDate.setMinutes(59);
 
       while(date<eDate){
         var evDate=new Date(input[i].start.dateTime);
@@ -124,7 +130,7 @@ function Application(menu,display){
             hour=date.getHours(),
             min=date.getMinutes();
 
-        if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
+        if(evDate.getFullYear()==year && evDate.getMonth()==month && evDate.getDate()==day){
           hour=evDate.getHours();
           min=evDate.getMinutes();
           rects.push({'input':{'year':year,'month':month,'day':day,'hour':hour,'minute':min},'output':{event:1}});
@@ -136,19 +142,44 @@ function Application(menu,display){
         date.setDate(date.getDate() + 1);
       }
 
+      output.innerHTML+='Training data prepared.<br/>';
 
-     
-      console.log(rects)
       net.train(rects);
+      output.innerHTML+='Training complete.<br/>';
 
-      var today=new Date(),
-        year=today.getFullYear(),
-        month=today.getMonth(),
-        day=today.getDate(),
-        hour=today.getHours(),
-        min=today.setMinutes(11);
+      //predict?
+      output.innerHTML+='Lets predict some.<br/>';
+      var startDate=new Date(),
+          maxDate=new Date();
 
-      console.log('Has today?',today,net.run({'year':year,'month':month,'day':day,'hour':hour,'minute':min}))
+          startDate.setDate(eDate.getDate()-21);
+          maxDate.setDate(startDate.getDate()+4);
+      
+      console.log(startDate,maxDate);
+      var counter=0;
+
+      var timer=setInterval(function(){
+        if(startDate>maxDate){
+          output.innerHTML+='Analyze completed:'+counter;
+          clearInterval(timer);
+        }else{
+          var hour=0,min=0;
+            counter++;
+            while(hour<=23){
+              var curDate=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate(),hour,min);
+              var result=net.run({'year':curDate.getFullYear(),'month':curDate.getMonth(),'day':curDate.getDate(),'hour':hour,'minute':min});
+              console.log(curDate,result.event);
+              if(result.event>0.95){
+                output.innerHTML+='Found:'+curDate+'<br/>';
+              }
+              min++;
+              if(min==60){  hour++; min=0; }
+            }
+          startDate.setDate(startDate.getDate()+1);
+
+        }
+      },1000);
+      
 
   }
   this.redraw=function(){
@@ -201,10 +232,11 @@ function Application(menu,display){
 
 }
 
-function extend(){
-    for(var i=1; i<arguments.length; i++)
+Object.prototype.extend=function(){
+  var dst=this;
+    for(var i=0; i<arguments.length; i++)
         for(var key in arguments[i])
             if(arguments[i].hasOwnProperty(key))
-                arguments[0][key] = arguments[i][key];
-    return arguments[0];
+                dst[key] = arguments[i][key];
+    return dst;
 }
