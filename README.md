@@ -6,5 +6,8 @@ It usases:
 * [Google APIs](https://developers.google.com/apis-explorer)
   * `Calendar`
 * [`harthur/brain`](https://github.com/harthur/brain) - neural network library.
+  * - [ ] `train` - train network with sample data from calendar.
+  * - [ ] `predict` - get future prediction.
+  * - [ ] `success` - Is it over?
 
 ### Demo: [http://titosust.github.io/Calendar.Event.11/](http://titosust.github.io/Calendar.Event.11/)
