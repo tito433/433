@@ -94,7 +94,13 @@ function Application(menu,display,sett){
           return {'input':{'year':d.getFullYear(),'month':d.getMonth(),'day':d.getDate(),'hour':d.getHours(),'minute':d.getMinutes()},'output':{'event':obj.marked?1:0}};
         });
       
-      net.train(input);
+      net.train(input,{
+        errorThresh: 0.005,  // error threshold to reach
+        iterations: 20000,   // maximum training iterations
+        log: true,           // console.log() progress periodically
+        logPeriod: 100,       // number of iterations between logging
+        learningRate: 0.3    // learning rate
+      });
       console.log('Training complete.<br/>');
 
       //predict?
