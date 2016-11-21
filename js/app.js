@@ -1,61 +1,19 @@
 "use strict";
 
-function Day(date){
-    Drawable.call(this);
-
-    this.date=date;
-    this.fillStyle='#fff';
-    this.fontColor='#888';
-    this.evts=[];
-    this.marked=false;
-
-    var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
-    this.label=[year,month,day];
-
-
-    this.draw=function(ctx){
-        ctx.save();
-        ctx.beginPath();
-        ctx.fillStyle=this.fillStyle;
-        ctx.rect(this.x,this.y,this.w,this.h);
-        ctx.closePath();
-        ctx.stroke();
-        if(this.marked) ctx.fill();
-        Drawable.prototype.draw.call(this,ctx);
-        ctx.restore();
-    }
-    this.events=function(){
-      if(arguments.length==0){
-        return this.evts;
-      }else{
-        this.evts=this.evts.concat(Array.prototype.slice.call(arguments));
-        this.label.push(this.evts.join());
-        this.fillStyle='#888';
-        this.fontColor='#fff';
-        this.marked=true;
-        return this;
-      }
-    }
-    this.onClick=function(x,y){
-      var x=this.fillStyle;
-      this.fillStyle=this.fontColor;
-      this.fontColor=x;
-      this.marked=!this.marked;
-    }
-}
-
-Day.prototype = Object.create(Drawable.prototype);
-Day.prototype.constructor = Day;
-
 function Application(menu,display,sett){
   Canvas.call(this,display);
 
   this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
-  sett=sett==undefined?{}:sett;
+  sett=sett.filter(function(nm,val){return nm.indexOf('dt.')!=-1;}).map(function(nm,val){
+    var srch='dt.', n=nm.indexOf(srch);
+    n=n!=-1?n+srch.length:0;
+    return {name:nm.substring(n),val:val};
+  });
   this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extend(sett);
   this._data=[];
   this._box=[];
+  this.fn=[];
 
   this.data=function(){
     if(arguments.length==0){
@@ -168,9 +126,16 @@ function Application(menu,display,sett){
       this.draw();
     }
   }
-  this.list=new List(menu,{ filter:{input:'#filter',output:this.processData.bind(this)}});
+  this.list=new List(menu);
   this.dataFetcher.getData(this.processData.bind(this));
   
+  this.fn['filter']=function(txt){
+    var data=this._data.filter(function(item){
+        return DataFetcher.hasValue(item,txt)!=undefined;
+    });
+    this.processData(data);
+    this.list.draw(data,this._settings.dataKeyset);
+  }
   this.getRLE=function(){
     if(this._box.length<1) return "";
 
@@ -208,12 +173,67 @@ function Application(menu,display,sett){
     if(undefined==val){
       return this._settings[key];
     }else{
-      this._settings[key]=val;
-      this.redraw();
+      var re = /([a-z0-9]+)/gi, match = key.match(re);
+      if(match && match.length>1){
+        if(match[0]=='dt'){
+          this._settings[match[1]]=val;
+          this.redraw();
+        }else if (match[0]=='fn' && this.fn[match[1]]){
+          this.fn[match[1]].call(this,val);
+        }
+      }    
     }
   };
 
 }
+
+function Day(date){
+    Drawable.call(this);
+
+    this.date=date;
+    this.fillStyle='#fff';
+    this.fontColor='#888';
+    this.evts=[];
+    this.marked=false;
+
+    var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
+    this.label=[year,month,day];
+
+
+    this.draw=function(ctx){
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle=this.fillStyle;
+        ctx.rect(this.x,this.y,this.w,this.h);
+        ctx.closePath();
+        ctx.stroke();
+        if(this.marked) ctx.fill();
+        Drawable.prototype.draw.call(this,ctx);
+        ctx.restore();
+    }
+    this.events=function(){
+      if(arguments.length==0){
+        return this.evts;
+      }else{
+        this.evts=this.evts.concat(Array.prototype.slice.call(arguments));
+        this.label.push(this.evts.join());
+        this.fillStyle='#888';
+        this.fontColor='#fff';
+        this.marked=true;
+        return this;
+      }
+    }
+    this.onClick=function(x,y){
+      var x=this.fillStyle;
+      this.fillStyle=this.fontColor;
+      this.fontColor=x;
+      this.marked=!this.marked;
+    }
+}
+
+Day.prototype = Object.create(Drawable.prototype);
+Day.prototype.constructor = Day;
+
 
 Object.defineProperty(Object.prototype, 'extend', {
   value:function(){
@@ -223,5 +243,29 @@ Object.defineProperty(Object.prototype, 'extend', {
               if(arguments[i].hasOwnProperty(key))
                   target[key] = arguments[i][key];
       return target;
+  }
+});
+Object.defineProperty(Object.prototype, 'forEach', {
+  value:function(callBack){
+    for(var name in this){callBack(name,this[name]);}
+  }
+});
+Object.defineProperty(Object.prototype, 'map', {
+  value:function(predicateFunction){
+    var results ={};
+    this.forEach(function(name,val) {
+      var resp=predicateFunction(name,val);
+      if(resp && resp.name && resp.val) results[resp.name]=resp.val;
+      });
+      return results;
+  }
+});
+Object.defineProperty(Object.prototype, 'filter', {
+  value:function(predicateFunction){
+    var results ={};
+    this.forEach(function(name,val) {
+      if(predicateFunction(name,val)) results[name]=val;
+      });
+      return results;
   }
 });

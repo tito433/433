@@ -4,35 +4,15 @@ var List=function(domElem,opt) {
      }
     if(undefined === domElem){	throw "Undefined domElem!!!! Nothing for display!!!"; }
     
-    var options={
-        childTemplate:domElem.innerHTML,
-        filter:false
-    };
+    var options={ childTemplate:domElem.innerHTML };
     
     domElem.innerHTML='';
     this.opt=options.extend(opt==undefined?{}:opt);
     this.elem=domElem;
 
-    this._isInit=false;
     this.data=false;
 
-    this.init=function(){
-    	if(this._isInit) return false;
-
-        if(this.opt['filter']){
-            var elem=document.querySelector(this.opt.filter.input);
-            if(elem){
-                elem.placeholder = "Search";
-                elem.addEventListener("keyup", this.filter.bind(this), true);
-            }else{
-                console.log('input filter not found! Search will not work');
-            }
-        }
-    	this._isInit=true;
-
-    }
     this.draw=function(data,keyset){
-    	this.init();
         this.data=data;
         var output="";
     	keyset=keyset||[];
@@ -48,19 +28,6 @@ var List=function(domElem,opt) {
             }
         }
         this.elem.innerHTML=output;
-    }
-    this.filter=function(event){
-        if(event.code=='Enter'){
-            var txt=event.target.value;
-            if(txt.trim()!=''){
-                var data=this.data.filter(function(item){
-                    return DataFetcher.hasValue(item,txt)!=undefined;
-                });
-                if(this.opt.filter.output){
-                    this.opt.filter.output(data);
-                }
-            }
-        }
     }
     this.getChildTemplate=function(food){
     	var re =/\{(.+?(?=\}))\}/g;

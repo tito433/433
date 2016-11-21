@@ -3,6 +3,7 @@
 <head>
   <title>Data graber from google calendar</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/store/store.min.js"></script>
   <script src="js/html5.canvas/lib/canvas.js"></script>
   <script src="js/brain-0.6.0.js"></script>
   <script src="js/data.js"></script>
@@ -16,31 +17,37 @@
           <fieldset>
           <legend>Data:</legend>
           <textarea id="input"></textarea>
+          <buttongroup>
+            <button id="reset">Reset</button>
+            <button id="export">Exp. RLE</button>
+            <button id="analyze">Analyze</button>
+          </buttongroup>
         </fieldset>
          <fieldset>
             <legend>Control:</legend>
-            <input type="text" placeholder="Search" id="filter"/>
             <ul id="settings">
               <li>
                 <p>Size</p>
                 <div class="input-group">
-                  <input type="number" name="size" class="form-control" value="36" />
+                  <input type="number" name="dt.size" class="form-control" value="36" />
                   <span class="input-group-addon">px</span>
                 </div>
               </li>
               <li>
                 <p>Font size</p>
                 <div class="input-group">
-                  <input type="number" name="font" class="form-control" value="10" />
+                  <input type="number" name="dt.font" class="form-control" value="10" />
                   <span class="input-group-addon">px</span>
                 </div>
               </li>
+              <li>
+                <p>Data Filter?</p>
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Filter" name="fn.filter"/>
+                </div>
+              </li>
             </ul>
-            <buttongroup>
-              <button id="reset">Reset</button>
-              <button id="export">Exp. RLE</button>
-              <button id="analyze">Analyze</button>
-            </buttongroup>
+            <!-- I'm lost -->
           </fieldset>
           <fieldset>
             <legend>Info:</legend>
@@ -69,26 +76,24 @@
           document.body.removeChild(txt);
         }
 
-        var settings_vars={};
-
-        document.querySelectorAll('#settings input').forEach(function(input){
-          var name=input.name,val=input.value;
-          settings_vars[name]=val;
-          
-          input.onchange=function(ev){
-            var el=ev.target,name=el.name,val=el.value;
-            if(el.type=='checkbox'){
-              val=el.checked;
-            }
-            app.setting(name,val);
-          }
-        });
         document.getElementById('analyze').onclick=function(e){
           infoPanel.innerHTML='Analyzing started...<br/>';
           infoPanel.innerHTML+=app.analyze(function(resp){
             infoPanel.innerHTML+=resp;
           });
         }
+
+        var settings_vars={};
+
+        document.querySelectorAll('#settings input').forEach(function(input){
+          var name=input.name,val=input.value;
+          settings_vars[name]=val;
+          input.onchange=function(ev){
+            var el=ev.target,name=el.name,val=el.value;
+            if(el.type=='checkbox') val=el.checked;
+            app.setting(name,val);
+          };
+        });
         app=new Application(infoPanel, document.getElementById('output'),settings_vars);
       }
     </script>

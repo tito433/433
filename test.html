@@ -8,19 +8,19 @@
 	<tr><td><h1>Heading 1</h1></td></tr>
 </table>
 <script type="text/javascript">
-var myTable=document.getElementById('output');
+// var myTable=document.getElementById('output');
 
-myTable.apendText=function(html){ 
-	var tbody=this.children[0];
+// myTable.apendText=function(html){ 
+// 	var tbody=this.children[0];
 
-	var row = document.createElement("tr");
-    var cell = document.createElement("td");
-    cell.innerHTML=html;
-    row.appendChild(cell);
-    tbody.appendChild(row);
-};
+// 	var row = document.createElement("tr");
+//     var cell = document.createElement("td");
+//     cell.innerHTML=html;
+//     row.appendChild(cell);
+//     tbody.appendChild(row);
+// };
 
-myTable.apendText("Let's start, shall we?");
+// myTable.apendText("Let's start, shall we?");
 
 // Object.prototype.each = function(f) {
 //   for(var prop in this) {
@@ -47,24 +47,69 @@ myTable.apendText("Let's start, shall we?");
 // 	console.log(itm);
 // });
 //supporting browsers only (not IE version 8 and earlier)
-Object.defineProperty(Object.prototype, 'extend', {
-	value:function(){
-		var target=this;
-		 for(var i=0; i<arguments.length; i++)
-	        for(var key in arguments[i])
-	            if(arguments[i].hasOwnProperty(key))
-	                target[key] = arguments[i][key];
-	    return target;
-	}
-});
+// Object.defineProperty(Object.prototype, 'extend', {
+// 	value:function(){
+// 		var target=this;
+// 		 for(var i=0; i<arguments.length; i++)
+// 	        for(var key in arguments[i])
+// 	            if(arguments[i].hasOwnProperty(key))
+// 	                target[key] = arguments[i][key];
+// 	    return target;
+// 	}
+// });
  
-var results = ['Mary','23:16', 'Ana','21:19', 'Evelyn','22:47'];
-for(var i in results){
-	console.log(i,results[i]);
+// var results = ['Mary','23:16', 'Ana','21:19', 'Evelyn','22:47'];
+// for(var i in results){
+// 	console.log(i,results[i]);
 
-}
+// }
 
-console.log(results.extend(['Mary','433']));
+// console.log(results.extend(['Mary','433']));
+Object.defineProperty(Object.prototype, 'forEach', {
+  value:function(callBack){
+    for(var name in this){callBack(name,this[name]);}
+  }
+});
+Object.defineProperty(Object.prototype, 'map', {
+  value:function(predicateFunction){
+  		var results ={};
+		this.forEach(function(name,val) {
+			var resp=predicateFunction(name,val);
+			if(resp && resp.name && resp.val)	results[resp.name]=resp.val;
+	    });
+	    return results;
+  }
+});
+Object.defineProperty(Object.prototype, 'filter', {
+  value:function(predicateFunction){
+  		var results ={};
+		this.forEach(function(name,val) {
+			if(predicateFunction(name,val)) results[name]=val;
+	    });
+	    return results;
+  }
+});
+
+var sett={'dt.size.test':34,'dt.font':12,'fn.filter':'','tito':false};
+// var dts={};
+// console.log(sett,typeof sett);
+// for(var name in sett){
+// 	if(this.indexOf('dt.')!=-1){
+// 		dts[name]=sett[name];
+// 	}
+// }
+var dts=sett.filter(function(nm,val){
+    return nm.indexOf('dt.')!=-1;
+});
+
+
+sett.forEach(function(nm,vl){
+	var re = /([a-z0-9]+)/gi;
+	var found = nm.match(re);
+
+	console.log(nm,found);
+
+})
 
 </script>
 </body>
