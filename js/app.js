@@ -53,7 +53,7 @@ function Application(menu,display,sett){
   this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
   sett=sett==undefined?{}:sett;
-  this._settings=extendEx({size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]},sett);
+  this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extend(sett);
   this._data=[];
   this._box=[];
 
@@ -215,10 +215,13 @@ function Application(menu,display,sett){
 
 }
 
-function extendEx(){
-    for(var i=1; i<arguments.length; i++)
-        for(var key in arguments[i])
-            if(arguments[i].hasOwnProperty(key))
-                arguments[0][key] = arguments[i][key];
-    return arguments[0];
-}
+Object.defineProperty(Object.prototype, 'extend', {
+  value:function(){
+    var target=this;
+     for(var i=0; i<arguments.length; i++)
+          for(var key in arguments[i])
+              if(arguments[i].hasOwnProperty(key))
+                  target[key] = arguments[i][key];
+      return target;
+  }
+});
