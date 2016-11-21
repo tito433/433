@@ -7,13 +7,16 @@
   <script src="js/html5.canvas/lib/canvas.js"></script>
   <script src="js/brain-0.6.0.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/list.js"></script>
   <script src="js/app.js"></script>
 </head>
 <body>
     <div class="container">
       <div id="menu">
         <div class="list">
+          <fieldset>
+            <legend>Info:</legend>
+            <div class="info"></div>
+          </fieldset>
           <fieldset>
           <legend>Data:</legend>
           <textarea id="input"></textarea>
@@ -41,7 +44,7 @@
                 </div>
               </li>
               <li>
-                <p>Data Filter?</p>
+                <p>Data Filter</p>
                 <div class="input-group">
                   <input type="text" class="form-control" placeholder="Filter" name="fn.filter"/>
                 </div>
@@ -49,19 +52,13 @@
             </ul>
             <!-- I'm lost -->
           </fieldset>
-          <fieldset>
-            <legend>Info:</legend>
-            <div class="result">
-              <div><h3 class="summary">{summary}</h3><p class="dateTime">{start.dateTime}</p></div>
-            </div>
-          </fieldset>
         </div>
       </div>
       <div id="output"></div>
     </div>
     <script type="text/javascript">
       window.onload =function(){
-        var infoPanel=document.querySelector('#menu .list .result');
+        var infoPanel=document.querySelector('#menu .list .info');
         var app={};
         
         document.getElementById('reset').onclick=function(e){ app.reset(); }
@@ -77,10 +74,10 @@
         }
 
         document.getElementById('analyze').onclick=function(e){
-          infoPanel.innerHTML='Analyzing started...<br/>';
-          infoPanel.innerHTML+=app.analyze(function(resp){
-            infoPanel.innerHTML+=resp;
-          });
+          // infoPanel.innerHTML='Analyzing started...<br/>';
+          // infoPanel.innerHTML+=app.analyze(function(resp){
+          //   infoPanel.innerHTML+=resp;
+          // });
         }
 
         var settings_vars={};

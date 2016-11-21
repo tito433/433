@@ -33,13 +33,6 @@ function Application(menu,display,sett){
     }
   }
 
-  this.processData=function(data){
-    if (data.length > 0) {
-        this.list.draw(data,this._settings.dataKeyset);
-        this.data(data);
-        
-      }
-  };
   this.analyze=function(callback){
     if(this._data.length==0){
       return 'Not engough data.';
@@ -126,15 +119,13 @@ function Application(menu,display,sett){
       this.draw();
     }
   }
-  this.list=new List(menu);
-  this.dataFetcher.getData(this.processData.bind(this));
+  this.dataFetcher.getData(this.data.bind(this));
   
   this.fn['filter']=function(txt){
     var data=this._data.filter(function(item){
         return DataFetcher.hasValue(item,txt)!=undefined;
     });
-    this.processData(data);
-    this.list.draw(data,this._settings.dataKeyset);
+    this.data(data);
   }
   this.getRLE=function(){
     if(this._box.length<1) return "";
@@ -165,9 +156,8 @@ function Application(menu,display,sett){
   };
   this.reset=function(){
     this.clear();
-    this.list.reset();
     this.dataFetcher.clear();
-    this.dataFetcher.getData(this.processData.bind(this));
+    this.dataFetcher.getData(this.data.bind(this));
   };
   this.setting=function(key,val){
     if(undefined==val){
