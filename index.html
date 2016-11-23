@@ -21,9 +21,9 @@
           <legend>Data:</legend>
           <textarea id="input"></textarea>
           <buttongroup>
-            <button id="reset">Reset</button>
-            <button id="export">Exp. RLE</button>
-            <button id="analyze">Analyze</button>
+            <button name="fn.reset">Reset</button>
+            <button name="fn.export">Exp. RLE</button>
+            <button name="fn.analyze">Analyze</button>
           </buttongroup>
         </fieldset>
          <fieldset>
@@ -61,6 +61,14 @@
         var infoPanel=document.querySelector('#menu .list .info');
         var app={};
         
+        document.querySelectorAll('button').forEach(function(input){
+          var name=input.name,val=input.value;
+          input.onclick=function(ev){
+            var el=ev.target,name=el.name,val=el.value;
+            infoPanel.innerHTML=app.setting(name,val);
+          };
+        });
+
         document.getElementById('reset').onclick=function(e){ app.reset(); }
         document.getElementById('export').onclick=function(e){
           var txt=document.createElement('textarea');

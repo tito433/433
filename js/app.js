@@ -16,22 +16,24 @@ function Application(menu,display,sett){
   this.fn=[];
 
   this.data=function(){
-    if(arguments.length==0){
-      return this.getRLE();
+    if(arguments.length==1){
+      var data=arguments[0];
+      if(data && data.length){
+        data=data.sort(function(a,b){
+          var keyA = new Date(a.start.dateTime),keyB = new Date(b.start.dateTime);
+          if(keyA < keyB) return -1;
+          if(keyA > keyB) return 1;
+          return 0;
+        });
+        this._data=data;
+        this.redraw();
+        return this;
+      }
     }else{
-        var data=arguments[0];
-        if(data && data.length){
-          data=data.sort(function(a,b){
-            var keyA = new Date(a.start.dateTime),keyB = new Date(b.start.dateTime);
-            if(keyA < keyB) return -1;
-            if(keyA > keyB) return 1;
-            return 0;
-          });
-          this._data=data;
-          this.redraw();
-        }
+      return this._data;
     }
   }
+  
 
   this.analyze=function(callback){
     if(this._data.length==0){
@@ -119,15 +121,15 @@ function Application(menu,display,sett){
       this.draw();
     }
   }
-  this.dataFetcher.getData(this.data.bind(this));
   
-  this.fn['filter']=function(txt){
+  
+  this.fn.filter=function(txt){
     var data=this._data.filter(function(item){
         return DataFetcher.hasValue(item,txt)!=undefined;
     });
     this.data(data);
   }
-  this.getRLE=function(){
+  this.fn.getRLE=function(){
     if(this._box.length<1) return "";
 
       var ev=this._box[0],y=ev.y,prev=ev.marked?'o':'b',run=1,yc=1,xc=1,result='';
@@ -152,9 +154,18 @@ function Application(menu,display,sett){
           prev=typ;
       }
 
-      return 'x = '+xc+', y = '+yc+', rule = B3/S23'+"\n"+result+'!';
+      var response='x = '+xc+', y = '+yc+', rule = B3/S23'+"\n"+result+'!';
+      var txt=document.createElement('textarea');
+      txt.innerHTML=app.getRLE();
+      document.body.appendChild(txt);
+      txt.focus();
+      txt.setSelectionRange(0, txt.value.length);
+      document.execCommand("copy");
+      infoPanel.innerHTML='RLE data copied to clipboard.<br/>Hint: Use Ctrl+v to get';
+      document.body.removeChild(txt);
+
   };
-  this.reset=function(){
+  this.fn.reset=function(){
     this.clear();
     this.dataFetcher.clear();
     this.dataFetcher.getData(this.data.bind(this));
@@ -169,12 +180,13 @@ function Application(menu,display,sett){
           this._settings[match[1]]=val;
           this.redraw();
         }else if (match[0]=='fn' && this.fn[match[1]]){
-          this.fn[match[1]].call(this,val);
+          return this.fn[match[1]].call(this,val);
         }
       }    
     }
   };
-
+  
+  this.dataFetcher.getData(this.data.bind(this));
 }
 
 function Day(date){

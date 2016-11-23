@@ -60,24 +60,24 @@ var DataFetcher=function() {
 	    });
 	};
 	this.getData=function(callBack){
-	    if (typeof(Storage) !== "undefined") {
-	        var data=localStorage.getItem("events");
+	    if (store.enabled) {
+	        var data=store.get("evt.cal.raw");
 	        if(data){
 	        	if(undefined!=callBack)
-	        	return  callBack(JSON.parse(data));
+	        	return  callBack(data);
 	        }
 	    }
 	    this.addGoogleAPI(callBack);
 	    return false;
 	}
 	this.clear=function(){
-		if (typeof(Storage) !== "undefined") {
-	        localStorage.clear();
+		if (store.enabled) {
+	        store.clear()
 	    }
 	}
 	this.setData=function(data){
-	 	if (typeof(Storage) !== "undefined") {
-	        localStorage.setItem("events", JSON.stringify(data));
+	 	if (store.enabled) {
+	        store.set("evt.cal.raw", data);
 	    }
 	 }
 }
