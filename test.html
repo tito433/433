@@ -65,52 +65,54 @@
 // }
 
 // console.log(results.extend(['Mary','433']));
-Object.defineProperty(Object.prototype, 'forEach', {
-  value:function(callBack){
-    for(var name in this){callBack(name,this[name]);}
-  }
-});
-Object.defineProperty(Object.prototype, 'map', {
-  value:function(predicateFunction){
-  		var results ={};
-		this.forEach(function(name,val) {
-			var resp=predicateFunction(name,val);
-			if(resp && resp.name && resp.val)	results[resp.name]=resp.val;
-	    });
-	    return results;
-  }
-});
-Object.defineProperty(Object.prototype, 'filter', {
-  value:function(predicateFunction){
-  		var results ={};
-		this.forEach(function(name,val) {
-			if(predicateFunction(name,val)) results[name]=val;
-	    });
-	    return results;
-  }
-});
+// Object.defineProperty(Object.prototype, 'forEach', {
+//   value:function(callBack){
+//     for(var name in this){callBack(name,this[name]);}
+//   }
+// });
+// Object.defineProperty(Object.prototype, 'map', {
+//   value:function(predicateFunction){
+//   		var results ={};
+// 		this.forEach(function(name,val) {
+// 			var resp=predicateFunction(name,val);
+// 			if(resp && resp.name && resp.val)	results[resp.name]=resp.val;
+// 	    });
+// 	    return results;
+//   }
+// });
+// Object.defineProperty(Object.prototype, 'filter', {
+//   value:function(predicateFunction){
+//   		var results ={};
+// 		this.forEach(function(name,val) {
+// 			if(predicateFunction(name,val)) results[name]=val;
+// 	    });
+// 	    return results;
+//   }
+// });
 
-var sett={'dt.size.test':34,'dt.font':12,'fn.filter':'','tito':false};
-// var dts={};
-// console.log(sett,typeof sett);
-// for(var name in sett){
-// 	if(this.indexOf('dt.')!=-1){
-// 		dts[name]=sett[name];
-// 	}
-// }
-var dts=sett.filter(function(nm,val){
-    return nm.indexOf('dt.')!=-1;
-});
+// var sett={'dt.size.test':34,'dt.font':12,'fn.filter':'','tito':false};
+// // var dts={};
+// // console.log(sett,typeof sett);
+// // for(var name in sett){
+// // 	if(this.indexOf('dt.')!=-1){
+// // 		dts[name]=sett[name];
+// // 	}
+// // }
+// var dts=sett.filter(function(nm,val){
+//     return nm.indexOf('dt.')!=-1;
+// });
 
 
-sett.forEach(function(nm,vl){
-	var re = /([a-z0-9]+)/gi;
-	var found = nm.match(re);
+// sett.forEach(function(nm,vl){
+// 	var re = /([a-z0-9]+)/gi;
+// 	var found = nm.match(re);
 
-	console.log(nm,found);
+// 	console.log(nm,found);
 
-})
-
+// })
+	var obj={};
+	obj['class.name']='input-group';
+	console.log(obj,obj['class.name']);
 </script>
 </body>
 </html>

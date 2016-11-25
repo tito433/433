@@ -1,10 +1,12 @@
 "use strict";
 
-function Application(menu,display,sett){
-  Canvas.call(this,display);
+function Application(input,output,sett){
+  Canvas.call(this,output);
 
+  this._plugins=[];
   this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
+  sett=sett||{};
   sett=sett.filter(function(nm,val){return nm.indexOf('dt.')!=-1;}).map(function(nm,val){
     var srch='dt.', n=nm.indexOf(srch);
     n=n!=-1?n+srch.length:0;
@@ -14,6 +16,13 @@ function Application(menu,display,sett){
   this._data=[];
   this._box=[];
   this.fn=[];
+
+  this.addPlugin=function(pl){
+    if(pl instanceof Plugin){
+      this._plugins.push(pl);
+      pl.input.call(this,input);
+    }
+  }
 
   this.data=function(){
     if(arguments.length==1){
@@ -189,53 +198,39 @@ function Application(menu,display,sett){
   this.dataFetcher.getData(this.data.bind(this));
 }
 
-function Day(date){
-    Drawable.call(this);
-
-    this.date=date;
-    this.fillStyle='#fff';
-    this.fontColor='#888';
-    this.evts=[];
-    this.marked=false;
-
-    var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
-    this.label=[year,month,day];
-
-
-    this.draw=function(ctx){
-        ctx.save();
-        ctx.beginPath();
-        ctx.fillStyle=this.fillStyle;
-        ctx.rect(this.x,this.y,this.w,this.h);
-        ctx.closePath();
-        ctx.stroke();
-        if(this.marked) ctx.fill();
-        Drawable.prototype.draw.call(this,ctx);
-        ctx.restore();
-    }
-    this.events=function(){
-      if(arguments.length==0){
-        return this.evts;
-      }else{
-        this.evts=this.evts.concat(Array.prototype.slice.call(arguments));
-        this.label.push(this.evts.join());
-        this.fillStyle='#888';
-        this.fontColor='#fff';
-        this.marked=true;
-        return this;
-      }
-    }
-    this.onClick=function(x,y){
-      var x=this.fillStyle;
-      this.fillStyle=this.fontColor;
-      this.fontColor=x;
-      this.marked=!this.marked;
-    }
+function Plugin(){
+  this.input=function(){};
+  this.output=function(){};
 }
+Plugin.prototype.addSettingsItem = function(settingsPanel,title,opt){
+  var option={callBack:false,'igdiv':'input-group',
+              'input.type':'input','input.value':'','input.class':'form-control','input.addon':false}.extend(opt),
+      li=document.createElement('li'),
+      para = document.createElement("P"),
+      t = document.createTextNode(title),
+      igdiv=document.createElement("DIV"),
+      input=document.createElement("INPUT");
 
-Day.prototype = Object.create(Drawable.prototype);
-Day.prototype.constructor = Day;
 
+  input.className =option['input.class'];
+  input.type=option['input.type'];
+  input.value=option['input.value'];;
+  if(option.callBack) input.onchange=callBack;
+
+  para.appendChild(t);
+  li.appendChild(para);
+  settingsPanel.appendChild(li);
+  igdiv.className=option.igdiv;
+  li.appendChild(igdiv);
+  igdiv.appendChild(input);
+  if(option['input.addon']){
+    var span=document.createElement('span');
+    span.className='input-group-addon';
+    span.innerHTML=option['input.addon'];
+    igdiv.appendChild(span);
+  }
+  return input;
+};
 
 Object.defineProperty(Object.prototype, 'extend', {
   value:function(){

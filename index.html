@@ -5,13 +5,14 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/store/store.min.js"></script>
   <script src="js/html5.canvas/lib/canvas.js"></script>
-  <script src="js/brain-0.6.0.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/cal.js"></script>
+ 
 </head>
 <body>
     <div class="container">
-      <div id="menu">
+      <div id="input">
         <div class="list">
           <fieldset>
             <legend>Info:</legend>
@@ -28,28 +29,7 @@
         </fieldset>
          <fieldset>
             <legend>Control:</legend>
-            <ul id="settings">
-              <li>
-                <p>Size</p>
-                <div class="input-group">
-                  <input type="number" name="dt.size" class="form-control" value="36" />
-                  <span class="input-group-addon">px</span>
-                </div>
-              </li>
-              <li>
-                <p>Font size</p>
-                <div class="input-group">
-                  <input type="number" name="dt.font" class="form-control" value="10" />
-                  <span class="input-group-addon">px</span>
-                </div>
-              </li>
-              <li>
-                <p>Data Filter</p>
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Filter" name="fn.filter"/>
-                </div>
-              </li>
-            </ul>
+            <ul class="settings"></ul>
             <!-- I'm lost -->
           </fieldset>
         </div>
@@ -59,47 +39,49 @@
     <script type="text/javascript">
       window.onload =function(){
         var infoPanel=document.querySelector('#menu .list .info');
-        var app={};
         
-        document.querySelectorAll('button').forEach(function(input){
-          var name=input.name,val=input.value;
-          input.onclick=function(ev){
-            var el=ev.target,name=el.name,val=el.value;
-            infoPanel.innerHTML=app.setting(name,val);
-          };
-        });
+        // document.querySelectorAll('button').forEach(function(input){
+        //   var name=input.name,val=input.value;
+        //   input.onclick=function(ev){
+        //     var el=ev.target,name=el.name,val=el.value;
+        //     infoPanel.innerHTML=app.setting(name,val);
+        //   };
+        // });
 
-        document.getElementById('reset').onclick=function(e){ app.reset(); }
-        document.getElementById('export').onclick=function(e){
-          var txt=document.createElement('textarea');
-          txt.innerHTML=app.getRLE();
-          document.body.appendChild(txt);
-          txt.focus();
-          txt.setSelectionRange(0, txt.value.length);
-          document.execCommand("copy");
-          infoPanel.innerHTML='RLE data copied to clipboard.<br/>Hint: Use Ctrl+v to get';
-          document.body.removeChild(txt);
-        }
+        // document.getElementById('reset').onclick=function(e){ app.reset(); }
+        // document.getElementById('export').onclick=function(e){
+        //   var txt=document.createElement('textarea');
+        //   txt.innerHTML=app.getRLE();
+        //   document.body.appendChild(txt);
+        //   txt.focus();
+        //   txt.setSelectionRange(0, txt.value.length);
+        //   document.execCommand("copy");
+        //   infoPanel.innerHTML='RLE data copied to clipboard.<br/>Hint: Use Ctrl+v to get';
+        //   document.body.removeChild(txt);
+        // }
 
-        document.getElementById('analyze').onclick=function(e){
-          // infoPanel.innerHTML='Analyzing started...<br/>';
-          // infoPanel.innerHTML+=app.analyze(function(resp){
-          //   infoPanel.innerHTML+=resp;
-          // });
-        }
+        // document.getElementById('analyze').onclick=function(e){
+        //   // infoPanel.innerHTML='Analyzing started...<br/>';
+        //   // infoPanel.innerHTML+=app.analyze(function(resp){
+        //   //   infoPanel.innerHTML+=resp;
+        //   // });
+        // }
 
-        var settings_vars={};
+        // var settings_vars={};
 
-        document.querySelectorAll('#settings input').forEach(function(input){
-          var name=input.name,val=input.value;
-          settings_vars[name]=val;
-          input.onchange=function(ev){
-            var el=ev.target,name=el.name,val=el.value;
-            if(el.type=='checkbox') val=el.checked;
-            app.setting(name,val);
-          };
-        });
-        app=new Application(infoPanel, document.getElementById('output'),settings_vars);
+        // document.querySelectorAll('#settings input').forEach(function(input){
+        //   var name=input.name,val=input.value;
+        //   settings_vars[name]=val;
+        //   input.onchange=function(ev){
+        //     var el=ev.target,name=el.name,val=el.value;
+        //     if(el.type=='checkbox') val=el.checked;
+        //     app.setting(name,val);
+        //   };
+        // });
+        var application=new Application(document.getElementById('input'), document.getElementById('output'));
+
+        application.addPlugin(new SequenceCal());
+
       }
     </script>
 </body>

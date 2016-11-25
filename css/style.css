@@ -26,7 +26,7 @@ fieldset{
   width: auto;
 }
 
-div#menu {
+div#input {
     width: 300px;
     margin: 0;
     padding: 10px 10px 0;
@@ -44,12 +44,12 @@ div#menu {
   padding: 3px 10px;
   margin-bottom:10px;
 }
-#menu .list {
+#input .list {
   height: 100%;
   overflow: hidden;
   max-height: 100%;
 }
-#menu .list .result{
+#input .list .result{
   overflow: auto;
   height: 100%;
   max-height: 100%;
