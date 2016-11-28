@@ -5,10 +5,8 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/store/store.min.js"></script>
   <script src="js/html5.canvas/lib/canvas.js"></script>
-  <script src="js/data.js"></script>
+  <script src="js/plugins/plugin.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/cal.js"></script>
- 
 </head>
 <body>
     <div class="container">
@@ -37,50 +35,24 @@
       <div id="output"></div>
     </div>
     <script type="text/javascript">
+      var dir_plugins='js/plugins/';
+      var plugins=['data','cal'];
+
       window.onload =function(){
-        var infoPanel=document.querySelector('#menu .list .info');
-        
-        // document.querySelectorAll('button').forEach(function(input){
-        //   var name=input.name,val=input.value;
-        //   input.onclick=function(ev){
-        //     var el=ev.target,name=el.name,val=el.value;
-        //     infoPanel.innerHTML=app.setting(name,val);
-        //   };
-        // });
+        var application=new Application(document.getElementById('input'), 
+                              document.getElementById('output'));
 
-        // document.getElementById('reset').onclick=function(e){ app.reset(); }
-        // document.getElementById('export').onclick=function(e){
-        //   var txt=document.createElement('textarea');
-        //   txt.innerHTML=app.getRLE();
-        //   document.body.appendChild(txt);
-        //   txt.focus();
-        //   txt.setSelectionRange(0, txt.value.length);
-        //   document.execCommand("copy");
-        //   infoPanel.innerHTML='RLE data copied to clipboard.<br/>Hint: Use Ctrl+v to get';
-        //   document.body.removeChild(txt);
-        // }
-
-        // document.getElementById('analyze').onclick=function(e){
-        //   // infoPanel.innerHTML='Analyzing started...<br/>';
-        //   // infoPanel.innerHTML+=app.analyze(function(resp){
-        //   //   infoPanel.innerHTML+=resp;
-        //   // });
-        // }
-
-        // var settings_vars={};
-
-        // document.querySelectorAll('#settings input').forEach(function(input){
-        //   var name=input.name,val=input.value;
-        //   settings_vars[name]=val;
-        //   input.onchange=function(ev){
-        //     var el=ev.target,name=el.name,val=el.value;
-        //     if(el.type=='checkbox') val=el.checked;
-        //     app.setting(name,val);
-        //   };
-        // });
-        var application=new Application(document.getElementById('input'), document.getElementById('output'));
-
-        application.addPlugin(new SequenceCal());
+        if(window.Plugin && plugins.length){
+          for(var i=0,ln=plugins.length;i<ln;i++){
+            var plugin_name=plugins[i];
+            Plugin.require(dir_plugins+plugin_name,function(e){
+              console.log('who am i?');
+              application.addPlugin(plugin_name);
+            });
+          }
+        }else{
+          console.log('window.load',window.Plugin,plugins.length);
+        }
 
       }
     </script>

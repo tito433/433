@@ -3,6 +3,7 @@
 function Application(input,output,sett){
   Canvas.call(this,output);
 
+  this.dom={'input':input,'output':output};
   this._plugins=[];
   this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
@@ -18,9 +19,13 @@ function Application(input,output,sett){
   this.fn=[];
 
   this.addPlugin=function(pl){
-    if(pl instanceof Plugin){
-      this._plugins.push(pl);
-      pl.input.call(this,input);
+    var PlClass=pl.capitalizeFirstLetter();
+    if(window[PlClass]){
+      var pln=new window[PlClass]();
+      if(pln instanceof Plugin){
+        this._plugins.push(pln);
+        pln.init.call(this,this.dom.input);
+      }
     }
   }
 
@@ -198,39 +203,7 @@ function Application(input,output,sett){
   this.dataFetcher.getData(this.data.bind(this));
 }
 
-function Plugin(){
-  this.input=function(){};
-  this.output=function(){};
-}
-Plugin.prototype.addSettingsItem = function(settingsPanel,title,opt){
-  var option={callBack:false,'igdiv':'input-group',
-              'input.type':'input','input.value':'','input.class':'form-control','input.addon':false}.extend(opt),
-      li=document.createElement('li'),
-      para = document.createElement("P"),
-      t = document.createTextNode(title),
-      igdiv=document.createElement("DIV"),
-      input=document.createElement("INPUT");
 
-
-  input.className =option['input.class'];
-  input.type=option['input.type'];
-  input.value=option['input.value'];;
-  if(option.callBack) input.onchange=callBack;
-
-  para.appendChild(t);
-  li.appendChild(para);
-  settingsPanel.appendChild(li);
-  igdiv.className=option.igdiv;
-  li.appendChild(igdiv);
-  igdiv.appendChild(input);
-  if(option['input.addon']){
-    var span=document.createElement('span');
-    span.className='input-group-addon';
-    span.innerHTML=option['input.addon'];
-    igdiv.appendChild(span);
-  }
-  return input;
-};
 
 Object.defineProperty(Object.prototype, 'extend', {
   value:function(){
@@ -266,3 +239,8 @@ Object.defineProperty(Object.prototype, 'filter', {
       return results;
   }
 });
+
+//http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
