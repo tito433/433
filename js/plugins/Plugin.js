@@ -11,7 +11,7 @@ Plugin.addView=function(domConUl,opt){
   
   domConUl.appendChild(lbl);
   input.value=option['text'];
-  input.type='checkbox';
+  input.type='radio';
   lbl.className=option['labelClass'];
   lbl.appendChild(input);
   lbl.appendChild(t);
