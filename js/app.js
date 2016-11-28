@@ -5,7 +5,7 @@ function Application(input,output,sett){
 
   this.dom={'input':input,'output':output};
   this._plugins=[];
-  this.dataFetcher=new DataFetcher();
+  // this.dataFetcher=new DataFetcher();
   this.layout=new Layout(this.width,this.height);
   sett=sett||{};
   sett=sett.filter(function(nm,val){return nm.indexOf('dt.')!=-1;}).map(function(nm,val){
@@ -15,16 +15,14 @@ function Application(input,output,sett){
   });
   this._settings={size:50,font:16,dataKeyset:[ 'summary', 'start.dateTime' ]}.extend(sett);
   this._data=[];
-  this._box=[];
   this.fn=[];
 
   this.addPlugin=function(pl){
     var PlClass=pl.capitalizeFirstLetter();
-    if(window[PlClass]){
-      var pln=new window[PlClass]();
+    if(typeof window[PlClass] === "function"){
+      var pln=window[PlClass].call(this);
       if(pln instanceof Plugin){
         this._plugins.push(pln);
-        pln.init.call(this,this.dom.input);
       }
     }
   }
@@ -137,12 +135,12 @@ function Application(input,output,sett){
   }
   
   
-  this.fn.filter=function(txt){
-    var data=this._data.filter(function(item){
-        return DataFetcher.hasValue(item,txt)!=undefined;
-    });
-    this.data(data);
-  }
+  // this.fn.filter=function(txt){
+  //   var data=this._data.filter(function(item){
+  //       return DataFetcher.hasValue(item,txt)!=undefined;
+  //   });
+  //   this.data(data);
+  // }
   this.fn.getRLE=function(){
     if(this._box.length<1) return "";
 
@@ -179,11 +177,11 @@ function Application(input,output,sett){
       document.body.removeChild(txt);
 
   };
-  this.fn.reset=function(){
-    this.clear();
-    this.dataFetcher.clear();
-    this.dataFetcher.getData(this.data.bind(this));
-  };
+  // this.fn.reset=function(){
+  //   this.clear();
+  //   this.dataFetcher.clear();
+  //   this.dataFetcher.getData(this.data.bind(this));
+  // };
   this.setting=function(key,val){
     if(undefined==val){
       return this._settings[key];
@@ -192,7 +190,6 @@ function Application(input,output,sett){
       if(match && match.length>1){
         if(match[0]=='dt'){
           this._settings[match[1]]=val;
-          this.redraw();
         }else if (match[0]=='fn' && this.fn[match[1]]){
           return this.fn[match[1]].call(this,val);
         }
@@ -200,7 +197,7 @@ function Application(input,output,sett){
     }
   };
   
-  this.dataFetcher.getData(this.data.bind(this));
+  // this.dataFetcher.getData(this.data.bind(this));
 }
 
 

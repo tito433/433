@@ -1,6 +1,14 @@
-var DataFetcher=function() {
+function Data() {
+	Plugin.apply(this,arguments);
 
-	this._DataCallabk=false;
+	var ulControl=this.dom.input.querySelector('.control'),
+		btnDataLoad=Plugin.addControl(ulControl,{'input.value':'Load data'});
+		
+        
+    btnDataLoad.onclick=function(ev){
+        this.data(this.getData(this.data.bind(this)));
+    }.bind(this);
+
 
 	this.addGoogleAPI=function(callBack){
 		this._DataCallabk=callBack;
@@ -60,15 +68,17 @@ var DataFetcher=function() {
 	    });
 	};
 	this.getData=function(callBack){
-	    if (store.enabled) {
-	        var data=store.get("evt.cal.raw");
+	    if (typeof(Storage) !== "undefined") {
+	        var data=localStorage.getItem("evt.cal.raw");
 	        if(data){
-	        	if(undefined!=callBack)
-	        	return  callBack(data);
+	        	return data;
 	        }
+	    }else{
+	    	alert('Local storage is not supported by your browser. Please disable "Private Mode", or upgrade to a modern browser.')
+            return
 	    }
 	    this.addGoogleAPI(callBack);
-	    return false;
+	    return [];
 	}
 	this.clear=function(){
 		if (store.enabled) {
@@ -76,45 +86,55 @@ var DataFetcher=function() {
 	    }
 	}
 	this.setData=function(data){
-	 	if (store.enabled) {
-	        store.set("evt.cal.raw", data);
+	 	if (typeof(Storage) !== "undefined") {
+	        localStorage.setItem("evt.cal.raw", data);
+	    }else{
+	    	alert('Local storage is not supported by your browser. Please disable "Private Mode", or upgrade to a modern browser.')
+            return;
 	    }
-	 }
-}
-DataFetcher.getValue=function(data,key){
-	var args = key.split('.');
-	for (var i = 0; i < args.length; i++) {
-	    if (!data || !data.hasOwnProperty(args[i])) {
-	      return data[args[i]];
+	}
+	this.getValue=function(data,key){
+		var args = key.split('.');
+		for (var i = 0; i < args.length; i++) {
+		    if (!data || !data.hasOwnProperty(args[i])) {
+		      return data[args[i]];
+		    }
+		    data = data[args[i]];
+		  }
+
+		  return data;
+	}
+	this.hasValue=function(data,findValue,index){
+	    switch(typeof data) {
+	        case "object":
+	        case "array":
+	            for (var item in data) {
+	                var r=DataFetcher.hasValue(data[item],findValue,item);
+	                if(r!=undefined)  return r;
+	            }
+	            break;
+	        default:
+	        	var args=findValue.split(':'),key=false,value=args[0];
+
+				if(args.length>1){
+					key=args[0];
+					value=args[1];
+				}
+				
+
+				var regx=new RegExp(value,"i"),match = regx.exec(''+data);
+
+				if(key!=false && key==index && match)
+					return data;
+	        	if(!key && match)  
+	        		return data;
 	    }
-	    data = data[args[i]];
-	  }
+	}
 
-	  return data;
+
 }
-DataFetcher.hasValue=function(data,findValue,index){
-    switch(typeof data) {
-        case "object":
-        case "array":
-            for (var item in data) {
-                var r=DataFetcher.hasValue(data[item],findValue,item);
-                if(r!=undefined)  return r;
-            }
-            break;
-        default:
-        	var args=findValue.split(':'),key=false,value=args[0];
 
-			if(args.length>1){
-				key=args[0];
-				value=args[1];
-			}
-			
 
-			var regx=new RegExp(value,"i"),match = regx.exec(''+data);
 
-			if(key!=false && key==index && match)
-				return data;
-        	if(!key && match)  
-        		return data;
-    }
-}
+Data.prototype = Object.create(Plugin.prototype);
+Data.prototype.constructor = Data;

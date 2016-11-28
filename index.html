@@ -3,7 +3,6 @@
 <head>
   <title>Data graber from google calendar</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/store/store.min.js"></script>
   <script src="js/html5.canvas/lib/canvas.js"></script>
   <script src="js/plugins/plugin.js"></script>
   <script src="js/app.js"></script>
@@ -11,32 +10,25 @@
 <body>
     <div class="container">
       <div id="input">
-        <div class="list">
-          <fieldset>
-            <legend>Info:</legend>
-            <div class="info"></div>
-          </fieldset>
-          <fieldset>
-          <legend>Data:</legend>
-          <textarea id="input"></textarea>
-          <buttongroup>
-            <button name="fn.reset">Reset</button>
-            <button name="fn.export">Exp. RLE</button>
-            <button name="fn.analyze">Analyze</button>
-          </buttongroup>
-        </fieldset>
-         <fieldset>
-            <legend>Control:</legend>
-            <ul class="settings"></ul>
+        <fieldset>
+            <legend>Settings:</legend>
+            <ul class="model"></ul>
             <!-- I'm lost -->
-          </fieldset>
-        </div>
+        </fieldset>
+        <fieldset class="view">
+            <legend>View:</legend>
+            <!-- I'm lost -->
+        </fieldset>
+        <fieldset class="control">
+            <legend>Control:</legend>
+            <!-- I'm lost -->
+        </fieldset>
       </div>
       <div id="output"></div>
     </div>
     <script type="text/javascript">
       var dir_plugins='js/plugins/';
-      var plugins=['data','cal'];
+      var plugins=['data','SeqCal'];
 
       window.onload =function(){
         var application=new Application(document.getElementById('input'), 
@@ -44,11 +36,10 @@
 
         if(window.Plugin && plugins.length){
           for(var i=0,ln=plugins.length;i<ln;i++){
-            var plugin_name=plugins[i];
-            Plugin.require(dir_plugins+plugin_name,function(e){
-              console.log('who am i?');
-              application.addPlugin(plugin_name);
-            });
+            //last override!
+            (function(pn){
+              Plugin.require(dir_plugins+pn,function(e){application.addPlugin(pn);});
+            })(plugins[i]);
           }
         }else{
           console.log('window.load',window.Plugin,plugins.length);
