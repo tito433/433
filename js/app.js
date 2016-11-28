@@ -5,8 +5,7 @@ function Application(input,output,sett){
 
   this.dom={'input':input,'output':output};
   this._plugins=[];
-  // this.dataFetcher=new DataFetcher();
-  this.layout=new Layout(this.width,this.height);
+  this.view=function(){};
   sett=sett||{};
   sett=sett.filter(function(nm,val){return nm.indexOf('dt.')!=-1;}).map(function(nm,val){
     var srch='dt.', n=nm.indexOf(srch);
@@ -41,9 +40,7 @@ function Application(input,output,sett){
           return 0;
         });
         this._data=data;
-        for(var i in this._plugins){
-          this._plugins[i].onData.call(this);
-        }
+        this.view.call(this);
         return this;
       }
     }else{

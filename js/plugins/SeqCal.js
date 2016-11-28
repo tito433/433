@@ -49,11 +49,11 @@ Day.prototype.constructor = Day;
 function SeqCal(){
     Plugin.apply(this,arguments);
 
-    var size=36,fontSize=10,hasView=false;
+    var size=36,fontSize=10;
 
     var view=this.onData=function(){
         var data=this.data(),i=0,ln=data.length,box=[];
-        if(hasView && ln){
+        if(ln){
             this.clear();
             var layout=new Layout(this.width,this.height),
                 date=new Date(data[0].start.dateTime),
@@ -97,7 +97,11 @@ function SeqCal(){
             fontSize=parseInt(ev.target.value);
             view.call(this);
         }.bind(this);
-        radioView.onchange=function(ev){ hasView=ev.target.checked;}
+        radioView.onchange=function(ev){ 
+            if(ev.target.checked){
+                this.view=view;
+            }
+        }.bind(this);
     }
     
 

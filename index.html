@@ -13,26 +13,22 @@
         <fieldset>
             <legend>Settings:</legend>
             <ul class="model"></ul>
-            <!-- I'm lost -->
         </fieldset>
         <fieldset class="view">
             <legend>View:</legend>
-            <!-- I'm lost -->
         </fieldset>
         <fieldset class="control">
             <legend>Control:</legend>
-            <!-- I'm lost -->
         </fieldset>
       </div>
       <div id="output"></div>
     </div>
     <script type="text/javascript">
       var dir_plugins='js/plugins/';
-      var plugins=['data','SeqCal','filter'];
+      var plugins=['data','SeqCal','filter','plot'];
 
       window.onload =function(){
-        var application=new Application(document.getElementById('input'), 
-                              document.getElementById('output'));
+        var application=new Application(document.getElementById('input'),document.getElementById('output'));
 
         if(window.Plugin && plugins.length){
           for(var i=0,ln=plugins.length;i<ln;i++){
@@ -41,8 +37,6 @@
               Plugin.require(dir_plugins+pn,function(e){application.addPlugin(pn);});
             })(plugins[i]);
           }
-        }else{
-          console.log('window.load',window.Plugin,plugins.length);
         }
 
       }
