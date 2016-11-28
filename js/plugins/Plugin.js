@@ -1,5 +1,6 @@
 var Plugin=function (){
   this.init=function(){};
+  this.onData=function(){};
 }
 Plugin.addView=function(domConUl,opt){
   var d=document,

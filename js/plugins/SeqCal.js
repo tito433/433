@@ -47,13 +47,16 @@ Day.prototype.constructor = Day;
 
 
 function SeqCal(){
-    var size=36,fontSize=10;
+    Plugin.apply(this,arguments);
 
-    var view=function(){
-        var layout=new Layout(this.width,this.height),
-            data=this.data(),i=0,ln=data.length,box=[];
-        if(ln){
-            var date=new Date(data[0].start.dateTime),
+    var size=36,fontSize=10,hasView=false;
+
+    var view=this.onData=function(){
+        var data=this.data(),i=0,ln=data.length,box=[];
+        if(hasView && ln){
+            this.clear();
+            var layout=new Layout(this.width,this.height),
+                date=new Date(data[0].start.dateTime),
                 eDate=new Date(data[ln-1].end.dateTime);
 
             while(date<eDate){
@@ -73,10 +76,9 @@ function SeqCal(){
                 this.add(rect);
                 date.setDate(date.getDate() + 1);
             }
-        layout.flowLeft(box);
-        this.draw();
+            layout.flowLeft(box);
+            this.draw();
       }
-      
     }
 
     this.init=function(){
@@ -84,60 +86,20 @@ function SeqCal(){
             ulView=this.dom.input.querySelector('.view'),
             inpSize=Plugin.addModel(sp,'Size',{'input.type':'number','input.value':size,'input.addon':'px'}),
             inpFont=Plugin.addModel(sp,'Font Size',{'input.type':'number','input.value':fontSize,'input.addon':'px'}),
-            filter=Plugin.addModel(sp,'Filter'),
             radioView=Plugin.addView(ulView,{'text':'SeqCal'});
 
         inpSize.onchange=function(ev){
             size=parseInt(ev.target.value);
-            this.clear();
             view.call(this);
 
         }.bind(this);
         inpFont.onchange=function(ev){
             fontSize=parseInt(ev.target.value);
-
-            this.clear();
             view.call(this);
         }.bind(this);
-        filter.onchange=function(ev){
-            var el=ev.target,val=el.value;
-            var data=this.data().filter(function(item){
-                return hasValue(item,val)!=undefined;
-            });
-            this.data(data);
-            this.clear();
-            view.call(this);
-        }.bind(this);
-
-        radioView.onchange=view.bind(this);
-
+        radioView.onchange=function(ev){ hasView=ev.target.checked;}
     }
-    var hasValue=function(data,findValue,index){
-        switch(typeof data) {
-            case "object":
-            case "array":
-                for (var item in data) {
-                    var r=hasValue(data[item],findValue,item);
-                    if(r!=undefined)  return r;
-                }
-                break;
-            default:
-                var args=findValue.split(':'),key=false,value=args[0];
-
-                if(args.length>1){
-                    key=args[0];
-                    value=args[1];
-                }
-                
-
-                var regx=new RegExp(value,"i"),match = regx.exec(''+data);
-
-                if(key!=false && key==index && match)
-                    return data;
-                if(!key && match)  
-                    return data;
-        }
-    };
+    
 
 }
 SeqCal.prototype = Object.create(Plugin.prototype);

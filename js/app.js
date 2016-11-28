@@ -41,6 +41,9 @@ function Application(input,output,sett){
           return 0;
         });
         this._data=data;
+        for(var i in this._plugins){
+          this._plugins[i].onData.call(this);
+        }
         return this;
       }
     }else{
@@ -104,14 +107,7 @@ function Application(input,output,sett){
       return response;
   }
   
-  
-  
-  // this.fn.filter=function(txt){
-  //   var data=this._data.filter(function(item){
-  //       return DataFetcher.hasValue(item,txt)!=undefined;
-  //   });
-  //   this.data(data);
-  // }
+
   this.fn.getRLE=function(){
     if(this._box.length<1) return "";
 
