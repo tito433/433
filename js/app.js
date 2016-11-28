@@ -20,9 +20,12 @@ function Application(input,output,sett){
   this.addPlugin=function(pl){
     var PlClass=pl.capitalizeFirstLetter();
     if(typeof window[PlClass] === "function"){
-      var pln=window[PlClass].call(this);
+      var pln=new window[PlClass](this);
       if(pln instanceof Plugin){
+        pln.init.call(this);
         this._plugins.push(pln);
+      }else{
+        console.log('not plugin?',pln instanceof Plugin,typeof pln)
       }
     }
   }
@@ -38,7 +41,6 @@ function Application(input,output,sett){
           return 0;
         });
         this._data=data;
-        this.redraw();
         return this;
       }
     }else{
@@ -101,38 +103,7 @@ function Application(input,output,sett){
       //sending incomplete data!!!
       return response;
   }
-  this.redraw=function(){
-    var ln=this._data.length,i=0;
-
-    if(ln){
-      this.clear();
-      this._box=[];
-      var date=new Date(this._data[0].start.dateTime),
-          eDate=new Date(this._data[ln-1].end.dateTime);
-
-      while(date<eDate){
-        var size=parseInt(this._settings.size),
-            evDate=new Date(this._data[i].start.dateTime);
-
-        var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
-            rect.fontSize=this._settings.font;
-
-        if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
-          var hour=evDate.getHours(),mins=evDate.getMinutes();
-          rect.date.setHours(hour);
-          rect.date.setMinutes(mins);
-          rect.events(hour+':'+mins);
-          i++;
-        }
-            
-        this._box.push(rect);
-        this.add(rect);
-        date.setDate(date.getDate() + 1);
-      }
-      this.layout.flowLeft(this._box);
-      this.draw();
-    }
-  }
+  
   
   
   // this.fn.filter=function(txt){

@@ -1,6 +1,5 @@
 var Plugin=function (){
-  this.init=function(inputPanel){};
-  
+  this.init=function(){};
 }
 Plugin.addView=function(domConUl,opt){
   var d=document,

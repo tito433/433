@@ -1,38 +1,39 @@
 function Data() {
 	Plugin.apply(this,arguments);
 
-	var ulControl=this.dom.input.querySelector('.control'),
-		btnDataLoad=Plugin.addControl(ulControl,{'input.value':'Load data'});
+	this.init=function(){
+		var ulControl=this.dom.input.querySelector('.control'),
+			btnDataLoad=Plugin.addControl(ulControl,{'input.value':'Load data'}),
+			_DataCallabk=false;
+			
+	    btnDataLoad.onclick=function(ev){
+	        this.data(getData(this.data.bind(this)));
+	    }.bind(this);
+	}
+	
+	var addGoogleAPI=function(callBack){
+		_DataCallabk=callBack;
+		var d=document,
+			iDiv = d.createElement('div'),
+			p = d.createElement("p");
 		
-        
-    btnDataLoad.onclick=function(ev){
-        this.data(this.getData(this.data.bind(this)));
-    }.bind(this);
-
-
-	this.addGoogleAPI=function(callBack){
-		this._DataCallabk=callBack;
-
-	 	var iDiv = document.createElement('div');
 		iDiv.id = 'authorize-div';
-		document.getElementsByTagName('body')[0].appendChild(iDiv);
+		d.body.appendChild(iDiv);
 
-		var p = document.createElement("p");
-		var node = document.createTextNode("Authorize access to Google Calendar API");
-		p.appendChild(node);
+		p.appendChild(d.createTextNode("Authorize access to Google Calendar API"));
 		iDiv.appendChild(p);
 
-		var btn = document.createElement("button");        
-		btn.appendChild(document.createTextNode("Authorize"));                               
+		var btn = d.createElement("button");        
+		btn.appendChild(d.createTextNode("Authorize"));                               
 		iDiv.appendChild(btn); 
-		btn.addEventListener("click", this.glAuthorizeMe.bind(this), true);
+		btn.addEventListener("click", glAuthorizeMe, true);
 		//script
-		var script = document.createElement('script');
+		var script = d.createElement('script');
 		script.src = "https://apis.google.com/js/client.js";
-		document.getElementsByTagName('body')[0].appendChild(script);
- 	}
- 	this.glAuthorizeMe=function() {
- 		var self=this;
+		d.body.appendChild(script);
+ 	};
+ 	var glAuthorizeMe=function() {
+ 		
 	    gapi.auth.authorize({
 	        'client_id': '169881026239-62ks55c662hlrf6hnkui6uspmom0mj9i.apps.googleusercontent.com',
 	        'scope': "https://www.googleapis.com/auth/calendar.readonly",
@@ -41,7 +42,7 @@ function Data() {
 	          var authorizeDiv = document.getElementById('authorize-div');
 	          if (authResult && !authResult.error) {
 	            authorizeDiv.style.display = 'none';
-	            gapi.client.load('calendar', 'v3', self._getAllEvents.bind(self));
+	            gapi.client.load('calendar', 'v3', _getAllEvents);
 	          } else {
 	            authorizeDiv.appendChild(document.createElement('br'));
 	            authorizeDiv.appendChild(document.createTextNode("Error:"+authResult.error+","+authResult.error_subtype));
@@ -49,9 +50,8 @@ function Data() {
 	        }
 	    );
   	}
-  	this._getAllEvents=function() {
-	    var self=this,
-	    	date_from=new Date("01 Jan 2014"),
+  	var _getAllEvents=function() {
+	    var date_from=new Date("01 Jan 2014"),
 	        date_to=new Date();
 	        date_to.setDate(date_to.getDate() + 1); //till tomorrow?
 
@@ -61,39 +61,34 @@ function Data() {
 	      'showDeleted': false, 'singleEvents': true,
 	      'maxResults': 999999,'orderBy': 'startTime'
 	    }).execute(function(resp) {
-	      self.setData(resp.items);
-	      if(self._DataCallabk)
-	      	self._DataCallabk(resp.items);
+	    	console.log(resp);
+	      setData(resp.items);
+	      if(_DataCallabk) _DataCallabk(resp.items);
 
 	    });
 	};
-	this.getData=function(callBack){
+	var getData=function(callBack){
 	    if (typeof(Storage) !== "undefined") {
 	        var data=localStorage.getItem("evt.cal.raw");
-	        if(data){
-	        	return data;
+	        if(data && data!=''){
+	        	return JSON.parse(data);
 	        }
 	    }else{
 	    	alert('Local storage is not supported by your browser. Please disable "Private Mode", or upgrade to a modern browser.')
             return
 	    }
-	    this.addGoogleAPI(callBack);
+	    addGoogleAPI(callBack);
 	    return [];
 	}
-	this.clear=function(){
-		if (store.enabled) {
-	        store.clear()
-	    }
-	}
-	this.setData=function(data){
+	var setData=function(data){
 	 	if (typeof(Storage) !== "undefined") {
-	        localStorage.setItem("evt.cal.raw", data);
+	        localStorage.setItem("evt.cal.raw", JSON.stringify(data));
 	    }else{
 	    	alert('Local storage is not supported by your browser. Please disable "Private Mode", or upgrade to a modern browser.')
             return;
 	    }
-	}
-	this.getValue=function(data,key){
+	};
+	var getValue=function(data,key){
 		var args = key.split('.');
 		for (var i = 0; i < args.length; i++) {
 		    if (!data || !data.hasOwnProperty(args[i])) {
@@ -103,34 +98,8 @@ function Data() {
 		  }
 
 		  return data;
-	}
-	this.hasValue=function(data,findValue,index){
-	    switch(typeof data) {
-	        case "object":
-	        case "array":
-	            for (var item in data) {
-	                var r=DataFetcher.hasValue(data[item],findValue,item);
-	                if(r!=undefined)  return r;
-	            }
-	            break;
-	        default:
-	        	var args=findValue.split(':'),key=false,value=args[0];
-
-				if(args.length>1){
-					key=args[0];
-					value=args[1];
-				}
-				
-
-				var regx=new RegExp(value,"i"),match = regx.exec(''+data);
-
-				if(key!=false && key==index && match)
-					return data;
-	        	if(!key && match)  
-	        		return data;
-	    }
-	}
-
+	};
+	
 
 }
 

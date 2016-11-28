@@ -47,27 +47,20 @@ Day.prototype.constructor = Day;
 
 
 function SeqCal(){
-    var sp=this.dom.input.querySelector('.model'),
-        ulView=this.dom.input.querySelector('.view'),
-        inpsize=Plugin.addModel(sp,'Size',{'input.type':'number','input.value':36,'input.addon':'px'}),
-        fontsize=Plugin.addModel(sp,'Font Size',{'input.type':'number','input.value':10,'input.addon':'px'}),
-        filter=Plugin.addModel(sp,'Filter'),
-        radioView=Plugin.addView(ulView,{'text':'SeqCal'});
+    var size=36,fontSize=10;
 
     var view=function(){
         var layout=new Layout(this.width,this.height),
             data=this.data(),i=0,ln=data.length,box=[];
-        console.log('view',this,data,data.length)
         if(ln){
             var date=new Date(data[0].start.dateTime),
                 eDate=new Date(data[ln-1].end.dateTime);
 
             while(date<eDate){
-                var size=parseInt(this._settings.size),
-                    evDate=new Date(data[i].start.dateTime);
+                var evDate=new Date(data[i].start.dateTime);
 
                 var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
-                    rect.fontSize=this._settings.font;
+                    rect.fontSize=fontSize;
 
                 if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
                   var hour=evDate.getHours(),mins=evDate.getMinutes();
@@ -86,22 +79,66 @@ function SeqCal(){
       
     }
 
-    inpsize.onchange=function(ev){
-        var el=ev.target,val=el.value;
-        this.setting('dt.size',val);
-    }.bind(this);
-    fontsize.onchange=function(ev){
-        var el=ev.target,val=el.value;
-        this.setting('dt.font',val);
-    }.bind(this);
-    filter.onchange=function(ev){
-        var el=ev.target,val=el.value;
-        this.setting('fn.filter',val);
-    }.bind(this);
+    this.init=function(){
+        var sp=this.dom.input.querySelector('.model'),
+            ulView=this.dom.input.querySelector('.view'),
+            inpSize=Plugin.addModel(sp,'Size',{'input.type':'number','input.value':size,'input.addon':'px'}),
+            inpFont=Plugin.addModel(sp,'Font Size',{'input.type':'number','input.value':fontSize,'input.addon':'px'}),
+            filter=Plugin.addModel(sp,'Filter'),
+            radioView=Plugin.addView(ulView,{'text':'SeqCal'});
 
-    radioView.onchange=view.bind(this);
+        inpSize.onchange=function(ev){
+            size=parseInt(ev.target.value);
+            this.clear();
+            view.call(this);
 
-    
+        }.bind(this);
+        inpFont.onchange=function(ev){
+            fontSize=parseInt(ev.target.value);
+
+            this.clear();
+            view.call(this);
+        }.bind(this);
+        filter.onchange=function(ev){
+            var el=ev.target,val=el.value;
+            var data=this.data().filter(function(item){
+                return hasValue(item,val)!=undefined;
+            });
+            this.data(data);
+            this.clear();
+            view.call(this);
+        }.bind(this);
+
+        radioView.onchange=view.bind(this);
+
+    }
+    var hasValue=function(data,findValue,index){
+        switch(typeof data) {
+            case "object":
+            case "array":
+                for (var item in data) {
+                    var r=hasValue(data[item],findValue,item);
+                    if(r!=undefined)  return r;
+                }
+                break;
+            default:
+                var args=findValue.split(':'),key=false,value=args[0];
+
+                if(args.length>1){
+                    key=args[0];
+                    value=args[1];
+                }
+                
+
+                var regx=new RegExp(value,"i"),match = regx.exec(''+data);
+
+                if(key!=false && key==index && match)
+                    return data;
+                if(!key && match)  
+                    return data;
+        }
+    };
+
 }
 SeqCal.prototype = Object.create(Plugin.prototype);
 SeqCal.prototype.constructor = SeqCal;
