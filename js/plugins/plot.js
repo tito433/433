@@ -5,8 +5,8 @@ function Plot(){
     this._data=[];
 
     this.view=function(){
-        if(!this.dom.view.checked) return false;
         this._data=arguments.length==1 && arguments[0] instanceof Array?arguments[0]:this._data;
+        if(!this.dom.view.checked) return false;
         
         if(this._data && this._data.length){
             this.clear();
