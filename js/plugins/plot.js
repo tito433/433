@@ -10,14 +10,21 @@ function Plot(){
         
         if(this._data && this._data.length){
             this.clear();
-            this.add(new Axis(this._data).size(this.width-40,this.height-40));
+            var axis=new Axis(this._data).size(this.width-40,this.height-40);
+            axis.grid(this.dom.chkGridX.checked);
+            this.add(axis);
             this.draw();
         }
     }
 
-    this.dom.view=Plugin.addView(this.dom.input.querySelector('.view'),{'text':'Plot'});
-    this.dom.view.onchange=this.view.bind(this);
+    var ulModel=this.dom.input.querySelector('.model'),
+        ulView=this.dom.input.querySelector('.view');
+        
 
+    this.dom.view=Plugin.addView(ulView,{'text':'Plot'});
+    this.dom.view.onchange=this.view.bind(this);
+    this.dom.chkGridX=Plugin.addModel(ulModel,'Plot grid.x',{'input.type':'checkbox'});
+    this.dom.chkGridX.onchange=this.view.bind(this);
 }
 Plot.prototype = Object.create(Plugin.prototype);
 Plot.prototype.constructor = Plot;
@@ -30,7 +37,16 @@ function Axis(data){
     this.data=data;
     this.x=20;
     this.y=20;
+    this._grid={'x':true,'y':true};
 
+    this.grid=function(){
+        if(arguments.length){
+            this._grid.x=arguments[0];
+            this._grid.y=arguments[1]||false;
+        }else{
+            return this._grid;
+        }
+    }
     this.draw=function(ctx){
         var lineX=new Line().position(this.x,this.y+this.h).size(this.w,this.y+this.h),
             lineY=new Line().position(this.x,this.y+this.h).size(this.x,this.y);
@@ -75,10 +91,24 @@ function Axis(data){
                 ctx.fillStyle='#000';
                 ctx.arc(x,y,2,0,2*Math.PI);
                 ctx.fill();
+                
+                if(this._grid.x)
+                    drawLine(ctx,x,20,x,this.y+this.h)
             }
         }
     }
-    
+    var drawLine=function(ctx,x,y,w,h){
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle='#ccc';
+        ctx.lineWidth=0.5;
+        ctx.moveTo(x,y);
+        ctx.lineTo(w,h);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.restore();
+
+    }
 
 }
 Axis.prototype = Object.create(Drawable.prototype);

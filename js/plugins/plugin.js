@@ -50,7 +50,6 @@ Plugin.addModel=function(settingsPanel,title,opt){
       li=d.createElement('li'),
       para = d.createElement("P"),
       t = d.createTextNode(title),
-      igdiv=d.createElement("DIV"),
       input=d.createElement("INPUT");
 
 
@@ -62,13 +61,25 @@ Plugin.addModel=function(settingsPanel,title,opt){
   para.appendChild(t);
   li.appendChild(para);
   settingsPanel.appendChild(li);
-  igdiv.className=option['input.group'];
-  li.appendChild(igdiv);
-  igdiv.appendChild(input);
-  if(option['input.addon']){
-    var span=document.createElement('span');
+
+  if(option['input.type']=='checkbox'){
+    var id=new Date().getTime();
+    input.id=id;
+    input.className='tgl';
+    input.checked=true;
+    var label=document.createElement('label');
+    label.htmlFor=id;
+    li.appendChild(input);
+    li.appendChild(label);
+  }else if(option['input.addon']){
+    var igdiv=d.createElement("DIV"),
+        span=document.createElement('span');
+    
     span.className='input-group-addon';
     span.innerHTML=option['input.addon'];
+    igdiv.className=option['input.group'];
+    li.appendChild(igdiv);
+    igdiv.appendChild(input);
     igdiv.appendChild(span);
   }
   return input;
