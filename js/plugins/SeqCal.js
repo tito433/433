@@ -1,3 +1,68 @@
+function SeqCal(){
+    Plugin.apply(this,arguments);
+    Canvas.call(this,arguments[1]);
+
+    var size=36,fontSize=10;
+    this._data=[];
+
+    this.view=function(){
+        if(!this.dom.view.checked) return false;
+        this._data=arguments.length==1 && arguments[0] instanceof Array?arguments[0]:this._data;
+        
+        if(this._data && this._data.length){
+            var i=0,ln=this._data.length,box=[];
+            this.clear();//im canvas remember?
+            var layout=new Layout(this.width,this.height),
+                date=new Date(this._data[0].start.dateTime),
+                eDate=new Date(this._data[ln-1].end.dateTime);
+
+            while(date<eDate){
+                var evDate=new Date(this._data[i].start.dateTime);
+
+                var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
+                    rect.fontSize=fontSize;
+
+                if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
+                  var hour=evDate.getHours(),mins=evDate.getMinutes();
+                  rect.date.setHours(hour);
+                  rect.date.setMinutes(mins);
+                  rect.events(hour+':'+mins);
+                  i++;
+                }
+                box.push(rect);
+                this.add(rect);
+                date.setDate(date.getDate() + 1);
+            }
+            layout.flowLeft(box);
+            this.draw();
+      }
+    }
+
+    
+    var ulModel=this.dom.input.querySelector('.model'),
+        ulView=this.dom.input.querySelector('.view'),
+        inpSize=Plugin.addModel(ulModel,'Size',{'input.type':'number','input.value':size,'input.addon':'px'}),
+        inpFont=Plugin.addModel(ulModel,'Font Size',{'input.type':'number','input.value':fontSize,'input.addon':'px'});
+
+    this.dom.view=Plugin.addView(ulView,{'text':'SeqCal'});
+
+    inpSize.onchange=function(ev){
+        size=parseInt(ev.target.value);
+        this.view();
+    }.bind(this);
+
+    inpFont.onchange=function(ev){
+        fontSize=parseInt(ev.target.value);
+        this.view();
+    }.bind(this);
+
+    this.dom.view.onchange=this.view.bind(this);
+    
+}
+SeqCal.prototype = Object.create(Plugin.prototype);
+SeqCal.prototype.constructor = SeqCal;
+
+
 function Day(date){
     Drawable.call(this);
 
@@ -34,77 +99,13 @@ function Day(date){
         return this;
       }
     }
-    this.onClick=function(x,y){
-      var x=this.fillStyle;
-      this.fillStyle=this.fontColor;
-      this.fontColor=x;
-      this.marked=!this.marked;
-    }
+    // this.onClick=function(x,y){
+    //   var x=this.fillStyle;
+    //   this.fillStyle=this.fontColor;
+    //   this.fontColor=x;
+    //   this.marked=!this.marked;
+    // }
 }
 
 Day.prototype = Object.create(Drawable.prototype);
 Day.prototype.constructor = Day;
-
-
-function SeqCal(){
-    Plugin.apply(this,arguments);
-
-    var size=36,fontSize=10;
-
-    var view=this.onData=function(){
-        var data=this.data(),i=0,ln=data.length,box=[];
-        if(ln){
-            this.clear();
-            var layout=new Layout(this.width,this.height),
-                date=new Date(data[0].start.dateTime),
-                eDate=new Date(data[ln-1].end.dateTime);
-
-            while(date<eDate){
-                var evDate=new Date(data[i].start.dateTime);
-
-                var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
-                    rect.fontSize=fontSize;
-
-                if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
-                  var hour=evDate.getHours(),mins=evDate.getMinutes();
-                  rect.date.setHours(hour);
-                  rect.date.setMinutes(mins);
-                  rect.events(hour+':'+mins);
-                  i++;
-                }
-                box.push(rect);
-                this.add(rect);
-                date.setDate(date.getDate() + 1);
-            }
-            layout.flowLeft(box);
-            this.draw();
-      }
-    }
-
-    this.init=function(){
-        var sp=this.dom.input.querySelector('.model'),
-            ulView=this.dom.input.querySelector('.view'),
-            inpSize=Plugin.addModel(sp,'Size',{'input.type':'number','input.value':size,'input.addon':'px'}),
-            inpFont=Plugin.addModel(sp,'Font Size',{'input.type':'number','input.value':fontSize,'input.addon':'px'}),
-            radioView=Plugin.addView(ulView,{'text':'SeqCal'});
-
-        inpSize.onchange=function(ev){
-            size=parseInt(ev.target.value);
-            view.call(this);
-
-        }.bind(this);
-        inpFont.onchange=function(ev){
-            fontSize=parseInt(ev.target.value);
-            view.call(this);
-        }.bind(this);
-        radioView.onchange=function(ev){ 
-            if(ev.target.checked){
-                this.view=view;
-            }
-        }.bind(this);
-    }
-    
-
-}
-SeqCal.prototype = Object.create(Plugin.prototype);
-SeqCal.prototype.constructor = SeqCal;

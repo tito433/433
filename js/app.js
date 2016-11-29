@@ -12,6 +12,7 @@ function Application(input,output){
       var pln=new window[PlClass](this.dom.input,this.dom.output);
       if(pln instanceof Plugin){
         this._plugins.push(pln);
+        pln.view.call(pln,this._data);
       }
     }
   }
@@ -21,7 +22,7 @@ function Application(input,output){
       this._data=arguments[0];
       
       this._plugins.forEach(function(plugin){
-        plugin.onData.call(plugin,this._data);
+        plugin.view.call(plugin,this._data);
       });
     }else{
       return this._data;
@@ -81,11 +82,11 @@ function Application(input,output){
         localStorage.setItem(key,JSON.stringify(data));
     }
   }
-
   this._data=this.getData(function(data){
     this.saveData("evt.cal.raw",data);
     this.data(data);
   }.bind(this));
+
 }
 
 

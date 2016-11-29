@@ -1,47 +1,22 @@
 function Plot(){
     Plugin.apply(this,arguments);
-    
-    var view=this.onData=function(){
-        var data=this.data(),i=0,ln=data.length;
-        if(ln){
+    Canvas.call(this,arguments[1]);
+
+    this._data=[];
+
+    this.view=function(){
+        if(!this.dom.view.checked) return false;
+        this._data=arguments.length==1 && arguments[0] instanceof Array?arguments[0]:this._data;
+        
+        if(this._data && this._data.length){
             this.clear();
-            this.add(new Axis(data,24).position(20,10).width(this.width-40));
+            this.add(new Axis(this._data,24).position(20,10).width(this.width-40));
             this.draw();
-            
-            return;
-            
-
-            while(date<eDate){
-                var evDate=new Date(data[i].start.dateTime);
-
-                var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
-                    rect.fontSize=fontSize;
-
-                if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
-                  var hour=evDate.getHours(),mins=evDate.getMinutes();
-                  rect.date.setHours(hour);
-                  rect.date.setMinutes(mins);
-                  rect.events(hour+':'+mins);
-                  i++;
-                }
-                this.add(rect);
-                date.setDate(date.getDate() + 1);
-            }
-            this.draw();
-      }
+        }
     }
 
-    this.init=function(){
-        var ulView=this.dom.input.querySelector('.view'),
-            radioView=Plugin.addView(ulView,{'text':'Plot'});
-
-        radioView.onchange=function(ev){ 
-            if(ev.target.checked){
-                this.view=view;
-            }
-        }.bind(this);
-    }
-    
+    this.dom.view=Plugin.addView(this.dom.input.querySelector('.view'),{'text':'Plot'});
+    this.dom.view.onchange=this.view.bind(this);
 
 }
 Plot.prototype = Object.create(Plugin.prototype);

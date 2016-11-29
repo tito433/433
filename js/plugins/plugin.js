@@ -1,6 +1,6 @@
-var Plugin=function (){
-  this.init=function(){};
-  this.onData=function(){};
+var Plugin=function (input,output){
+  this.dom={'input':input,'output':output};
+  this.view=function(){};
 }
 Plugin.addView=function(domConUl,opt){
   var d=document,
@@ -13,6 +13,7 @@ Plugin.addView=function(domConUl,opt){
   input.value=option['text'];
   input.name='view';
   input.type='radio';
+  input.checked=true;
   lbl.className=option['labelClass'];
   lbl.appendChild(input);
   lbl.appendChild(t);
@@ -74,7 +75,7 @@ Plugin.addModel=function(settingsPanel,title,opt){
 };
 
 //http://stackoverflow.com/questions/12820953/asynchronous-script-loading-callback
-Plugin.require=function(u,c){
+Plugin.load=function(u,c){
   var d = document, t = 'script', o = d.createElement(t),s = d.getElementsByTagName(t)[0];
   o.src = 'js/plugins/'+u+'.js';
   if (c) { o.addEventListener('load', function (e) { c(null, e);}, false); }
