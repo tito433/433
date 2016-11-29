@@ -76,7 +76,7 @@ Plugin.addModel=function(settingsPanel,title,opt){
 //http://stackoverflow.com/questions/12820953/asynchronous-script-loading-callback
 Plugin.require=function(u,c){
   var d = document, t = 'script', o = d.createElement(t),s = d.getElementsByTagName(t)[0];
-  o.src = u+'.js';
+  o.src = 'js/plugins/'+u+'.js';
   if (c) { o.addEventListener('load', function (e) { c(null, e);}, false); }
   d.body.appendChild(o);
 }

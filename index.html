@@ -3,6 +3,7 @@
 <head>
   <title>Data graber from google calendar</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://apis.google.com/js/client.js"></script>
   <script src="js/html5.canvas/lib/canvas.js"></script>
   <script src="js/plugins/plugin.js"></script>
   <script src="js/app.js"></script>
@@ -24,19 +25,16 @@
       <div id="output"></div>
     </div>
     <script type="text/javascript">
-      var dir_plugins='js/plugins/';
-      var plugins=['data','SeqCal','filter','plot'];
+      var plugins=['SeqCal','filter','plot'];
 
       window.onload =function(){
         var application=new Application(document.getElementById('input'),document.getElementById('output'));
 
         if(window.Plugin && plugins.length){
-          for(var i=0,ln=plugins.length;i<ln;i++){
-            //last override!
-            (function(pn){
-              Plugin.require(dir_plugins+pn,function(e){application.addPlugin(pn);});
-            })(plugins[i]);
-          }
+          plugins.forEach(function(pClass){
+            Plugin.require(pClass, application.addPlugin.bind(application,pClass)
+            );
+          });
         }
 
       }
