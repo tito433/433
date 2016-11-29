@@ -20,7 +20,7 @@ function Application(input,output){
   this.data=function(){
     if(arguments.length==1){
       this._data=arguments[0];
-      for(var i=0,ln=this._data.length;i<ln;i++){
+      for(var i=0,ln=this._plugins.length;i<ln;i++){
         this._plugins[i].view.call(this._plugins[i],this._data);
       }
     }else{
