@@ -11,7 +11,7 @@ function Plot(){
         if(this._data && this._data.length){
             this.clear();
             var axis=new Axis(this._data).size(this.width-40,this.height-40);
-            axis.grid(this.dom.chkGridX.checked);
+            axis.grid(this.dom.chkGridX.checked,this.dom.chkGridY.checked);
             this.add(axis);
             this.draw();
         }
@@ -23,8 +23,13 @@ function Plot(){
 
     this.dom.view=Plugin.addView(ulView,{'text':'Plot'});
     this.dom.view.onchange=this.view.bind(this);
+    
     this.dom.chkGridX=Plugin.addModel(ulModel,'Plot grid.x',{'input.type':'checkbox'});
     this.dom.chkGridX.onchange=this.view.bind(this);
+    
+    this.dom.chkGridY=Plugin.addModel(ulModel,'Plot grid.y',{'input.type':'checkbox'});
+    this.dom.chkGridY.onchange=this.view.bind(this);
+
 }
 Plot.prototype = Object.create(Plugin.prototype);
 Plot.prototype.constructor = Plot;
@@ -94,6 +99,8 @@ function Axis(data){
                 
                 if(this._grid.x)
                     drawLine(ctx,x,20,x,this.y+this.h)
+                if(this._grid.y)
+                    drawLine(ctx,20,y,this.w,y);
             }
         }
     }
@@ -107,7 +114,6 @@ function Axis(data){
         ctx.stroke();
         ctx.closePath();
         ctx.restore();
-
     }
 
 }

@@ -63,7 +63,7 @@ Plugin.addModel=function(settingsPanel,title,opt){
   settingsPanel.appendChild(li);
 
   if(option['input.type']=='checkbox'){
-    var id=new Date().getTime();
+    var id=new Date().getTime()+Math.random();
     input.id=id;
     input.className='tgl';
     input.checked=true;
