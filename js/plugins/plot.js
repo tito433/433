@@ -60,18 +60,8 @@ function Axis(data){
         lineY.draw(ctx);
         var perY=this.h/this.n,y=this.y;
         for(var i=0,ln=this.n;i<ln;i++){
-            var line=new Line().position(this.x-3,y).size(this.x+3,y);
-            line.lineWidth=1;
-            line.draw(ctx);
-            if(i%3==0){
-                ctx.font='10px arial';
-                ctx.fillStyle='#000';
-                ctx.textBaseline="middle";
-                ctx.textAlign="center";  
-
-                ctx.fillText(24-i, this.x-10, y);
-            }
-            
+            if(i%3==0) this.label(ctx,this.x,y,24-i,1);
+            if(this._grid.y) drawLine(ctx,this.x,y,this.width(),y);
             y+=perY;
         }
         if(this.data.length){
@@ -84,23 +74,34 @@ function Axis(data){
             var eDate=new Date(this.data[this.data.length-1].start.dateTime),
                 samples=Math.round((eDate-preDate)/86400000)+3,
                 xSeg=this.width()/samples;
+            //draw x lables
+            var x=this.x,y=this.y+this.h,xturn=0,curDate=new Date();
+            curDate.setFullYear(preDate.getFullYear());
+            curDate.setHours(0);
+            curDate.setMinutes(0);
 
+            while(curDate<=eDate){
+                if(xturn%9==0){
+                   this.label(ctx,x,y,curDate.getDate()+'/'+curDate.getMonth(),0);
+                   if(this._grid.x) drawLine(ctx,x,y,x,0); 
+                }  
+                
+                x+=xSeg;
+                xturn++;
+                curDate.setDate(curDate.getDate() + 1);
+            }
             for(var i=0,ln=this.data.length;i<ln;i++){
                 var cDate=new Date(this.data[i].start.dateTime),
                     offsetX=Math.round((cDate-preDate)/86400000),
-                    offsetY=this.h-(cDate.getHours()*perY+((cDate.getMinutes()/60)*perY)),
-                    x=this.x+(offsetX*xSeg),
-                    y=this.y+offsetY;
-                
+                    offsetY=this.h-(cDate.getHours()*perY+((cDate.getMinutes()/60)*perY));
+
+                x=this.x+(offsetX*xSeg),
+                y=this.y+offsetY;
                 ctx.beginPath();
                 ctx.fillStyle='#000';
                 ctx.arc(x,y,2,0,2*Math.PI);
                 ctx.fill();
                 
-                if(this._grid.x)
-                    drawLine(ctx,x,20,x,this.y+this.h)
-                if(this._grid.y)
-                    drawLine(ctx,20,y,this.w,y);
             }
         }
     }
@@ -113,6 +114,34 @@ function Axis(data){
         ctx.lineTo(w,h);
         ctx.stroke();
         ctx.closePath();
+        ctx.restore();
+    }
+    this.label=function(ctx,x,y,txt,dir){
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle='#000';
+        var w=h=0
+     
+        if(txt && dir==0){
+            w=x;h=y+5;
+            ctx.font='10px arial';
+            ctx.fillStyle='#000';
+            ctx.textBaseline="middle";
+            ctx.textAlign="center";  
+            ctx.fillText(txt, x, y+15);
+        }else{
+            w=x-5;h=y;
+            ctx.font='10px arial';
+            ctx.fillStyle='#000';
+            ctx.textBaseline="middle";
+            ctx.textAlign="center";  
+            ctx.fillText(txt, x-15,y);
+        }
+        
+        
+        ctx.moveTo(x,y);
+        ctx.lineTo(w,h);
+        ctx.stroke();
         ctx.restore();
     }
 
