@@ -11,3 +11,10 @@ It usases:
   * - [ ] `success` - Is it over?
 
 ### Demo: [http://titosust.github.io/Calendar.Event.11/](http://titosust.github.io/Calendar.Event.11/)
+
+Note:
+```
+When you crossover, your each property gets multiplied. 4
+If you are moving from 2d to 3d, your each x,y point becomes a spheare itself. 3
+We've another useless information a quantity or number. 3
+``` 
