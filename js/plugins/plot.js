@@ -10,7 +10,7 @@ function Plot(){
         
         if(this._data && this._data.length){
             this.clear();
-            this.add(new Axis(this._data,24).position(20,10).width(this.width-40));
+            this.add(new Axis(this._data).size(this.width-40,this.height-40));
             this.draw();
         }
     }
@@ -23,13 +23,13 @@ Plot.prototype = Object.create(Plugin.prototype);
 Plot.prototype.constructor = Plot;
 
 
-function Axis(data,n){
+function Axis(data){
     Drawable.call(this);
-    var yGap=10;
-    
-    this.n=n;
-    this.h=n*yGap+10;
+   
+    this.n=24;
     this.data=data;
+    this.x=20;
+    this.y=20;
 
     this.draw=function(ctx){
         var lineX=new Line().position(this.x,this.y+this.h).size(this.w,this.y+this.h),
@@ -37,7 +37,7 @@ function Axis(data,n){
 
         lineX.draw(ctx);
         lineY.draw(ctx);
-        var y=this.y+10;
+        var perY=this.h/this.n,y=this.y;
         for(var i=0,ln=this.n;i<ln;i++){
             var line=new Line().position(this.x-3,y).size(this.x+3,y);
             line.lineWidth=1;
@@ -51,7 +51,7 @@ function Axis(data,n){
                 ctx.fillText(24-i, this.x-10, y);
             }
             
-            y+=yGap;
+            y+=perY;
         }
         if(this.data.length){
             var date=new Date(this.data[0].start.dateTime),
@@ -67,7 +67,7 @@ function Axis(data,n){
             for(var i=0,ln=this.data.length;i<ln;i++){
                 var cDate=new Date(this.data[i].start.dateTime),
                     offsetX=Math.round((cDate-preDate)/86400000),
-                    offsetY=this.h-(cDate.getHours()*yGap+((cDate.getMinutes()/60)*yGap)),
+                    offsetY=this.h-(cDate.getHours()*perY+((cDate.getMinutes()/60)*perY)),
                     x=this.x+(offsetX*xSeg),
                     y=this.y+offsetY;
                 
