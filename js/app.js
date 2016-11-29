@@ -52,7 +52,7 @@ function Application(input,output){
       btn.addEventListener("click", function(){
           gapi.auth.authorize({
               'client_id': '169881026239-62ks55c662hlrf6hnkui6uspmom0mj9i.apps.googleusercontent.com',
-              'scope': "https://www.googleapis.com/auth/calendar.readonly",'immediate': true
+              'scope': "https://www.googleapis.com/auth/calendar.readonly",'immediate': false
           },function(authResult) {
                 if (authResult && !authResult.error) {
                   div.parentNode.removeChild(div);
