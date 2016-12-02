@@ -2,7 +2,7 @@ function SeqCal(){
     Plugin.apply(this,arguments);
     Canvas.call(this,this.dom.output);
 
-    var size=36,fontSize=10;
+    var size=45,fontSize=12;
 
     this.updateData=function(evt){
         if(arguments.length==1 && arguments[0] instanceof Event){
@@ -18,25 +18,31 @@ function SeqCal(){
             var i=0,ln=this._data.length,box=[];
             this.clear();//im canvas remember?
             var layout=new Layout(this.width,this.height),
-                date=new Date(this._data[0].start.dateTime),
+                startDate=new Date(this._data[0].start.dateTime),
                 eDate=new Date(this._data[ln-1].end.dateTime);
+            
+            startDate.setMinutes(0);
+            startDate.setHours(0);
 
-            while(date<eDate){
+            while(i<ln){
+                console.log(i)
+                var date=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate());
                 var evDate=new Date(this._data[i].start.dateTime);
-
-                var rect=new Day(new Date(date.getFullYear(),date.getMonth(),date.getDate())).size(size,size);
+                var rect=new Day(date).size(size,size);
                     rect.fontSize=fontSize;
 
-                if(evDate.getDate()>=date.getDate() && evDate.getDate()<date.getDate()+1){
+                if( evDate.getFullYear()==date.getFullYear() && 
+                    evDate.getMonth()==date.getMonth() &&
+                    evDate.getDay()==date.getDay()){
                   var hour=evDate.getHours(),mins=evDate.getMinutes();
-                  rect.date.setHours(hour);
-                  rect.date.setMinutes(mins);
+                  rect.setDate(evDate);
                   rect.events(hour+':'+mins);
                   i++;
+                }else{
+                    startDate.setDate(startDate.getDate() + 1);
                 }
                 box.push(rect);
-                this.add(rect);
-                date.setDate(date.getDate() + 1);
+                this.add(rect);                
             }
             layout.flowLeft(box);
             this.draw();
@@ -79,8 +85,11 @@ function Day(date){
     this.marked=false;
 
     var year=date.getFullYear(), month=date.getMonth(), day=date.getDate();
-    this.label=[year,month,day];
+    this.label=[month+'-'+day,year];
 
+    this.setDate=function(date){
+        this.date=date;
+    }
 
     this.draw=function(ctx){
         ctx.save();
@@ -105,12 +114,6 @@ function Day(date){
         return this;
       }
     }
-    // this.onClick=function(x,y){
-    //   var x=this.fillStyle;
-    //   this.fillStyle=this.fontColor;
-    //   this.fontColor=x;
-    //   this.marked=!this.marked;
-    // }
 }
 
 Day.prototype = Object.create(Drawable.prototype);
