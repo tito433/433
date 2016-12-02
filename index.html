@@ -25,15 +25,16 @@
       <div id="output"></div>
     </div>
     <script type="text/javascript">
-      var plugins=['SeqCal','plot'];
+
+      var plugins=['glcalevt','SeqCal','plot'];
 
       window.onload =function(){
-        var application=new Application(document.getElementById('input'),document.getElementById('output'));
+        var application=new Application(document.getElementById('input'),
+            document.getElementById('output'));
 
         if(window.Plugin && plugins.length){
           plugins.forEach(function(pClass){
-            Plugin.load(pClass, application.addPlugin.bind(application,pClass)
-            );
+            Plugin.load(pClass, application.addPlugin.bind(application,pClass));
           });
         }
 

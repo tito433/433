@@ -1,7 +1,13 @@
-var Plugin=function (input,output){
-  this.dom={'input':input,'output':output};
-  this.view=function(){};
+var Plugin=function (settings){
+  this._settings={}.extend(settings);
+  this.dom={}.extend(this._settings.dom);
+  this._data=[];
+  
+  var dt=localStorage.getItem(this._settings.data.key);
+  if(dt && dt!='') this._data=JSON.parse(dt);
+
 }
+
 Plugin.addView=function(domConUl,opt){
   var d=document,
       option={'labelClass':'checkbox-inline','text':''}.extend(opt),

@@ -1,11 +1,16 @@
 function Plot(){
     Plugin.apply(this,arguments);
-    Canvas.call(this,arguments[1]);
+    Canvas.call(this,this.dom.output);
 
-    this._data=[];
+    this.updateData=function(evt){
+        if(arguments.length==1 && arguments[0] instanceof Event){
+            this._data= arguments[0].detail?arguments[0].detail:this._data;
+        }
+        this.view();
+    }
 
     this.view=function(){
-        this._data=arguments.length==1 && arguments[0] instanceof Array?arguments[0]:this._data;
+        console.log('view plot',this.dom.view.checked)
         if(!this.dom.view.checked) return false;
         
         if(this._data && this._data.length){
@@ -30,6 +35,8 @@ function Plot(){
     this.dom.chkGridY=Plugin.addModel(ulModel,'Plot grid.y',{'input.type':'checkbox'});
     this.dom.chkGridY.onchange=this.view.bind(this);
 
+    window.addEventListener(this._settings.data.event,this.updateData.bind(this),false);
+    this.view();
 }
 Plot.prototype = Object.create(Plugin.prototype);
 Plot.prototype.constructor = Plot;
