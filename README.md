@@ -1,20 +1,14 @@
-# The 433
+# The 433 ([demo](http://tito433.github.io/433/))
 
 Reading message from my Calendar Event added in a specific time(could be ends with 11)
 
-It usases:
-* [Google APIs](https://developers.google.com/apis-explorer)
-  * `Calendar`
-* [`harthur/brain`](https://github.com/harthur/brain) - neural network library.
-  * - [ ] `train` - train network with sample data from calendar.
-  * - [ ] `predict` - get future prediction.
-  * - [ ] `success` - Is it over?
+It usases [Google APIs](https://developers.google.com/apis-explorer) `Calendar` to fetch data from your google calendar.
 
-### Demo: [http://tito433.github.io/433/](http://tito433.github.io/433/)
 
 Note:
 ```
 When you crossover, your each property gets multiplied. 4
 If you are moving from 2d to 3d, your each x,y point becomes a spheare itself. 3
 We've another useless information a quantity or number. 3
+Opposite happens when you move from 3d to 2d, every sphear becomes a x,y point.
 ``` 

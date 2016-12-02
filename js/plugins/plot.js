@@ -10,12 +10,11 @@ function Plot(){
     }
 
     this.view=function(){
-        console.log('view plot',this.dom.view.checked)
         if(!this.dom.view.checked) return false;
         
         if(this._data && this._data.length){
             this.clear();
-            var axis=new Axis(this._data).size(this.width-40,this.height-40);
+            var axis=new Axis(this._data).position(20,20).size(this.width-40,this.height-60);
             axis.grid(this.dom.chkGridX.checked,this.dom.chkGridY.checked);
             this.add(axis);
             this.draw();
@@ -47,8 +46,6 @@ function Axis(data){
    
     this.n=24;
     this.data=data;
-    this.x=20;
-    this.y=20;
     this._grid={'x':true,'y':true};
 
     this.grid=function(){
@@ -60,59 +57,61 @@ function Axis(data){
         }
     }
     this.draw=function(ctx){
-        var lineX=new Line().position(this.x,this.y+this.h).size(this.w,this.y+this.h),
-            lineY=new Line().position(this.x,this.y+this.h).size(this.x,this.y);
+        var x=this.x,y=this.y, w=x+this.width(),h=y+this.height();
 
-        lineX.draw(ctx);
-        lineY.draw(ctx);
-        var perY=this.h/this.n,y=this.y;
-        for(var i=0,ln=this.n;i<ln;i++){
-            if(i%3==0) this.label(ctx,this.x,y,24-i,1);
-            if(this._grid.y) drawLine(ctx,this.x,y,this.width(),y);
-            y+=perY;
+        new Line().position(x,h).size(w,h).draw(ctx);
+        new Line().position(x,y).size(x,h).draw(ctx);
+
+        var perY=this.height()/this.n,curY=h;
+        for(var i=1;i<=this.n;i++){
+            curY-=perY;
+            if(i%2==0) this.label(ctx,x,curY,i,4);
+            if(this._grid.y) this.drawLine(ctx,x,curY,w,curY);
         }
+
         if(this.data.length){
             var date=new Date(this.data[0].start.dateTime),
-                preDate=new Date(date-86400000);
+                startDate=new Date(date-86400000),
+                endDate=new Date(this.data[this.data.length-1].end.dateTime);
             
-            preDate.setMinutes(0);
-            preDate.setHours(0);
+            startDate.setMinutes(0);
+            startDate.setHours(0);
             
-            var eDate=new Date(this.data[this.data.length-1].start.dateTime),
-                samples=Math.round((eDate-preDate)/86400000)+3,
+            var samples=Math.round((endDate-startDate)/86400000),
                 xSeg=this.width()/samples;
             //draw x lables
-            var x=this.x,y=this.y+this.h,xturn=0,curDate=new Date();
-            curDate.setFullYear(preDate.getFullYear());
+            var xturn=0,currX=x,curDate=new Date();
+            curDate.setFullYear(startDate.getFullYear());
             curDate.setHours(0);
             curDate.setMinutes(0);
 
-            while(curDate<=eDate){
+            while(xturn<samples){
                 if(xturn%9==0){
-                   this.label(ctx,x,y,curDate.getDate()+'/'+curDate.getMonth(),0);
-                   if(this._grid.x) drawLine(ctx,x,y,x,0); 
+                   this.label(ctx,currX,h,curDate.getDate()+'/'+curDate.getMonth(),3);
+                   if(this._grid.x) this.drawLine(ctx,currX,y,currX,h); 
                 }  
                 
-                x+=xSeg;
+                currX+=xSeg;
                 xturn++;
                 curDate.setDate(curDate.getDate() + 1);
             }
+            //draw data
             for(var i=0,ln=this.data.length;i<ln;i++){
                 var cDate=new Date(this.data[i].start.dateTime),
-                    offsetX=Math.round((cDate-preDate)/86400000),
-                    offsetY=this.h-(cDate.getHours()*perY+((cDate.getMinutes()/60)*perY));
+                    offsetX=Math.round((cDate-startDate)/86400000),
+                    offsetY=h-(cDate.getHours()*perY+((cDate.getMinutes()/60)*perY));
 
-                x=this.x+(offsetX*xSeg),
-                y=this.y+offsetY;
                 ctx.beginPath();
                 ctx.fillStyle='#000';
-                ctx.arc(x,y,2,0,2*Math.PI);
+                var dx=x+(offsetX*xSeg);
+                
+                ctx.arc(dx,offsetY,2,0,2*Math.PI);
                 ctx.fill();
                 
             }
         }
     }
-    var drawLine=function(ctx,x,y,w,h){
+    this.drawLine=function(ctx,x,y,w,h){
         ctx.save();
         ctx.beginPath();
         ctx.strokeStyle='#ccc';
@@ -126,28 +125,25 @@ function Axis(data){
     this.label=function(ctx,x,y,txt,dir){
         ctx.save();
         ctx.beginPath();
-        ctx.strokeStyle='#000';
-        var w=h=0
-     
-        if(txt && dir==0){
-            w=x;h=y+5;
-            ctx.font='10px arial';
-            ctx.fillStyle='#000';
-            ctx.textBaseline="middle";
-            ctx.textAlign="center";  
-            ctx.fillText(txt, x, y+15);
-        }else{
-            w=x-5;h=y;
-            ctx.font='10px arial';
-            ctx.fillStyle='#000';
-            ctx.textBaseline="middle";
-            ctx.textAlign="center";  
-            ctx.fillText(txt, x-15,y);
+        var lx=x,ly=y,lx2=x,ly2=y;
+        switch (dir) {
+            case 4:
+                lx-=4;
+                x-=15;
+                break;
+            case 3:
+                ly2+=4;
+                y+=15 
+            default:
+                break;
         }
-        
-        
-        ctx.moveTo(x,y);
-        ctx.lineTo(w,h);
+        ctx.font='10px arial';
+        ctx.fillStyle=ctx.strokeStyle='#000';
+        ctx.textBaseline="middle";
+        ctx.textAlign="center";
+        ctx.fillText(txt, x,y);
+        ctx.moveTo(lx,ly);
+        ctx.lineTo(lx2,ly2);
         ctx.stroke();
         ctx.restore();
     }
