@@ -1,25 +1,5 @@
 "use strict";
 
-function Application(input,output){
-  if(typeof(Storage) === "undefined"){
-    throw "Storage undefined! This app can't run without localStorage. Can you?";
-  }
-
-  this._settings={
-    'dom':{'input':input,'output':output},
-    'data':{'key':'evt.cal.raw','event':'433.data.changed'}
-  };
-
-  this.addPlugin=function(pl){
-    var PlClass=pl.capitalizeFirstLetter();
-    if(typeof window[PlClass] === "function"){
-      new window[PlClass](this._settings);
-    }
-  }
-}
-
-
-
 Object.defineProperty(Object.prototype, 'extend', {
   value:function(){
     var target=this;

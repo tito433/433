@@ -1,5 +1,7 @@
 function Filter(){
     Plugin.apply(this,arguments);
+
+    this._storage=this._settings.data;
     
     this.init=function(){
         var sp=this.dom.input.querySelector('.model'),

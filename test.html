@@ -152,9 +152,26 @@
 // 	console.log(nm,found);
 
 // })
-	var obj={};
-	obj['class.name']='input-group';
-	console.log(obj,obj['class.name']);
+	// var obj={};
+	// obj['class.name']='input-group';
+	// console.log(obj,obj['class.name']);
+
+//05-Dec-16 test localStorage
+var key='myDataAsObject';
+var data=localStorage.getItem(key);
+//console.log(null===data,data,typeof data,Object.prototype.toString.call(data));
+// var data=function(obe){};
+console.log(data)
+console.log('is Object',data instanceof Object);
+console.log('is String',data instanceof String);
+console.log('is Array',data instanceof Array);
+console.log('is Function',data instanceof Function);
+for(var key in data){
+        console.log('key',key,'value',data[key]);
+}
+// data=[{'date':new Date(),'name':"O'Clock"},{'date':new Date()+4,'name':"O'Clock"}]
+// localStorage.setItem(key,data);
+// console.log('new data added:',data);
 </script>
 </body>
 </html>

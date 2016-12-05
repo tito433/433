@@ -1,41 +1,32 @@
 function Plot(){
     Plugin.apply(this,arguments);
-    Canvas.call(this,this.dom.output);
-
-    this.updateData=function(evt){
-        if(arguments.length==1 && arguments[0] instanceof Event){
-            this._data= arguments[0].detail?arguments[0].detail:this._data;
-        }
-        this.view();
-    }
-
+    this.dom={}
     this.view=function(){
-        if(!this.dom.view.checked) return false;
-        
-        if(this._data && this._data.length){
+        if(this._data){
             this.clear();
             var axis=new Axis(this._data).position(20,20).size(this.width-40,this.height-60);
             axis.grid(this.dom.chkGridX.checked,this.dom.chkGridY.checked);
             this.add(axis);
             this.draw();
+        }else{
+            console.log('Plot:view not engough data!');
         }
     }
+    this.updateData=function(){
+        console.log('hole ack')
+        if(arguments.length==1 && arguments[0] instanceof Event){
+              this._data= arguments[0].detail?arguments[0].detail:this._data;
+        }
+    }
+    var doOut=this._settings.dom && this._settings.dom.output && this._settings.dom.input;
+    if(doOut){
+        Canvas.call(this,this._settings.dom.output);
+        this.addView('Plot',this.view.bind(this));
+        this.dom.chkGridX=this.addModel('Plot grid.x',{'input.type':'checkbox','onchange':this.view.bind(this)});
+        this.dom.chkGridY=this.addModel('Plot grid.y',{'input.type':'checkbox','onchange':this.view.bind(this)});
+    }
 
-    var ulModel=this.dom.input.querySelector('.model'),
-        ulView=this.dom.input.querySelector('.view');
-        
-
-    this.dom.view=Plugin.addView(ulView,{'text':'Plot'});
-    this.dom.view.onchange=this.view.bind(this);
     
-    this.dom.chkGridX=Plugin.addModel(ulModel,'Plot grid.x',{'input.type':'checkbox'});
-    this.dom.chkGridX.onchange=this.view.bind(this);
-    
-    this.dom.chkGridY=Plugin.addModel(ulModel,'Plot grid.y',{'input.type':'checkbox'});
-    this.dom.chkGridY.onchange=this.view.bind(this);
-
-    window.addEventListener(this._settings.data.event,this.updateData.bind(this),false);
-    this.view();
 }
 Plot.prototype = Object.create(Plugin.prototype);
 Plot.prototype.constructor = Plot;
