@@ -6,7 +6,6 @@ function Glcalevt(){
     
     this.setData=function(resp){
         localStorage.setItem(this._storage.key,JSON.stringify(resp.items));
-        console.log('fire in the hole',this._storage.event)
         window.dispatchEvent(new CustomEvent(this._storage.event,{'detail': resp.items}));
     }
     //if no data then bring it...
@@ -29,8 +28,8 @@ function Glcalevt(){
             if (authResult && !authResult.error) {
               div.parentNode.removeChild(div);
               gapi.client.load('calendar', 'v3', function(){
-                var date_from=new Date(),date_to=new Date();
-                date_from.setFullYear(date_to.getFullYear()-1);
+                var date=new Date(),
+                    date_from=new Date(date.getFullYear(),1,1),date_to=new Date();
 
                 gapi.client.calendar.events.list({
                   'calendarId': 'primary','showDeleted': false, 'singleEvents': true,

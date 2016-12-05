@@ -13,7 +13,6 @@ function Plot(){
         }
     }
     this.updateData=function(){
-        console.log('hole ack')
         if(arguments.length==1 && arguments[0] instanceof Event){
               this._data= arguments[0].detail?arguments[0].detail:this._data;
         }

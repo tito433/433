@@ -1,20 +1,14 @@
 function Filter(){
     Plugin.apply(this,arguments);
 
-    this._storage=this._settings.data;
-    
-    this.init=function(){
-        var sp=this.dom.input.querySelector('.model'),
-            filter=Plugin.addModel(sp,'Filter');
-
-        filter.onchange=function(ev){
-            var el=ev.target,val=el.value;
-            var data=this.data().filter(function(item){
-                return hasValue(item,val)!=undefined;
-            });
-            this.data(data);
-        }.bind(this);
+    this.updateData=function(){
+        if(arguments.length==1 && arguments[0] instanceof Event){
+              this._data= arguments[0].detail?arguments[0].detail:this._data;
+              console.log('SeqCal',this._data.length)
+        }
     }
+
+    this._storage=this._settings.data;
 
     var hasValue=function(data,findValue,index){
         switch(typeof data) {
@@ -42,6 +36,23 @@ function Filter(){
                     return data;
         }
     };
+
+    var doOut=this._settings.dom && this._settings.dom.input;
+    if(doOut){
+        var filter=this.addModel('Filter',{'input.type':'text'});
+        filter.onchange=function(ev){
+            var el=ev.target,val=el.value;
+            if(this._data!=null){
+                var data=this._data.filter(function(item){
+                    return hasValue(item,val)!=undefined;
+                });
+
+                localStorage.setItem(this._storage.key,JSON.stringify(data));
+                window.dispatchEvent(new CustomEvent(this._storage.event,{'detail': data}));
+            }
+            
+        }.bind(this);
+    }
 
 }
 Filter.prototype = Object.create(Plugin.prototype);

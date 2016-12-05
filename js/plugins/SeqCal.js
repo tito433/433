@@ -4,6 +4,7 @@ function SeqCal(){
     var size=45,fontSize=12;
     this.view=function(){
         if(this._data){
+            console.log('SeqCal view',this._data)
             var i=0,ln=this._data.length,box=[];
             this.clear();//im canvas remember?
             var layout=new Layout(this.width,this.height),
@@ -39,9 +40,9 @@ function SeqCal(){
         }
     }
     this.updateData=function(){
-        console.log('hole ack')
         if(arguments.length==1 && arguments[0] instanceof Event){
               this._data= arguments[0].detail?arguments[0].detail:this._data;
+              console.log('SeqCal',this._data.length)
         }
     }
 

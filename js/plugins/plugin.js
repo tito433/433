@@ -77,6 +77,7 @@ var Plugin=function (settings){
 
 
         var igdiv=d.createElement("DIV");
+        igdiv.className=option['input.group'];
         igdiv.appendChild(btn);
 
         if(option['input.type']=='checkbox'){
@@ -94,7 +95,7 @@ var Plugin=function (settings){
           var span=document.createElement('span');
           span.className='input-group-addon';
           span.innerHTML=option['input.addon'];
-          igdiv.className=option['input.group'];
+          igdiv.appendChild(span);
         }
         
         li.appendChild(igdiv);
