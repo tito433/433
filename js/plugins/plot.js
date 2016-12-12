@@ -1,42 +1,57 @@
 function Plot(){
     Plugin.apply(this,arguments);
     this.dom={}
+    this._chart=[];
+    this._layout=false;
+
     this.view=function(){
         if(this._data){
             this.clear();
-            var axis=new Axis(this._data).position(20,20).size(this.width-40,this.height-60);
-            axis.grid(this.dom.chkGridX.checked,this.dom.chkGridY.checked);
-            this.add(axis);
+            for(var i in this._chart){
+                this.add(this._chart[i]);
+                this._chart[i].grid(this.dom.chkGridX.checked,this.dom.chkGridY.checked);
+            }
             this.draw();
         }else{
-            console.log('Plot:view not engough data!');
+            console.log('Plot:Not enough data');
         }
     }
-    this.updateData=function(){
-        if(arguments.length==1 && arguments[0] instanceof Event){
-              this._data= arguments[0].detail?arguments[0].detail:this._data;
-        }
-    }
+
     var doOut=this._settings.dom && this._settings.dom.output && this._settings.dom.input;
     if(doOut){
         Canvas.call(this,this._settings.dom.output);
         this.addView('Plot',this.view.bind(this));
         this.dom.chkGridX=this.addModel('Plot grid.x',{'input.type':'checkbox','onchange':this.view.bind(this)});
         this.dom.chkGridY=this.addModel('Plot grid.y',{'input.type':'checkbox','onchange':this.view.bind(this)});
-    }
+        this._layout=new Layout(this.width,this.height);
+        this._layout.padding=20;
 
+    }
+    this.addChart=function(chart){
+        if(chart instanceof Chart){
+            this._chart.push(chart);
+            chart.size(this.width/2-60,this.height/2-40);
+            if(this._layout){
+                this._layout.add(chart);
+                this._layout.flowLeft();
+            }
+        }
+    }
     
+    this.addChart(new Chart(this._data).title('Original'))
+    this.addChart(new Chart(this._data).title('Gap'))
 }
 Plot.prototype = Object.create(Plugin.prototype);
 Plot.prototype.constructor = Plot;
 
 
-function Axis(data){
+function Chart(data){
     Drawable.call(this);
    
     this.n=24;
-    this.data=data;
     this._grid={'x':true,'y':true};
+    this._data=data;
+    this._title=false;
 
     this.grid=function(){
         if(arguments.length){
@@ -47,28 +62,48 @@ function Axis(data){
         }
     }
     this.draw=function(ctx){
-        var x=this.x,y=this.y, w=x+this.width(),h=y+this.height();
+        var x=this.x,y=this.y, w=this.width(),h=this.height();
 
-        new Line().position(x,h).size(w,h).draw(ctx);
-        new Line().position(x,y).size(x,h).draw(ctx);
+        if(this._title){
+            ctx.font='bold 16pt Courier';
+            ctx.fillStyle='#444';
+            ctx.textBaseline="middle";
+            ctx.textAlign="center"
+            ctx.fillText(this._title, this.x+this.width()/2,this.y+8);
+            y+=25;
+            h-=25;
 
-        var perY=this.height()/this.n,curY=h;
-        for(var i=1;i<=this.n;i++){
-            curY-=perY;
-            if(i%2==0) this.label(ctx,x,curY,i,4);
-            if(this._grid.y) this.drawLine(ctx,x,curY,w,curY);
         }
+        if(this._grid.y){x+=20;w-=20;}
 
-        if(this.data.length){
-            var date=new Date(this.data[0].start.dateTime),
+        if(this._grid.x){
+            h-=20;
+            new Line().position(x,y+h).size(x+w,y+h).draw(ctx);
+        }
+        var perY=h/this.n;
+
+        if(this._grid.y){
+            var curY=y+h;
+            new Line().position(x,y).size(x,y+h).draw(ctx);
+
+            for(var i=1;i<=this.n;i++){
+                curY-=perY;
+                if(i%2==0) this.label(ctx,x,curY,i,4);
+                this.drawLine(ctx,x,curY,x+w,curY);
+            }
+
+        }
+        
+
+        if(this._data.length){
+            var date=new Date(this._data[0].start.dateTime),
                 startDate=new Date(date-86400000),
-                endDate=new Date(this.data[this.data.length-1].end.dateTime);
+                endDate=new Date(this._data[this._data.length-1].end.dateTime);
             
             startDate.setMinutes(0);
             startDate.setHours(0);
-            
             var samples=Math.round((endDate-startDate)/86400000),
-                xSeg=this.width()/samples;
+                xSeg=w/samples;
             //draw x lables
             var xturn=0,currX=x,curDate=new Date();
             curDate.setFullYear(startDate.getFullYear());
@@ -76,9 +111,9 @@ function Axis(data){
             curDate.setMinutes(0);
 
             while(xturn<samples){
-                if(xturn%9==0){
-                   this.label(ctx,currX,h,curDate.getDate()+'/'+curDate.getMonth(),3);
-                   if(this._grid.x) this.drawLine(ctx,currX,y,currX,h); 
+                if(this._grid.x && xturn%9==0){
+                   this.label(ctx,currX,y+h,curDate.getDate(),3);
+                   this.drawLine(ctx,currX,y,currX,y+h); 
                 }  
                 
                 currX+=xSeg;
@@ -86,8 +121,8 @@ function Axis(data){
                 curDate.setDate(curDate.getDate() + 1);
             }
             //draw data
-            for(var i=0,ln=this.data.length;i<ln;i++){
-                var cDate=new Date(this.data[i].start.dateTime),
+            for(var i=0,ln=this._data.length;i<ln;i++){
+                var cDate=new Date(this._data[i].start.dateTime),
                     offsetX=Math.round((cDate-startDate)/86400000),
                     offsetY=h-(cDate.getHours()*perY+((cDate.getMinutes()/60)*perY));
 
@@ -95,11 +130,12 @@ function Axis(data){
                 ctx.fillStyle='#000';
                 var dx=x+(offsetX*xSeg);
                 
-                ctx.arc(dx,offsetY,2,0,2*Math.PI);
+                ctx.arc(dx,y+offsetY,2,0,2*Math.PI);
                 ctx.fill();
                 
             }
         }
+
     }
     this.drawLine=function(ctx,x,y,w,h){
         ctx.save();
@@ -137,7 +173,14 @@ function Axis(data){
         ctx.stroke();
         ctx.restore();
     }
-
+    this.title=function(){
+        if(arguments.length){
+            this._title=arguments[0];
+            return this;
+        }else{
+            return this._title;
+        }
+    }
 }
-Axis.prototype = Object.create(Drawable.prototype);
-Axis.prototype.constructor = Axis;
+Chart.prototype = Object.create(Drawable.prototype);
+Chart.prototype.constructor = Chart;

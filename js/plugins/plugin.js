@@ -24,89 +24,98 @@ var Plugin=function (settings){
 
   this.view=function(){}
 
-  this.updateData=function(){}
-
-  if(evName){
-    window.addEventListener(evName,function(e){
-      this.updateData(e)
-    }.bind(this),false);
-  } 
-  
-  this.addView=function(label,callBack){
-    var d=document,
-        settings=this._settings||{},
-        dom=settings.dom||false,
-        input=dom.input || false;
-
-    if(settings && dom && input){
-      var parent=input.querySelector('buttongroup.view');
-      if(parent){
-        var btn=d.createElement("button");
-        btn.innerHTML=label;
-        if(callBack) btn.onclick=callBack;
-        parent.appendChild(btn);
-        return btn;
-      }
+  this.updateData=function(){
+    if(arguments.length==1 && arguments[0] instanceof Event){
+          this._data= arguments[0].detail?arguments[0].detail:this._data;
     }
-    return false;
   }
-  this.addModel=function(label,options){
+
+  if(evName) window.addEventListener(evName,this.updateData.bind(this),false);
+
+  
+  this._addUI=function(label,option){
     var d=document,
         settings=this._settings||{},
         dom=settings.dom||false,
-        input=dom.input || false;
+        input=dom.input || false,
+        parent=input.querySelector(option.parent);
+
+    if(parent){
+      var btn=d.createElement(option.type);
+      
+      if("button"===option.type){
+        btn.innerHTML=label;
+      }  
     
-    if(settings && dom && input){
-      var parent=input.querySelector('ul.model');
-      if(parent){
-        var btn=d.createElement("button"),
-            option={'input.group':'input-group','input.type':'input','input.value':'','input.class':'form-control','input.addon':false,'onchange':false}.extend(options),
-            li=d.createElement('li'),
-            para = d.createElement("P"),
-            t = d.createTextNode(label),
-            btn=d.createElement("INPUT");
+      
+      if(option['input.wrap']){
+        var li=d.createElement(option['input.wrap']),
+            p=d.createElement("P");
 
-        para.appendChild(t);
-        li.appendChild(para);
-
-        //input
-        btn.className =option['input.class'];
-        btn.type=option['input.type'];
-        btn.value=option['input.value'];;
-        if(option.onchange && typeof option.onchange=='function') btn.onchange=option.onchange;
-
-
+        p.appendChild(d.createTextNode(label));
+        li.appendChild(p);
+        parent.appendChild(li);
+        parent=li;
+      }
+      //input prop
+      btn.className =option['input.class']||'';
+      btn.type=option['input.type']||'';
+      btn.value=option['input.value']||'';
+      
+      //addon only for inputgroup!
+      if(option['input.group']){
         var igdiv=d.createElement("DIV");
         igdiv.className=option['input.group'];
-        igdiv.appendChild(btn);
-
-        if(option['input.type']=='checkbox'){
-          var id=new Date().getTime()+Math.random();
-          btn.id=id;
-          btn.className='tgl';
-          btn.checked=true;
-          var label=document.createElement('label');
-          label.htmlFor=id;
-          igdiv.appendChild(label);
-        }
-
-        //has addon?
-        if(option['input.addon']){
-          var span=document.createElement('span');
-          span.className='input-group-addon';
-          span.innerHTML=option['input.addon'];
-          igdiv.appendChild(span);
-        }
-        
-        li.appendChild(igdiv);
-        parent.appendChild(li);
-        return btn;
+        parent.appendChild(igdiv);
+        parent=igdiv;
       }
+      parent.appendChild(btn);
+      
+      if(option['input.type']==='checkbox'){
+        var id=new Date().getTime()+Math.random();
+        btn.id=id;
+        btn.className='tgl';
+        btn.checked=true;
+        var label=d.createElement('label');
+        label.innerHTML=' ';
+        label.htmlFor=id;
+        parent.appendChild(label);
+      }
+
+      //has addon?
+      if(option['input.addon']){
+        var span=d.createElement('span');
+        span.className='input-group-addon';
+        span.innerHTML=option['input.addon'];
+        parent.appendChild(span);
+      }
+
+      if(option.onchange && typeof option.onchange=='function'){
+        if(btn instanceof HTMLButtonElement){
+          btn.onclick=option.onchange;
+        }else if(btn instanceof HTMLInputElement){
+          btn.onchange=option.onchange;
+        }
+      } 
+      return btn;
+    }else{
+      throw "No parent found!";
     }
-    return false;
+
+  }
+  this.addView=function(label,callBack){
+    var options={'type':'button','parent':'buttongroup.view','onchange':callBack};
+    return this._addUI(label,options);
+  }
+  this.addModel=function(label,options){
+    var option={'type':'input','parent':'ul.model','input.wrap':'li','input.group':'input-group','input.type':'input','input.value':'','input.class':'form-control','input.addon':false,'onchange':false}.extend(options);
+    return this._addUI(label,option);
   }
 
-  this.addControl=this.addModel;
+  this.addControl=function(label,callBack){
+    var options={'type':'button','parent':'buttongroup.controll','onchange':callBack};
+    return this._addUI(label,options);
+  };
 }
 
 

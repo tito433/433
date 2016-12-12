@@ -4,8 +4,7 @@ function SeqCal(){
     var size=45,fontSize=12;
     this.view=function(){
         if(this._data){
-            console.log('SeqCal view',this._data)
-            var i=0,ln=this._data.length,box=[];
+            var i=0,ln=this._data.length;
             this.clear();//im canvas remember?
             var layout=new Layout(this.width,this.height),
                 startDate=new Date(this._data[0].start.dateTime),
@@ -30,19 +29,13 @@ function SeqCal(){
                 }else{
                     startDate.setDate(startDate.getDate() + 1);
                 }
-                box.push(rect);
+                layout.add(rect);
                 this.add(rect);                
             }
-            layout.flowLeft(box);
+            layout.flowLeft();
             this.draw();
         }else{
-            console.log('SeqCal:view not engough data!');
-        }
-    }
-    this.updateData=function(){
-        if(arguments.length==1 && arguments[0] instanceof Event){
-              this._data= arguments[0].detail?arguments[0].detail:this._data;
-              console.log('SeqCal',this._data.length)
+            console.log('SeqCal:view have not engough data!');
         }
     }
 
