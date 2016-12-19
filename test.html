@@ -157,21 +157,48 @@
 	// console.log(obj,obj['class.name']);
 
 //05-Dec-16 test localStorage
-var key='myDataAsObject';
-var data=localStorage.getItem(key);
+// var key='myDataAsObject';
+// var data=localStorage.getItem(key);
 //console.log(null===data,data,typeof data,Object.prototype.toString.call(data));
 // var data=function(obe){};
-console.log(data)
-console.log('is Object',data instanceof Object);
-console.log('is String',data instanceof String);
-console.log('is Array',data instanceof Array);
-console.log('is Function',data instanceof Function);
-for(var key in data){
-        console.log('key',key,'value',data[key]);
-}
+// console.log(data)
+// console.log('is Object',data instanceof Object);
+// console.log('is String',data instanceof String);
+// console.log('is Array',data instanceof Array);
+// console.log('is Function',data instanceof Function);
+// for(var key in data){
+//         console.log('key',key,'value',data[key]);
+// }
 // data=[{'date':new Date(),'name':"O'Clock"},{'date':new Date()+4,'name':"O'Clock"}]
 // localStorage.setItem(key,data);
 // console.log('new data added:',data);
+// function template(str,vars){
+
+//         var template=String(str),
+//         re =/\{(.+?(?=\}))\}/g, result=[], m=false;
+
+//         while (m = re.exec(str)) {
+//                 result.push(m);
+//         }
+
+//         for(var idx in result){
+//                var m=result[idx];
+//                 if(vars.hasOwnProperty(m[1])){
+//                         template=template.replace(m[0],vars[m[1]]);
+//                 } 
+//         }
+//         return template;
+// }
+// var msg='You will need to spend at least {SYMBOL}{MINIMUM} to qualify for a tax refund.';
+// var vars={'SYMBOL':'BDT','MINIMUM':'100,000'};
+// console.log(template(msg,vars));
+//19-dec-2016
+var mapTo=function(x, a, b, c, d) {
+    return  (x-a)/(b-a) * (d-c) + c;
+}
+var view=[0,24,0,50];
+console.log(mapTo(2,view[0],view[1],0,200));
+
 </script>
 </body>
 </html>

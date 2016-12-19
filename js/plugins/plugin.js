@@ -1,12 +1,13 @@
-var Plugin=function (settings){
+var Plugin=function (){
   
   if(typeof(Storage) === "undefined"){
       throw "Storage undefined! This app can't run without localStorage. Can you?";
   }
 
-  this._settings=settings;
+  this._settings=arguments[0]||{};
   this._data=null;
-  
+  this._hasIO=this._settings.dom && this._settings.dom.output && this._settings.dom.input;
+
   this.loadData=function(key){
     var dt=localStorage.getItem(key);
     if(dt!=null) {
@@ -15,7 +16,7 @@ var Plugin=function (settings){
       }catch(err){}
     }
   }
-  var oData=settings && settings.data || false,
+  var oData=this._settings.data || false,
       key=oData && oData.key? oData.key:false,
       evName=oData && oData.event?oData.event:false;
 
@@ -25,19 +26,20 @@ var Plugin=function (settings){
   this.view=function(){}
 
   this.updateData=function(){
+    console.log('updateData',this)
     if(arguments.length==1 && arguments[0] instanceof Event){
           this._data= arguments[0].detail?arguments[0].detail:this._data;
     }
   }
 
-  if(evName) window.addEventListener(evName,this.updateData.bind(this),false);
+  if(evName) window.addEventListener(evName,function (){
+    this.updateData.apply(this,arguments)}.bind(this),false);
 
   
   this._addUI=function(label,option){
     var d=document,
-        settings=this._settings||{},
-        dom=settings.dom||false,
-        input=dom.input || false,
+        dom=this._settings.dom||{},
+        input=dom.input || document.body,
         parent=input.querySelector(option.parent);
 
     if(parent){
@@ -98,8 +100,6 @@ var Plugin=function (settings){
         }
       } 
       return btn;
-    }else{
-      throw "No parent found!";
     }
 
   }

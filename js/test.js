@@ -337,29 +337,30 @@ console.log('null',data)
 // var w1="body .canvas";
 
 // console.log(Object.prototype.toString.call(v1),typeof v1,v1 instanceof String,v1 instanceof Date,v1 instanceof Object)
-alert('attach')
-window.onload=function(){
+// alert('attach')
+// window.onload=function(){
 
-    console.log('loaded')
-    var bd='body #canvas';
-    var parent = document.querySelector(bd);
+//     console.log('loaded')
+//     var bd='body #canvas';
+//     var parent = document.querySelector(bd);
 
-    if(!parent){
-        parent=document.body;
-    }
+//     if(!parent){
+//         parent=document.body;
+//     }
 
-    if(parent instanceof HTMLCanvasElement){
+//     if(parent instanceof HTMLCanvasElement){
 
-    }else{
+//     }else{
         
-    }
+//     }
 
-    console.log(parent,typeof parent,Object.prototype.toString.call(parent),parent instanceof HTMLBodyElement);
+//     console.log(parent,typeof parent,Object.prototype.toString.call(parent),parent instanceof HTMLBodyElement);
 
-    console.log('HTMLUListElement',parent instanceof HTMLUListElement)
-    console.log('HTMLElement',parent instanceof HTMLElement)
-    console.log('Element',parent instanceof Element)
-    console.log('HTMLCanvasElement',parent instanceof HTMLCanvasElement)
+//     console.log('HTMLUListElement',parent instanceof HTMLUListElement)
+//     console.log('HTMLElement',parent instanceof HTMLElement)
+//     console.log('Element',parent instanceof Element)
+//     console.log('HTMLCanvasElement',parent instanceof HTMLCanvasElement)
     
 
-}
+// }
+

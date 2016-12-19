@@ -37,8 +37,7 @@ function Filter(){
         }
     };
 
-    var doOut=this._settings.dom && this._settings.dom.input;
-    if(doOut){
+    if(this._hasIO){
         var filter=this.addModel('Filter',{'input.type':'text'});
         filter.onchange=function(ev){
             var el=ev.target,val=el.value;

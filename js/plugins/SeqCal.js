@@ -39,8 +39,7 @@ function SeqCal(){
         }
     }
 
-    var doOut=this._settings.dom && this._settings.dom.output && this._settings.dom.input;
-    if(doOut){
+    if(this._hasIO){
         Canvas.call(this,this._settings.dom.output);
         
         
