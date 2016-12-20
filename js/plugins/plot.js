@@ -42,36 +42,44 @@ function Plot(){
 
         var chartOrig=new Chart();
         chartOrig.format(function(data){
-            var date=new Date(data[0].start.dateTime),
-                startDate=new Date(date-86400000),
-                endDate=new Date(data[data.length-1].end.dateTime);
-            
-            startDate.setMinutes(0);
-            startDate.setHours(0);
             var fmtData=[];
-            for(var i=0,ln=data.length;i<ln;i++){
-                var cDate=new Date(data[i].start.dateTime),
-                    offsetX=Math.round((cDate-startDate)/86400000),
-                    offsetY=cDate.getHours()+(cDate.getMinutes()/60);
-                fmtData.push({'x':offsetX,'y':offsetY});           
+            if(data && data instanceof Array){
+                var date=new Date(data[0].start.dateTime),
+                    startDate=new Date(date-86400000),
+                    endDate=new Date(data[data.length-1].end.dateTime);
+                
+                startDate.setMinutes(0);
+                startDate.setHours(0);
+                
+                for(var i=0,ln=data.length;i<ln;i++){
+                    var cDate=new Date(data[i].start.dateTime),
+                        offsetX=Math.round((cDate-startDate)/86400000),
+                        offsetY=cDate.getHours()+(cDate.getMinutes()/60);
+                    fmtData.push({'x':offsetX,'y':offsetY});           
+                }
             }
             return fmtData;
-        }).data(this._data).title('Original').size(this.width/2-60,this.height/2-40);
+        });
+        chartOrig.data(this._data).title('Original').size(this.width/2-60,this.height/2-40);
         this._chart.push(chartOrig);
         this._layout.add(chartOrig);
 
         var chartGap=new Chart();
         chartGap.format(function(data){
-            var date=new Date(data[0].start.dateTime);
-            var fmtData=[];
-            for(var i=0,ln=data.length;i<ln;i++){
-                var cDate=new Date(data[i].start.dateTime),
-                    offsetY=Math.round((cDate-date)/86400000);
-                date=cDate;
-                fmtData.push({'x':i,'y':offsetY});           
+            fmtData=[];
+            if(data && data instanceof Array){
+                var date=new Date(data[0].start.dateTime);
+                for(var i=0,ln=data.length;i<ln;i++){
+                    var cDate=new Date(data[i].start.dateTime),
+                        offsetY=Math.round((cDate-date)/86400000);
+                    date=cDate;
+                    fmtData.push({'x':i,'y':offsetY});           
+                }
             }
+            
             return fmtData;
-        }).data(this._data).title('Gap').size(this.width/2-60,this.height/2-40);
+        });
+        chartGap.data(this._data).title('Gap').size(this.width/2-60,this.height/2-40);
         this._chart.push(chartGap);
         this._layout.add(chartGap);
 
