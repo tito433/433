@@ -67,10 +67,6 @@ function Plot(){
             for(var i=0,ln=data.length;i<ln;i++){
                 var cDate=new Date(data[i].start.dateTime),
                     offsetY=Math.round((cDate-date)/86400000);
-                console.log(i,offsetY)
-                if(offsetY>10){
-                    console.log(cDate,date);
-                }
                 date=cDate;
                 fmtData.push({'x':i,'y':offsetY});           
             }
@@ -176,7 +172,7 @@ function Chart(){
             for(var i in this._data){
                 var point=this._data[i];
                 if(point.x && point.y){
-                    var mapToY=this.mapTo(point.y,this._viewPort[0],this._viewPort[1],y,y+h);
+                    var mapToY=this.mapTo(point.y,this._viewPort[0],this._viewPort[1],y+h,y);
                     var mapToX=this.mapTo(point.x,this._viewPort[2],this._viewPort[3],x,x+w);
                     ctx.beginPath();
                     ctx.fillStyle='#000';
