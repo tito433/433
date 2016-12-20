@@ -171,13 +171,14 @@ function Chart(){
             
             for(var i in this._data){
                 var point=this._data[i];
-                if(point.x && point.y){
+                if(point.x!=undefined && point.y!=undefined){
                     var mapToY=this.mapTo(point.y,this._viewPort[0],this._viewPort[1],y+h,y);
                     var mapToX=this.mapTo(point.x,this._viewPort[2],this._viewPort[3],x,x+w);
                     ctx.beginPath();
                     ctx.fillStyle='#000';
                     ctx.arc(mapToX,mapToY,2,0,2*Math.PI);
                     ctx.fill();
+
                 } 
             }
             ctx.restore();
