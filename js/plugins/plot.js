@@ -98,7 +98,8 @@ function Chart(){
     this._data=[];
     this._grid={'x':133,'y':24};
     this._title=false;
-    this._viewPort=[0,24,0,this._grid.x];
+    var animate=false;
+    var _ctx=false;
 
     this._fn_data_format=function(){}
 
@@ -124,6 +125,8 @@ function Chart(){
         return this;
     }
     this.draw=function(ctx){
+        //i clean my mess!
+        ctx.clearRect(this.x,this.y,this.width(),this.height());
         var x=this.x,y=this.y, w=this.width(),h=this.height();
         ctx.save();
         if(this._title){
@@ -221,6 +224,47 @@ function Chart(){
     this.mapTo=function(x, a, b, c, d) {
         return  (x-a)/(b-a) * (d-c) + c;
     }
+    this._animate=function(){
+        if(animate && this._data.length){
+            for(var i=0,ln=this._data.length;i<ln;i++){
+                var pt=this._data[i],
+                    x=this.mapTo(pt.x,0,this._grid.x,0,this.width());
+                    y=this.mapTo(pt.y,0,this._grid.y,this.y+this.height(),this.y);
+                if(y>=this.y+this.height()){
+                    playSound(x*20);
+                    this._data.splice(i,1);
+                    ln--;
+                }else{
+                    y+=5; //gravity?
+                    pt.y=this.mapTo(y,this.y+this.height(),this.y,0,this._grid.y);
+                }
+            }
+            this.draw(_ctx);
+
+        }else if(0==this._data.length){
+            clearInterval(animate);
+        }else{
+            animate=setInterval(this._animate.bind(this),100);
+        }
+    }
+    this.onClick=function(ctx){
+        if(!animate){
+            _ctx=ctx;
+            this._animate();
+        }else{
+            clearInterval(animate);
+        }
+    }
+    var context = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(f){
+        var osc = context.createOscillator();
+        osc.type = 'square'; 
+        osc.frequency.value = 2000; 
+        osc.connect(context.destination);
+        osc.start();
+        osc.stop(context.currentTime + 0.03);
+    }
+
 }
 Chart.prototype = Object.create(Drawable.prototype);
 Chart.prototype.constructor = Chart;
