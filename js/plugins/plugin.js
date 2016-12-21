@@ -4,36 +4,33 @@ var Plugin=function (){
       throw "Storage undefined! This app can't run without localStorage. Can you?";
   }
 
+  var oData={'key':'evt.cal.raw','event':'433.data.void'};
+
   this._settings=arguments[0]||{};
+  this._settings.data=oData;
   this._data=null;
   this._hasIO=this._settings.dom && this._settings.dom.output && this._settings.dom.input;
+  this._evt_data_loaded=function(){};
 
-  this.loadData=function(key){
-    var dt=localStorage.getItem(key);
-    if(dt!=null) {
-      try{
-        this._data=JSON.parse(dt);
-      }catch(err){}
-    }
+  
+
+  try{
+    this._data=JSON.parse(localStorage.getItem(oData.key));
+  }catch(err){
+    console.log('Error parsing localData',err);
   }
-  var oData=this._settings.data || false,
-      key=oData && oData.key? oData.key:false,
-      evName=oData && oData.event?oData.event:false;
-
-
-  if(key) this.loadData(key);
-
+  
   this.view=function(){}
 
   this.updateData=function(){
-    console.log('updateData',this)
+    console.log('updateData ack')
     if(arguments.length==1 && arguments[0] instanceof Event){
-          this._data= arguments[0].detail?arguments[0].detail:this._data;
+          this._data= arguments[0].detail && arguments[0].detail instanceof Array?arguments[0].detail:[];
+          this._evt_data_loaded();
     }
   }
 
-  if(evName) window.addEventListener(evName,function (){
-    this.updateData.apply(this,arguments)}.bind(this),false);
+  window.addEventListener(oData.event,this.updateData.bind(this),false);
 
   
   this._addUI=function(label,option){

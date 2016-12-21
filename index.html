@@ -32,27 +32,25 @@
   <article id="output"></article>
 <script type="text/javascript">
 
-  var plugins=['glcalevt','SeqCal','plot','filter'];
+  
 
   window.onload =function(){
-    var input=document.getElementById('input'),
+    var plugins=['glcalevt','SeqCal','plot','filter'],
+        input=document.getElementById('input'),
         output=document.getElementById('output');
 
-    var application={
-      'dom':{'input':input,'output':output},
-      'data':{'key':'evt.cal.raw','event':'433.data.changed'}
-    };
-
-    if(window.Plugin && plugins.length){
-      plugins.forEach(function(pClass){
-        Plugin.load(pClass, function(pl){
-          var PlClass=pl.capitalizeFirstLetter();
-          if(typeof window[PlClass] === "function"){
-            new window[PlClass](application);
+    plugins.forEach(function(pClass){
+      Plugin.load(pClass, 
+        function(pl){
+          var className=pl.capitalizeFirstLetter();
+          if(typeof window[className] === "function"){
+            new window[className]({
+              'dom':{'input':input,'output':output}
+            });
           }
-        });
-      });
-    }
+        }
+      );
+    });
 
   }
 </script>

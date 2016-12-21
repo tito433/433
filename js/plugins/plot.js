@@ -1,6 +1,5 @@
 function Plot(){
     Plugin.apply(this,arguments);
-    this.dom={}
     this._chart=[];
     this._layout=new Layout(this.width,this.height);
     this._layout.padding=20;
@@ -18,23 +17,23 @@ function Plot(){
         this.addView('Plot',this.view.bind(this));
         
 
-        var inpX=this.addModel('Plot grid.x',{'input.type':'number','input.value':150,'input.addon':'px'}),
-            inpY=this.addModel('Plot grid.y',{'input.type':'number','input.value':24,'input.addon':'px'});
+        var inpX=this.addModel('Plot nx',{'input.type':'number','input.value':133}),
+            inpY=this.addModel('Plot ny',{'input.type':'number','input.value':24});
 
 
 
         inpX.onchange=function(ev){
-            for(var i in this._chart){
-                this.add(this._chart[i]);
+            for(var i =0,ln=this._chart.length;i<ln;i++){
                 this._chart[i].grid(ev.target.value);
             }
+            this.view();
         }.bind(this);
 
         inpY.onchange=function(ev){
-            for(var i in this._chart){
-                this.add(this._chart[i]);
+            for(var i =0,ln=this._chart.length;i<ln;i++){
                 this._chart[i].grid(null,ev.target.value);
             }
+            this.view();
         }.bind(this);
 
        
@@ -43,7 +42,7 @@ function Plot(){
         var chartOrig=new Chart();
         chartOrig.format(function(data){
             var fmtData=[];
-            if(data && data instanceof Array){
+            if(data instanceof Array && data.length){
                 var date=new Date(data[0].start.dateTime),
                     startDate=new Date(date-86400000),
                     endDate=new Date(data[data.length-1].end.dateTime);
@@ -53,9 +52,8 @@ function Plot(){
                 
                 for(var i=0,ln=data.length;i<ln;i++){
                     var cDate=new Date(data[i].start.dateTime),
-                        offsetX=Math.round((cDate-startDate)/86400000),
                         offsetY=cDate.getHours()+(cDate.getMinutes()/60);
-                    fmtData.push({'x':offsetX,'y':offsetY});           
+                    fmtData.push(new Point(i,offsetY));           
                 }
             }
             return fmtData;
@@ -67,18 +65,19 @@ function Plot(){
         var chartGap=new Chart();
         chartGap.format(function(data){
             fmtData=[];
-            if(data && data instanceof Array){
+            if(data instanceof Array && data.length){
                 var date=new Date(data[0].start.dateTime);
                 for(var i=0,ln=data.length;i<ln;i++){
                     var cDate=new Date(data[i].start.dateTime),
                         offsetY=Math.round((cDate-date)/86400000);
                     date=cDate;
-                    fmtData.push({'x':i,'y':offsetY});           
+                    fmtData.push(new Point(i,offsetY));           
                 }
             }
             
             return fmtData;
         });
+
         chartGap.data(this._data).title('Gap').size(this.width/2-60,this.height/2-40);
         this._chart.push(chartGap);
         this._layout.add(chartGap);
@@ -86,24 +85,20 @@ function Plot(){
         this._layout.flowLeft();
     }
 
-    this.updateData=function(){
-        if(arguments.length==1 && arguments[0] instanceof Event){
-            var data=arguments[0].detail?arguments[0].detail:[];
-            for(var i in this._chart){
-                this._chart[i].data(data);
-            }
+    this._evt_data_loaded=function(){
+        for(var i =0,ln=this._chart.length;i<ln;i++){
+            this._chart[i].data(this._data);
         }
     }
-    
 }
 
 //make this Chart resizeable.
 function Chart(){
     Drawable.call(this);
     this._data=[];
-    this._grid={'x':150,'y':24};
+    this._grid={'x':133,'y':24};
     this._title=false;
-    this._viewPort=[0,24,0,50];
+    this._viewPort=[0,24,0,this._grid.x];
 
     this._fn_data_format=function(){}
 
@@ -113,16 +108,7 @@ function Chart(){
     }
     this.data=function(){
         if(arguments.length==1){
-            this._data=this._fn_data_format(arguments[0]);
-            var mx = this._data.reduce(function(a, b) {
-              return a>b.x?a:b.x;
-            }, 0);
-            var my = this._data.reduce(function(a, b) {
-              return a>b.y?a:b.y;
-            }, 0);
-            this._viewPort[1]=Math.max(this._viewPort[1],my);
-            this._viewPort[3]=Math.max(this._viewPort[3],mx);
-
+            this._data=this._fn_data_format(arguments[0]||[]);
             return this;
         }else{
             return this._data;
@@ -154,40 +140,35 @@ function Chart(){
         if(this._grid.x){
             h-=20;
             new Line().position(x,y+h).size(x+w,y+h).draw(ctx);
-            var perX=w/this._grid.x;
-            for(var ix=x,nx=1;ix<=x+w;ix+=perX,nx++){
-                var lx=this.mapTo(ix,x,x+w,this._viewPort[2],this._viewPort[3]);
-                if(nx%10==0){
-                    this.label(ctx,ix,y+h,lx.toFixed(1),3);
-                    this.drawLine(ctx,ix,y,ix,y+h); 
+            
+            var tagGap=Math.floor(this._grid.x/30);
+            for(var i=0,ln=this._grid.x;i<=ln;i++){
+                var ix=this.mapTo(i,0,ln,x,x+w);
+                if(i && i%tagGap==0){
+                    this.drawLine(ctx,ix,y+h,ix,y);
+                    if(i%(tagGap*2)==0) this.label(ctx,ix,y+h,i,3);
                 }
             }
         }
 
         if(this._grid.y){
             new Line().position(x,y).size(x,y+h).draw(ctx);
-            var perY=h/this._grid.y;
-            for(var iy=y+h,ny=1;iy>=y;iy-=perY,ny++){
-                var ly=this.mapTo(iy,y,y+h,this._viewPort[1],this._viewPort[0]);
-                if(ny%2==0)this.label(ctx,x,iy,ly.toFixed(0),4);
+            for(var i=0,ln=this._grid.y;i<=ln;i++){
+                var iy=this.mapTo(i,0,ln,y+h,y);
+                if(i && i%2==0)this.label(ctx,x,iy,i,4);
                 this.drawLine(ctx,x,iy,x+w,iy); 
             }
 
         }
-
         if(this._data && this._data.length){
-            
             for(var i in this._data){
                 var point=this._data[i];
-                if(point.x!=undefined && point.y!=undefined){
-                    var mapToY=this.mapTo(point.y,this._viewPort[0],this._viewPort[1],y+h,y);
-                    var mapToX=this.mapTo(point.x,this._viewPort[2],this._viewPort[3],x,x+w);
-                    ctx.beginPath();
-                    ctx.fillStyle='#000';
-                    ctx.arc(mapToX,mapToY,2,0,2*Math.PI);
-                    ctx.fill();
-
-                } 
+                var mapToY=this.mapTo(point.y,0,this._grid.y,y+h,y);
+                var mapToX=this.mapTo(point.x,0,this._grid.x,x,x+w);
+                ctx.beginPath();
+                ctx.fillStyle='#000';
+                ctx.arc(mapToX,mapToY,2,0,2*Math.PI);
+                ctx.fill();
             }
             ctx.restore();
         }
