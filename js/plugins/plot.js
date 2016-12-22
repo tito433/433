@@ -168,10 +168,13 @@ function Chart(){
                 var point=this._data[i];
                 var mapToY=this.mapTo(point.y,0,this._grid.y,y+h,y);
                 var mapToX=this.mapTo(point.x,0,this._grid.x,x,x+w);
-                ctx.beginPath();
-                ctx.fillStyle='#000';
-                ctx.arc(mapToX,mapToY,2,0,2*Math.PI);
-                ctx.fill();
+                if(this.visible(mapToX,mapToY)){
+                    ctx.beginPath();
+                    ctx.fillStyle='#000';
+                    ctx.arc(mapToX,mapToY,2,0,2*Math.PI);
+                    ctx.fill();
+                }
+                
             }
             ctx.restore();
         }
