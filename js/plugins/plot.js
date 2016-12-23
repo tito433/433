@@ -1,95 +1,89 @@
-function Plot(){
+function Plot(input,output){
     Plugin.apply(this,arguments);
+    
+    Canvas.call(this,output);
+
     this._chart=[];
-    this._layout=new Layout(this.width,this.height);
-    this._layout.padding=20;
+    var _layout=new Layout(this.width,this.height);
+    _layout.padding=20;
 
     this.view=function(){
         this.clear();
         for(var i in this._chart){
+            this._chart[i].data(this.data());
             this.add(this._chart[i]);
         }
         this.draw();
     }
 
-    if(this._hasIO){
-        Canvas.call(this,this._settings.dom.output);
-        this.addView('Plot',this.view.bind(this));
-        
+    this.addView('Plot',this.view.bind(this));
+    
 
-        var inpX=this.addModel('Plot nx',{'input.type':'number','input.value':133}),
-            inpY=this.addModel('Plot ny',{'input.type':'number','input.value':24});
+    var inpX=this.addModel('Plot nx',{'input.type':'number','input.value':133}),
+        inpY=this.addModel('Plot ny',{'input.type':'number','input.value':24});
 
 
-
-        inpX.onchange=function(ev){
-            for(var i =0,ln=this._chart.length;i<ln;i++){
-                this._chart[i].grid(ev.target.value);
-            }
-            this.view();
-        }.bind(this);
-
-        inpY.onchange=function(ev){
-            for(var i =0,ln=this._chart.length;i<ln;i++){
-                this._chart[i].grid(null,ev.target.value);
-            }
-            this.view();
-        }.bind(this);
-
-       
-        //chart init all
-
-        var chartOrig=new Chart();
-        chartOrig.format(function(data){
-            var fmtData=[];
-            if(data instanceof Array && data.length){
-                var date=new Date(data[0].start.dateTime),
-                    startDate=new Date(date-86400000),
-                    endDate=new Date(data[data.length-1].end.dateTime);
-                
-                startDate.setMinutes(0);
-                startDate.setHours(0);
-                
-                for(var i=0,ln=data.length;i<ln;i++){
-                    var cDate=new Date(data[i].start.dateTime),
-                        offsetY=cDate.getHours()+(cDate.getMinutes()/60);
-                    fmtData.push(new Point(i,offsetY));           
-                }
-            }
-            return fmtData;
-        });
-        chartOrig.data(this._data).title('Original').size(this.width/2-60,this.height/2-40);
-        this._chart.push(chartOrig);
-        this._layout.add(chartOrig);
-
-        var chartGap=new Chart();
-        chartGap.format(function(data){
-            fmtData=[];
-            if(data instanceof Array && data.length){
-                var date=new Date(data[0].start.dateTime);
-                for(var i=0,ln=data.length;i<ln;i++){
-                    var cDate=new Date(data[i].start.dateTime),
-                        offsetY=Math.round((cDate-date)/86400000);
-                    date=cDate;
-                    fmtData.push(new Point(i,offsetY));           
-                }
-            }
-            
-            return fmtData;
-        });
-
-        chartGap.data(this._data).title('Gap').size(this.width/2-60,this.height/2-40);
-        this._chart.push(chartGap);
-        this._layout.add(chartGap);
-
-        this._layout.flowLeft();
-    }
-
-    this._evt_data_loaded=function(){
+    inpX.onchange=function(ev){
         for(var i =0,ln=this._chart.length;i<ln;i++){
-            this._chart[i].data(this._data);
+            this._chart[i].grid(ev.target.value);
         }
-    }
+        this.view();
+    }.bind(this);
+
+    inpY.onchange=function(ev){
+        for(var i =0,ln=this._chart.length;i<ln;i++){
+            this._chart[i].grid(null,ev.target.value);
+        }
+        this.view();
+    }.bind(this);
+
+   
+    //chart init all
+    var chartOrig=new Chart();
+    chartOrig.format(function(data){
+        var fmtData=[];
+        if(data instanceof Array && data.length){
+            var date=new Date(data[0].start.dateTime),
+                startDate=new Date(date-86400000),
+                endDate=new Date(data[data.length-1].end.dateTime);
+            
+            startDate.setMinutes(0);
+            startDate.setHours(0);
+            
+            for(var i=0,ln=data.length;i<ln;i++){
+                var cDate=new Date(data[i].start.dateTime),
+                    offsetY=cDate.getHours()+(cDate.getMinutes()/60);
+                fmtData.push(new Point(i,offsetY));           
+            }
+        }
+        return fmtData;
+    });
+    chartOrig.data(this.data()).title('Original').size(this.width/2-60,this.height/2-40);
+    this._chart.push(chartOrig);
+    _layout.add(chartOrig);
+
+    var chartGap=new Chart();
+    chartGap.format(function(data){
+        fmtData=[];
+        if(data instanceof Array && data.length){
+            var date=new Date(data[0].start.dateTime);
+            for(var i=0,ln=data.length;i<ln;i++){
+                var cDate=new Date(data[i].start.dateTime),
+                    offsetY=Math.round((cDate-date)/86400000);
+                date=cDate;
+                fmtData.push(new Point(i,offsetY));           
+            }
+        }
+        
+        return fmtData;
+    });
+
+    chartGap.data(this.data()).title('Gap').size(this.width/2-60,this.height/2-40);
+    this._chart.push(chartGap);
+    _layout.add(chartGap);
+
+    _layout.flowLeft();
+
 }
 
 //make this Chart resizeable.
@@ -100,6 +94,7 @@ function Chart(){
     this._title=false;
     var animate=false;
     var _ctx=false;
+    var _data_backup=[];
 
     this._fn_data_format=function(){}
 
@@ -168,7 +163,7 @@ function Chart(){
                 var point=this._data[i];
                 var mapToY=this.mapTo(point.y,0,this._grid.y,y+h,y);
                 var mapToX=this.mapTo(point.x,0,this._grid.x,x,x+w);
-                if(this.visible(mapToX,mapToY)){
+                if(this.vision(mapToX,mapToY)){
                     ctx.beginPath();
                     ctx.fillStyle='#000';
                     ctx.arc(mapToX,mapToY,2,0,2*Math.PI);
@@ -246,7 +241,11 @@ function Chart(){
 
         }else if(0==this._data.length){
             clearInterval(animate);
+            this._data=_data_backup;
+            this.draw(_ctx);
+            animate=false;
         }else{
+            _data_backup=JSON.parse(JSON.stringify(this._data));
             animate=setInterval(this._animate.bind(this),100);
         }
     }
@@ -254,9 +253,7 @@ function Chart(){
         if(!animate){
             _ctx=ctx;
             this._animate();
-        }else{
-            clearInterval(animate);
-        }
+        }//noone can pause it?
     }
     var context = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(f){

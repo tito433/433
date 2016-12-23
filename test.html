@@ -2,202 +2,57 @@
 <html>
 <head>
 	<title>Test page for js</title>
+    <style type="text/css">
+        #table p{
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-<table id="output" width="100%" height="100%" cellpadding="25" cellspacing="43" border="1">
-	<tr><td><h1>Heading 1</h1></td></tr>
-</table>
+
+<div id="table">
+    
+</div>
+<button type="button" id="add">Add</button>
 <script type="text/javascript">
 
-        // document.querySelectorAll('button').forEach(function(input){
-        //   var name=input.name,val=input.value;
-        //   input.onclick=function(ev){
-        //     var el=ev.target,name=el.name,val=el.value;
-        //     infoPanel.innerHTML=app.setting(name,val);
-        //   };
-        // });
-
-        // document.getElementById('reset').onclick=function(e){ app.reset(); }
-        // document.getElementById('export').onclick=function(e){
-        //   var txt=document.createElement('textarea');
-        //   txt.innerHTML=app.getRLE();
-        //   document.body.appendChild(txt);
-        //   txt.focus();
-        //   txt.setSelectionRange(0, txt.value.length);
-        //   document.execCommand("copy");
-        //   infoPanel.innerHTML='RLE data copied to clipboard.<br/>Hint: Use Ctrl+v to get';
-        //   document.body.removeChild(txt);
-        // }
-
-        // document.getElementById('analyze').onclick=function(e){
-        //   // infoPanel.innerHTML='Analyzing started...<br/>';
-        //   // infoPanel.innerHTML+=app.analyze(function(resp){
-        //   //   infoPanel.innerHTML+=resp;
-        //   // });
-        // }
-
-        // var settings_vars={};
-
-        // document.querySelectorAll('#settings input').forEach(function(input){
-        //   var name=input.name,val=input.value;
-        //   settings_vars[name]=val;
-        //   input.onchange=function(ev){
-        //     var el=ev.target,name=el.name,val=el.value;
-        //     if(el.type=='checkbox') val=el.checked;
-        //     app.setting(name,val);
-        //   };
-        // });
-        
-
-        
-// var myTable=document.getElementById('output');
-
-// myTable.apendText=function(html){ 
-// 	var tbody=this.children[0];
-
-// 	var row = document.createElement("tr");
-//     var cell = document.createElement("td");
-//     cell.innerHTML=html;
-//     row.appendChild(cell);
-//     tbody.appendChild(row);
-// };
-
-// myTable.apendText("Let's start, shall we?");
-
-// Object.prototype.each = function(f) {
-//   for(var prop in this) {
-//     var value = this[prop]
-//     f.call(value, prop, value) // calls f(prop, value), this=value
+// function modifyText() {
+//     console.log('click');
+//   var t2 = document.getElementById("t2");
+//   if (t2.firstChild.nodeValue == "three") {
+//     t2.firstChild.nodeValue = "two";
+//   } else {
+//     t2.firstChild.nodeValue = "three";
 //   }
 // }
 
-// // Try it: (works wrong!)  
-// var obj = { name: 'John', age: 25 }
-// obj.each(function(prop, val) {  
-//   alert(prop) // name -> age -> (!) each
-// })
-// constructor
-// var obj=Object;//Function.prototype
-// console.log('obj',obj);
-// Object.getOwnPropertyNames(obj).forEach(function(itm){
-// 	console.log(itm);
+// // add event listener to table
+// var el = document.getElementById("output");
+// el.addEventListener("click", modifyText, {'capture':true,'once':true});
+
+// var table=document.getElementById('output');
+// table.addEventListener("click",function(e){
+//     console.log('table click');
 // });
+var div=document.getElementById('table');
 
-// var proto=Object.prototype;//Function.prototype
-// console.log('proto',proto);
-// Object.getOwnPropertyNames(proto).forEach(function(itm){
-// 	console.log(itm);
-// });
-//supporting browsers only (not IE version 8 and earlier)
-// Object.defineProperty(Object.prototype, 'extend', {
-// 	value:function(){
-// 		var target=this;
-// 		 for(var i=0; i<arguments.length; i++)
-// 	        for(var key in arguments[i])
-// 	            if(arguments[i].hasOwnProperty(key))
-// 	                target[key] = arguments[i][key];
-// 	    return target;
-// 	}
-// });
- 
-// var results = ['Mary','23:16', 'Ana','21:19', 'Evelyn','22:47'];
-// for(var i in results){
-// 	console.log(i,results[i]);
+document.getElementById('add').addEventListener('click',function(e){
+    var template='<p><button>X</button></p>';
+    
+    div.innerHTML+=template;
+});
 
-// }
-
-// console.log(results.extend(['Mary','433']));
-// Object.defineProperty(Object.prototype, 'forEach', {
-//   value:function(callBack){
-//     for(var name in this){callBack(name,this[name]);}
-//   }
-// });
-// Object.defineProperty(Object.prototype, 'map', {
-//   value:function(predicateFunction){
-//   		var results ={};
-// 		this.forEach(function(name,val) {
-// 			var resp=predicateFunction(name,val);
-// 			if(resp && resp.name && resp.val)	results[resp.name]=resp.val;
-// 	    });
-// 	    return results;
-//   }
-// });
-// Object.defineProperty(Object.prototype, 'filter', {
-//   value:function(predicateFunction){
-//   		var results ={};
-// 		this.forEach(function(name,val) {
-// 			if(predicateFunction(name,val)) results[name]=val;
-// 	    });
-// 	    return results;
-//   }
-// });
-
-// var sett={'dt.size.test':34,'dt.font':12,'fn.filter':'','tito':false};
-// // var dts={};
-// // console.log(sett,typeof sett);
-// // for(var name in sett){
-// // 	if(this.indexOf('dt.')!=-1){
-// // 		dts[name]=sett[name];
-// // 	}
-// // }
-// var dts=sett.filter(function(nm,val){
-//     return nm.indexOf('dt.')!=-1;
-// });
+div.addEventListener("click",function cb(e){
+    var btn=e.target,p=btn.parentNode;
+    if(btn instanceof HTMLButtonElement){
+        div.removeChild(p);
+    }
+    
+});
 
 
-// sett.forEach(function(nm,vl){
-// 	var re = /([a-z0-9]+)/gi;
-// 	var found = nm.match(re);
-
-// 	console.log(nm,found);
-
-// })
-	// var obj={};
-	// obj['class.name']='input-group';
-	// console.log(obj,obj['class.name']);
-
-//05-Dec-16 test localStorage
-// var key='myDataAsObject';
-// var data=localStorage.getItem(key);
-//console.log(null===data,data,typeof data,Object.prototype.toString.call(data));
-// var data=function(obe){};
-// console.log(data)
-// console.log('is Object',data instanceof Object);
-// console.log('is String',data instanceof String);
-// console.log('is Array',data instanceof Array);
-// console.log('is Function',data instanceof Function);
-// for(var key in data){
-//         console.log('key',key,'value',data[key]);
-// }
-// data=[{'date':new Date(),'name':"O'Clock"},{'date':new Date()+4,'name':"O'Clock"}]
-// localStorage.setItem(key,data);
-// console.log('new data added:',data);
-// function template(str,vars){
-
-//         var template=String(str),
-//         re =/\{(.+?(?=\}))\}/g, result=[], m=false;
-
-//         while (m = re.exec(str)) {
-//                 result.push(m);
-//         }
-
-//         for(var idx in result){
-//                var m=result[idx];
-//                 if(vars.hasOwnProperty(m[1])){
-//                         template=template.replace(m[0],vars[m[1]]);
-//                 } 
-//         }
-//         return template;
-// }
-// var msg='You will need to spend at least {SYMBOL}{MINIMUM} to qualify for a tax refund.';
-// var vars={'SYMBOL':'BDT','MINIMUM':'100,000'};
-// console.log(template(msg,vars));
-//19-dec-2016
-var mapTo=function(x, a, b, c, d) {
-    return  (x-a)/(b-a) * (d-c) + c;
-}
-var view=[0,24,0,50];
-console.log(mapTo(2,view[0],view[1],0,200));
 
 </script>
 </body>

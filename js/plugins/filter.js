@@ -1,15 +1,6 @@
 function Filter(){
     Plugin.apply(this,arguments);
 
-    this.updateData=function(){
-        if(arguments.length==1 && arguments[0] instanceof Event){
-              this._data= arguments[0].detail?arguments[0].detail:this._data;
-              console.log('SeqCal',this._data.length)
-        }
-    }
-
-    this._storage=this._settings.data;
-
     var hasValue=function(data,findValue,index){
         switch(typeof data) {
             case "object":
@@ -37,21 +28,17 @@ function Filter(){
         }
     };
 
-    if(this._hasIO){
-        var filter=this.addModel('Filter',{'input.type':'text'});
-        filter.onchange=function(ev){
-            var el=ev.target,val=el.value;
-            if(this._data!=null){
-                var data=this._data.filter(function(item){
-                    return hasValue(item,val)!=undefined;
-                });
-
-                localStorage.setItem(this._storage.key,JSON.stringify(data));
-                window.dispatchEvent(new CustomEvent(this._storage.event,{'detail': data}));
-            }
-            
-        }.bind(this);
-    }
+    var filter=this.addModel('Filter',{'input.type':'text'});
+    filter.onchange=function(ev){
+        var el=ev.target,val=el.value,data=this.data();
+        if(data){
+            data=data.filter(function(item){
+                return hasValue(item,val)!=undefined;
+            });
+            window.dispatchEvent(new CustomEvent(this.settings.event,{'detail': data}));
+        }
+        
+    }.bind(this);
 
 }
 Filter.prototype = Object.create(Plugin.prototype);

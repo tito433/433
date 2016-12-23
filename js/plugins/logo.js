@@ -1,5 +1,5 @@
-function Logo(opt){
-	Canvas.call(this,opt.dom.output);
+function Logo(input,output){
+	Canvas.call(this,output);
 
 	var ctx=this._ctx;
 
@@ -8,12 +8,13 @@ function Logo(opt){
 	var radius=150;
 
 	ctx.save();
+
     ctx.beginPath();
     ctx.strokeStyle='#aaa';
     ctx.lineWidth=4;
     ctx.arc(center.x,center.y,radius,0,2*Math.PI);
     ctx.stroke();
-    ctx.restore();
+
   	var points=[];
 	//get positions
 	for(var i=1;i<=9;i++){
@@ -22,7 +23,6 @@ function Logo(opt){
 	}
 	//draw connection
 	var connecion=[1,2,4,8,7,5];
-	ctx.save();
     ctx.beginPath();
     ctx.strokeStyle='#ccc';
     ctx.lineWidth=3;
@@ -33,7 +33,6 @@ function Logo(opt){
 	ctx.closePath();
 	ctx.stroke();
 	//draw poller
-	ctx.save();
     ctx.beginPath();
     ctx.setLineDash([5, 10]);
     ctx.strokeStyle='#abc';
@@ -42,6 +41,7 @@ function Logo(opt){
     ctx.lineTo(points[9].x,points[9].y);
     ctx.lineTo(points[6].x,points[6].y);
 	ctx.stroke();
+	
 	ctx.restore();
 
 }

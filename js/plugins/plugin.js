@@ -3,41 +3,43 @@ var Plugin=function (){
   if(typeof(Storage) === "undefined"){
       throw "Storage undefined! This app can't run without localStorage. Can you?";
   }
+  
+  this.input=arguments[0]||document.body;
+  this.output=arguments[1]||document.body;
 
-  var oData={'key':'evt.cal.raw','event':'433.data.void'};
-
-  this._settings=arguments[0]||{};
-  this._settings.data=oData;
-  this._data=null;
-  this._hasIO=this._settings.dom && this._settings.dom.output && this._settings.dom.input;
-  this._evt_data_loaded=function(){};
+  this.settings={'key':'evt.cal.raw','event':'433.data.void'};
+  var _data=null;
+  var _evt_data_loaded=function(){};
 
   
 
   try{
-    this._data=JSON.parse(localStorage.getItem(oData.key));
+    _data=JSON.parse(localStorage.getItem(this.settings.key));
   }catch(err){
     console.log('Error parsing localData',err);
   }
   
   this.view=function(){}
 
-  this.updateData=function(){
-    console.log('updateData ack')
+  this._updateData=function(){
     if(arguments.length==1 && arguments[0] instanceof Event){
-          this._data= arguments[0].detail && arguments[0].detail instanceof Array?arguments[0].detail:[];
-          this._evt_data_loaded();
+          _data= arguments[0].detail && arguments[0].detail instanceof Array?arguments[0].detail:[];
+          _evt_data_loaded();
     }
   }
 
-  window.addEventListener(oData.event,this.updateData.bind(this),false);
+  window.addEventListener(this.settings.event,this._updateData.bind(this),false);
 
-  
-  this._addUI=function(label,option){
-    var d=document,
-        dom=this._settings.dom||{},
-        input=dom.input || document.body,
-        parent=input.querySelector(option.parent);
+  this.data=function(){
+    if(arguments.length>0 && typeof arguments[0]===Array){
+      _data=arguments[0];
+      return this;
+    }else{
+      return _data;
+    }
+  }
+  var fn_addUI=function(place,label,option){
+    var d=document, parent=this.input.querySelector(place);
 
     if(parent){
       var btn=d.createElement(option.type);
@@ -101,27 +103,20 @@ var Plugin=function (){
 
   }
   this.addView=function(label,callBack){
-    var options={'type':'button','parent':'buttongroup.view','onchange':callBack};
-    return this._addUI(label,options);
+    var options={'type':'button','onchange':callBack};
+    return fn_addUI.call(this,'.view',label,options);
   }
   this.addModel=function(label,options){
-    var option={'type':'input','parent':'ul.model','input.wrap':'li','input.group':'input-group','input.type':'input','input.value':'','input.class':'form-control','input.addon':false,'onchange':false}.extend(options);
-    return this._addUI(label,option);
+    var option={'type':'input','input.wrap':'li','input.group':'input-group','input.type':'input','input.value':'','input.class':'form-control','input.addon':false,'onchange':false}.extend(options);
+    return fn_addUI.call(this,'.model',label,option);
   }
 
   this.addControl=function(label,callBack){
-    var options={'type':'button','parent':'buttongroup.controll','onchange':callBack};
-    return this._addUI(label,options);
+    var options={'type':'button','onchange':callBack};
+    return fn_addUI.call(this,'.controll',label,options);
   };
 }
 
 
 
 
-//http://stackoverflow.com/questions/12820953/asynchronous-script-loading-callback
-Plugin.load=function(u,c){
-  var d = document, t = 'script', o = d.createElement(t),s = d.getElementsByTagName(t)[0];
-  o.src = 'js/plugins/'+u+'.js';
-  if (c) { o.addEventListener('load', c.bind(c,u), false); }
-  d.body.appendChild(o);
-}

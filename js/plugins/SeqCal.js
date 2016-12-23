@@ -1,21 +1,27 @@
 function SeqCal(){
     Plugin.apply(this,arguments);
+    //adapt drawing
+    Canvas.call(this,this.output);
 
     var size=45,fontSize=12;
+    var layout=new Layout(this.width,this.height);
+
     this.view=function(){
-        if(this._data){
-            var i=0,ln=this._data.length;
-            this.clear();//im canvas remember?
-            var layout=new Layout(this.width,this.height),
-                startDate=new Date(this._data[0].start.dateTime),
-                eDate=new Date(this._data[ln-1].end.dateTime);
+        var data=this.data();
+        if(data){
+            var i=0,ln=data.length;
+            
+            this.clear();
+            layout.clear();
+            var startDate=new Date(data[0].start.dateTime),
+                eDate=new Date(data[ln-1].end.dateTime);
             
             startDate.setMinutes(0);
             startDate.setHours(0);
 
             while(i<ln){
                 var date=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate());
-                var evDate=new Date(this._data[i].start.dateTime);
+                var evDate=new Date(data[i].start.dateTime);
                 var rect=new Day(date).size(size,size);
                     rect.fontSize=fontSize;
 
@@ -39,27 +45,23 @@ function SeqCal(){
         }
     }
 
-    if(this._hasIO){
-        Canvas.call(this,this._settings.dom.output);
+    this.addView('SeqCal',this.view.bind(this));
         
-        
-        var inpSize=this.addModel('Size',{'input.type':'number','input.value':size,'input.addon':'px'}),
-            inpFont=this.addModel('Font Size',{'input.type':'number','input.value':fontSize,'input.addon':'px'});
+    var inpSize=this.addModel('Size',{'input.type':'number','input.value':size,'input.addon':'px'}),
+        inpFont=this.addModel('Font Size',{'input.type':'number','input.value':fontSize,'input.addon':'px'});
 
+    //we need to decouple 'em. too much bindings
+    inpSize.onchange=function(ev){
+        size=parseInt(ev.target.value);
+        this.view();
+    }.bind(this);
 
-        this.addView('SeqCal',this.view.bind(this));
+    inpFont.onchange=function(ev){
+        fontSize=parseInt(ev.target.value);
+        this.view();
+    }.bind(this);
 
-        inpSize.onchange=function(ev){
-            size=parseInt(ev.target.value);
-            this.view();
-        }.bind(this);
-
-        inpFont.onchange=function(ev){
-            fontSize=parseInt(ev.target.value);
-            this.view();
-        }.bind(this);
-
-    }
+    
     
 }
 SeqCal.prototype = Object.create(Plugin.prototype);

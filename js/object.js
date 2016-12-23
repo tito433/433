@@ -36,6 +36,20 @@ Object.defineProperty(Object.prototype, 'filter', {
 });
 
 //http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
-String.prototype.capitalizeFirstLetter = function() {
+String.prototype.fistCapital = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+window.loadScript=function(u,c){
+  if(!u && typeof u!=="String") throw "Invalid js["+Object.prototype.toString.call(u)+"] name to load.";
+
+  var d = document, j = d.createElement('script');
+  j.src =u.startsWith('http')?u:'js/'+u+'.js';
+
+  if (c && typeof c==='function') { 
+    j.addEventListener('load', function cb(e){
+      e.currentTarget.removeEventListener(e.type, cb);
+      return c.call(c);
+    }, false); }
+  d.body.appendChild(j);
 }

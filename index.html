@@ -39,14 +39,12 @@
         input=document.getElementById('input'),
         output=document.getElementById('output');
 
-    plugins.forEach(function(pClass){
-      Plugin.load(pClass, 
-        function(pl){
-          var className=pl.capitalizeFirstLetter();
+    plugins.forEach(function(sClass){
+      loadScript('plugins/'+sClass, 
+        function(){
+          var className=sClass.fistCapital();
           if(typeof window[className] === "function"){
-            new window[className]({
-              'dom':{'input':input,'output':output}
-            });
+            new window[className](input,output);
           }
         }
       );
