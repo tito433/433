@@ -1,122 +1,138 @@
-var Plugin=function (){
-  
-  if(typeof(Storage) === "undefined"){
-      throw "Storage undefined! This app can't run without localStorage. Can you?";
-  }
-  
-  this.input=arguments[0]||document.body;
-  this.output=arguments[1]||document.body;
+var Plugin = function() {
 
-  this.settings={'key':'evt.cal.raw','event':'433.data.void'};
-  var _data=null;
-  var _evt_data_loaded=function(){};
+	if (typeof(Storage) === "undefined") {
+		throw "Storage undefined! This app can't run without localStorage. Can you?";
+	}
 
-  
+	this.input = arguments[0] || null;
+	this.output = arguments[1] || null;
 
-  try{
-    _data=JSON.parse(localStorage.getItem(this.settings.key));
-  }catch(err){
-    console.log('Error parsing localData',err);
-  }
-  
-  this.view=function(){}
+	this.settings = {
+		'storage': {
+			'data_key': '433.storage.data',
+			'event': '433.data.change',
+			'active': '433.state'
+		}
+	};
+	var _get_storageJson = function(key) {
+		var _dt = null;
+		try {
+			_dt = JSON.parse(localStorage.getItem(key));
+		} catch (err) {}
+		return _dt;
+	}
+	var _data = _get_storageJson(this.settings.storage.data_key);
 
-  this._updateData=function(){
-    if(arguments.length==1 && arguments[0] instanceof Event){
-          _data= arguments[0].detail && arguments[0].detail instanceof Array?arguments[0].detail:[];
-          _evt_data_loaded();
-    }
-  }
+	this.view = function() {}
+	this.isView = function() {
+		var state = _get_storageJson(this.settings.storage.active);
+		return state && state.view && this.getName() == state.view;
+	}
+	this._updateData = function() {
+		if (arguments.length == 1 && arguments[0] instanceof Event) {
+			_data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : [];
+			if (this.isView()) this.view();
+		}
+	}
 
-  window.addEventListener(this.settings.event,this._updateData.bind(this),false);
+	window.addEventListener(this.settings.storage.event, this._updateData.bind(this), false);
+	//check if has focus?
+	setTimeout(function() {
+		if (this.isView()) this.view();
+	}.bind(this), 400);
+	this.data = function() {
+		if (arguments.length > 0 && typeof arguments[0] === Array) {
+			_data = arguments[0];
+			return this;
+		} else {
+			return _data;
+		}
+	}
+	var fn_addUI = function(parent, label, option) {
+		var d = document,
+			btn = d.createElement(option.type);
 
-  this.data=function(){
-    if(arguments.length>0 && typeof arguments[0]===Array){
-      _data=arguments[0];
-      return this;
-    }else{
-      return _data;
-    }
-  }
-  var fn_addUI=function(place,label,option){
-    var d=document, parent=this.input.querySelector(place);
+		if (option['input.wrap']) {
+			var li = d.createElement(option['input.wrap']),
+				p = d.createElement("P");
 
-    if(parent){
-      var btn=d.createElement(option.type);
-      
-      if("button"===option.type){
-        btn.innerHTML=label;
-      }  
-    
-      
-      if(option['input.wrap']){
-        var li=d.createElement(option['input.wrap']),
-            p=d.createElement("P");
+			p.appendChild(d.createTextNode(label));
+			li.appendChild(p);
+			parent.appendChild(li);
+			parent = li;
+		}
+		if (option['input.group']) {
+			var igdiv = d.createElement("DIV");
+			igdiv.className = option['input.group'];
+			parent.appendChild(igdiv);
+			parent = igdiv;
+		}
+		//input prop
+		btn.className = option['input.class'] || '';
+		btn.type = option['input.type'] || 'input';
+		btn.value = option['input.value'] || '';
+		parent.appendChild(btn);
 
-        p.appendChild(d.createTextNode(label));
-        li.appendChild(p);
-        parent.appendChild(li);
-        parent=li;
-      }
-      //input prop
-      btn.className =option['input.class']||'';
-      btn.type=option['input.type']||'';
-      btn.value=option['input.value']||'';
-      
-      //addon only for inputgroup!
-      if(option['input.group']){
-        var igdiv=d.createElement("DIV");
-        igdiv.className=option['input.group'];
-        parent.appendChild(igdiv);
-        parent=igdiv;
-      }
-      parent.appendChild(btn);
-      
-      if(option['input.type']==='checkbox'){
-        var id=new Date().getTime()+Math.random();
-        btn.id=id;
-        btn.className='tgl';
-        btn.checked=true;
-        var label=d.createElement('label');
-        label.innerHTML=' ';
-        label.htmlFor=id;
-        parent.appendChild(label);
-      }
+		if ("button" === option.type) {
+			btn.innerHTML = label;
+		} else if ('checkbox' === option.type) {
+			var id = new Date().getTime() + Math.random();
+			btn.id = id;
+			btn.className = 'tgl';
+			btn.checked = true;
+			var label = d.createElement('label');
+			label.innerHTML = ' ';
+			label.htmlFor = id;
+			parent.appendChild(label);
+		}
 
-      //has addon?
-      if(option['input.addon']){
-        var span=d.createElement('span');
-        span.className='input-group-addon';
-        span.innerHTML=option['input.addon'];
-        parent.appendChild(span);
-      }
+		//has addon?
+		if (option['input.addon']) {
+			var span = d.createElement('span');
+			span.className = 'input-group-addon';
+			span.innerHTML = option['input.addon'];
+			parent.appendChild(span);
+		}
 
-      if(option.onchange && typeof option.onchange=='function'){
-        if(btn instanceof HTMLButtonElement){
-          btn.onclick=option.onchange;
-        }else if(btn instanceof HTMLInputElement){
-          btn.onchange=option.onchange;
-        }
-      } 
-      return btn;
-    }
+		if (option.onchange && typeof option.onchange == 'function') {
+			if (btn instanceof HTMLButtonElement) {
+				btn.onclick = option.onchange;
+			} else if (btn instanceof HTMLInputElement) {
+				btn.onchange = option.onchange;
+			}
+		}
+		return btn;
 
-  }
-  this.addView=function(label,callBack){
-    var options={'type':'button','onchange':callBack};
-    return fn_addUI.call(this,'.view',label,options);
-  }
-  this.addModel=function(label,options){
-    var option={'type':'input','input.wrap':'li','input.group':'input-group','input.type':'input','input.value':'','input.class':'form-control','input.addon':false,'onchange':false}.extend(options);
-    return fn_addUI.call(this,'.model',label,option);
-  }
+	}
+	this.addView = function(label) {
+		var btn = fn_addUI(this.input.querySelector('.view'), label, {
+			'type': 'button'
+		});
+		btn.onclick = function() {
+			var state = _get_storageJson(this.settings.storage.active) || {};
+			state.view = this.getName();
+			localStorage.setItem(this.settings.storage.active, JSON.stringify(state));
+			this.view();
+		}.bind(this);
+		return btn;
+	}
+	this.addModel = function(label, options) {
+		var option = {
+			'type': 'input',
+			'input.wrap': 'li',
+			'input.group': 'input-group',
+			'input.type': 'input',
+			'input.value': '',
+			'input.class': 'form-control',
+			'input.addon': false
+		}.extend(options);
 
-  this.addControl=function(label,callBack){
-    var options={'type':'button','onchange':callBack};
-    return fn_addUI.call(this,'.controll',label,options);
-  };
+		var btn = fn_addUI(this.input.querySelector('.model'), label, option);
+		return btn;
+	}
+
+	this.addControl = function(label) {
+		//for now as method not defined. let assume it would be like addView.
+		return this.addView(label, callBack);
+	};
 }
-
-
-
-
