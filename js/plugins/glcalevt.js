@@ -38,8 +38,11 @@ function Glcalevt() {
 						div.parentNode.removeChild(div);
 						gapi.client.load('calendar', 'v3', function() {
 							var date = new Date(),
-								date_from = new Date(date.getFullYear(), 1, 1),
-								date_to = new Date();
+								date_to = new Date(),
+								date_from = new Date();
+
+							date_from.setDate(date_to.getDate() - 365);
+
 
 							gapi.client.calendar.events.list({
 								'calendarId': 'primary',
@@ -50,7 +53,7 @@ function Glcalevt() {
 								'maxResults': 999999,
 								'orderBy': 'startTime'
 							}).execute(function(resp) {
-								console.log('store into:', storage, storage.data_key)
+								console.log('store into:', storage, storage.data_key, resp.items)
 								localStorage.setItem(storage.data_key, JSON.stringify(resp.items));
 								window.dispatchEvent(new CustomEvent(storage.event, {
 									'detail': resp.items
