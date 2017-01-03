@@ -3,9 +3,10 @@ function SeqCal() {
 	//adapt drawing
 	Canvas.call(this, this.output);
 
-	var size = 45,
+	var size = 23,
 		fontSize = 12;
 	var layout = new Layout(this.width, this.height);
+	layout.padding = 3;
 
 	this.view = function() {
 		var data = this.data();
@@ -24,7 +25,7 @@ function SeqCal() {
 			while (i < ln) {
 				var date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 				var evDate = new Date(data[i].start.dateTime);
-				var rect = new Day(date).size(size, size);
+				var rect = new Day(date);
 				rect.fontSize = fontSize;
 
 				if (evDate.getFullYear() == date.getFullYear() &&
@@ -41,7 +42,7 @@ function SeqCal() {
 				layout.add(rect);
 				this.add(rect);
 			}
-			layout.flowLeft();
+			layout.table(size);
 			this.draw();
 		} else {
 			console.log('SeqCal:view have not engough data!');
@@ -49,21 +50,13 @@ function SeqCal() {
 	}
 
 	this.addView('SeqCal');
-
-	var inpSize = this.addModel('Size', {
-			'type': 'number',
-			'value': size,
-			'input.group': 'input-group',
-			'input.class': 'form-control',
-			'input.addon': 'px'
-		}),
-		inpFont = this.addModel('Font Size', {
-			'type': 'number',
-			'input.group': 'input-group',
-			'input.class': 'form-control',
-			'value': fontSize,
-			'input.addon': 'px'
-		});
+	/* TODO: make rows and cols configurable */
+	var inpSize = this.addModel('SeqCal Cols', {
+		'type': 'number',
+		'value': size,
+		'input.group': 'input-group',
+		'input.class': 'form-control'
+	});
 
 	//we need to decouple 'em. too much bindings
 	inpSize.onchange = function(ev) {
@@ -73,15 +66,6 @@ function SeqCal() {
 		}
 
 	}.bind(this);
-
-	inpFont.onchange = function(ev) {
-		if (this.isView()) {
-			fontSize = parseInt(ev.target.value);
-			this.view();
-		}
-	}.bind(this);
-
-
 
 }
 SeqCal.prototype = Object.create(Plugin.prototype);
