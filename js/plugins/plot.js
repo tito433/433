@@ -19,13 +19,24 @@ function Plot(input, output) {
 	this.addView('Plot');
 
 
+
 	var inpX = this.addModel('Plot nx', {
-			'input.type': 'number',
-			'input.value': 133
+			'type': 'number',
+			'input.wrap': 'li',
+			'input.group': 'input-group',
+			'value': 133,
+			'input.class': 'form-control'
 		}),
 		inpY = this.addModel('Plot ny', {
-			'input.type': 'number',
-			'input.value': 24
+			'type': 'number',
+			'input.wrap': 'li',
+			'input.group': 'input-group',
+			'type': 'input',
+			'value': 24,
+			'input.class': 'form-control'
+		}),
+		inpG = this.addModel('Plot grid', {
+			'type': 'checkbox'
 		});
 
 
@@ -37,7 +48,15 @@ function Plot(input, output) {
 			this.view();
 		}
 	}.bind(this);
-
+	inpG.onchange = function(ev) {
+		var state = ev.target.checked;
+		if (this.isView()) {
+			for (var i = 0, ln = this._chart.length; i < ln; i++) {
+				this._chart[i].grid(state);
+			}
+			this.view();
+		}
+	}.bind(this);
 	inpY.onchange = function(ev) {
 		if (this.isView()) {
 			for (var i = 0, ln = this._chart.length; i < ln; i++) {
@@ -107,6 +126,7 @@ function Chart() {
 	var animate = false;
 	var _ctx = false;
 	var _data_backup = [];
+	var _show_grid = true;
 
 	this._fn_data_format = function() {}
 
@@ -123,11 +143,13 @@ function Chart() {
 		}
 	}
 	this.grid = function(x, y) {
-		if (x) {
-			this._grid.x = parseInt(x);
+		if (typeof x === 'boolean') {
+			_show_grid = x;
+		} else if (x != null) {
+			this._grid.x = Number(x);
 		}
 		if (y) {
-			this._grid.y = parseInt(y);
+			this._grid.y = Number(y);
 		}
 		return this;
 	}
@@ -161,7 +183,7 @@ function Chart() {
 			for (var i = 0, ln = this._grid.x; i <= ln; i++) {
 				var ix = this.mapTo(i, 0, ln, x, x + w);
 				if (i && i % tagGap == 0) {
-					this.drawLine(ctx, ix, y + h, ix, y);
+					if (_show_grid) this.drawLine(ctx, ix, y + h, ix, y);
 					if (i % (tagGap * 2) == 0) this.label(ctx, ix, y + h, i, 3);
 				}
 			}
@@ -172,7 +194,7 @@ function Chart() {
 			for (var i = 0, ln = this._grid.y; i <= ln; i++) {
 				var iy = this.mapTo(i, 0, ln, y + h, y);
 				if (i && i % 2 == 0) this.label(ctx, x, iy, i, 4);
-				this.drawLine(ctx, x, iy, x + w, iy);
+				if (_show_grid) this.drawLine(ctx, x, iy, x + w, iy);
 			}
 
 		}

@@ -48,17 +48,21 @@ function SeqCal() {
 		}
 	}
 
-	this.addView('SeqCal', this.view.bind(this));
+	this.addView('SeqCal');
 
 	var inpSize = this.addModel('Size', {
-			'input.type': 'number',
-			'input.value': size,
+			'type': 'number',
+			'value': size,
+			'input.group': 'input-group',
+			'input.class': 'form-control',
 			'input.addon': 'px'
 		}),
 		inpFont = this.addModel('Font Size', {
-			'input.type': 'number',
-			'input.value': fontSize,
-			'inpSizeut.addon': 'px'
+			'type': 'number',
+			'input.group': 'input-group',
+			'input.class': 'form-control',
+			'value': fontSize,
+			'input.addon': 'px'
 		});
 
 	//we need to decouple 'em. too much bindings

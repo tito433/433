@@ -50,7 +50,7 @@ var Plugin = function() {
 	}
 	var fn_addUI = function(parent, label, option) {
 		var d = document,
-			btn = d.createElement(option.type);
+			btn = d.createElement('input');
 
 		if (option['input.wrap']) {
 			var li = d.createElement(option['input.wrap']),
@@ -69,8 +69,8 @@ var Plugin = function() {
 		}
 		//input prop
 		btn.className = option['input.class'] || '';
-		btn.type = option['input.type'] || 'input';
-		btn.value = option['input.value'] || '';
+		btn.type = option['type'] || 'input';
+		btn.value = option['value'] || '';
 		parent.appendChild(btn);
 
 		if ("button" === option.type) {
@@ -106,7 +106,8 @@ var Plugin = function() {
 	}
 	this.addView = function(label) {
 		var btn = fn_addUI(this.input.querySelector('.view'), label, {
-			'type': 'button'
+			'type': 'submit',
+			'value': label
 		});
 		btn.onclick = function() {
 			var state = _get_storageJson(this.settings.storage.active) || {};
@@ -120,10 +121,10 @@ var Plugin = function() {
 		var option = {
 			'type': 'input',
 			'input.wrap': 'li',
-			'input.group': 'input-group',
+			'input.group': false,
 			'input.type': 'input',
 			'input.value': '',
-			'input.class': 'form-control',
+			'input.class': '',
 			'input.addon': false
 		}.extend(options);
 

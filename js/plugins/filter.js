@@ -32,7 +32,9 @@ function Filter() {
 	};
 
 	var filter = this.addModel('Filter', {
-		'input.type': 'text'
+		'input.type': 'text',
+		'input.group': 'input-group',
+		'input.class': 'form-control',
 	});
 	filter.onchange = function(ev) {
 		var el = ev.target,
