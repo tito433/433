@@ -46,6 +46,20 @@ Object.defineProperty(Object.prototype, 'getName', {
 	}
 });
 
+Object.defineProperty(Array.prototype, 'unique', {
+	value: function() {
+		var u = {},
+			a = [];
+		for (var i = 0, l = this.length; i < l; ++i) {
+			if (u.hasOwnProperty(this[i])) {
+				continue;
+			}
+			a.push(this[i]);
+			u[this[i]] = 1;
+		}
+		return a;
+	}
+});
 
 
 //http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript

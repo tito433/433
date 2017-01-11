@@ -7,24 +7,11 @@ function Plot(input, output) {
 	var _layout = new Layout(this.width, this.height);
 	_layout.padding = 20;
 
-	this.view = function() {
-		this.clear();
-		for (var i in this._chart) {
-			this._chart[i].data(this.data());
-			this.add(this._chart[i]);
-		}
-		this.draw();
-	}
-
-	this.addView('Plot');
-
-
-
 	var inpX = this.addModel('Plot nx', {
 			'type': 'number',
 			'input.wrap': 'li',
 			'input.group': 'input-group',
-			'value': 133,
+			'value': 160,
 			'input.class': 'form-control'
 		}),
 		inpY = this.addModel('Plot ny', {
@@ -39,32 +26,26 @@ function Plot(input, output) {
 			'type': 'checkbox'
 		});
 
+	this.view = function() {
+		if (!this.isView()) {
+			return false;
+		}
+		this.clear();
+		for (var i in this._chart) {
+			this._chart[i].grid(inpX.value, inpY.value);
+			this._chart[i].grid(inpG.checked);
+			this._chart[i].data(this.data());
 
-	inpX.onchange = function(ev) {
-		if (this.isView()) {
-			for (var i = 0, ln = this._chart.length; i < ln; i++) {
-				this._chart[i].grid(ev.target.value);
-			}
-			this.view();
+			this.add(this._chart[i]);
 		}
-	}.bind(this);
-	inpG.onchange = function(ev) {
-		var state = ev.target.checked;
-		if (this.isView()) {
-			for (var i = 0, ln = this._chart.length; i < ln; i++) {
-				this._chart[i].grid(state);
-			}
-			this.view();
-		}
-	}.bind(this);
-	inpY.onchange = function(ev) {
-		if (this.isView()) {
-			for (var i = 0, ln = this._chart.length; i < ln; i++) {
-				this._chart[i].grid(null, ev.target.value);
-			}
-			this.view();
-		}
-	}.bind(this);
+		this.draw();
+	}
+
+	this.addView('Plot');
+
+	inpX.onchange = this.view.bind(this);
+	inpG.onchange = this.view.bind(this);
+	inpY.onchange = this.view.bind(this);
 
 
 	//chart init all
