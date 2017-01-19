@@ -3,42 +3,48 @@ function SeqCal() {
 	//adapt drawing
 	Canvas.call(this, this.output);
 
-	var size = 23,
+	var size = 27,
 		fontSize = 12;
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 3;
 
+
 	this.view = function() {
 		var data = this.data();
 		if (data) {
-			var i = 0,
-				ln = data.length;
 
 			this.clear();
 			layout.clear();
 			var startDate = new Date(data[0].start.dateTime),
-				eDate = new Date(data[ln - 1].end.dateTime);
+				eDate = new Date(data[data.length - 1].end.dateTime);
 
 			startDate.setMinutes(0);
 			startDate.setHours(0);
 
-			while (i < ln) {
+			while (startDate <= eDate) {
 				var date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-				var evDate = new Date(data[i].start.dateTime);
 				var rect = new Day(date);
 				rect.fontSize = fontSize;
+				var todayEvt = data.filter(function(ev) {
+					var dt = new Date(ev.start.dateTime);
+					return dt.getFullYear() == date.getFullYear() &&
+						dt.getMonth() == date.getMonth() && dt.getDate() == date.getDate();
+				});
 
-				if (evDate.getFullYear() == date.getFullYear() &&
-					evDate.getMonth() == date.getMonth() &&
-					evDate.getDay() == date.getDay()) {
-					var hour = evDate.getHours(),
-						mins = evDate.getMinutes();
-					rect.setDate(evDate);
-					rect.events(hour + ':' + mins);
-					i++;
-				} else {
-					startDate.setDate(startDate.getDate() + 1);
+				if (todayEvt.length) {
+					for (var i in todayEvt) {
+						var d = new Date(todayEvt[i].start.dateTime);
+						var hour = d.getHours(),
+							mins = d.getMinutes();
+						rect.setDate(d);
+						rect.events(hour + ':' + mins);
+					}
+
+					if (todayEvt.length > 1) {
+						rect.fillStyle = '#333';
+					}
 				}
+				startDate.setDate(startDate.getDate() + 1);
 				layout.add(rect);
 				this.add(rect);
 			}
@@ -106,7 +112,8 @@ function Day(date) {
 			return this.evts;
 		} else {
 			this.evts = this.evts.concat(Array.prototype.slice.call(arguments));
-			this.label.push(this.evts.join());
+			this.label = [this.date.getMonth() + '-' + this.date.getDate()];
+			this.label = this.label.concat(this.evts);
 			this.fillStyle = '#888';
 			this.fontColor = '#fff';
 			this.marked = true;
