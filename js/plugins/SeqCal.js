@@ -41,7 +41,7 @@ function SeqCal() {
 					}
 
 					if (todayEvt.length > 1) {
-						rect.fillStyle = '#333';
+						rect.fillStyle = '#444';
 					}
 				}
 				startDate.setDate(startDate.getDate() + 1);
