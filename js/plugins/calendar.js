@@ -6,51 +6,43 @@ function Calendar() {
 	layout.padding = 10;
 
 	this.view = function() {
-		if (!this.isView()) {
-			return false;
-		}
 		this.clear();
 
 		var data = this.data();
-		if (data) {
-			var i = 0,
-				ln = data.length;
+		var i = 0,
+			ln = data.length;
 
-			layout.clear();
-			var startDate = new Date(data[0].start.dateTime),
-				eDate = new Date(data[ln - 1].end.dateTime);
+		layout.clear();
+		var startDate = new Date(data[0].start.dateTime),
+			eDate = new Date(data[ln - 1].end.dateTime);
 
 
-			//list of months
-			var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1),
-				eDate = new Date(eDate.getFullYear(), eDate.getMonth() + 1, 1),
-				months = [];
-			while (sDate < eDate) {
-				months.push(sDate.getMonth() + '_' + sDate.getFullYear());
-				sDate.setDate(sDate.getDate() + 1);
-			}
-			months = months.unique();
-			for (var idx in months) {
-				var month = new Month(months[idx], data);
-				layout.add(month);
-				this.add(month);
-			}
-			layout.table(Number(opt.value));
-			this.draw();
-
-		} else {
-			console.log('Calendar:view have not engough data!');
+		//list of months
+		var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1),
+			eDate = new Date(eDate.getFullYear(), eDate.getMonth() + 1, 1),
+			months = [];
+		while (sDate < eDate) {
+			months.push(sDate.getMonth() + '_' + sDate.getFullYear());
+			sDate.setDate(sDate.getDate() + 1);
 		}
+		months = months.unique();
+		for (var idx in months) {
+			var month = new Month(months[idx], data);
+			layout.add(month);
+			this.add(month);
+		}
+		layout.table(Number(opt.value));
+		this.draw();
 	}
 
-	this.addView('Calendar');
+	this.addView();
+
 	var opt = this.addModel('Calendar Cols', {
 		'type': 'number',
 		'value': 6,
 		'input.group': 'input-group',
 		'input.class': 'form-control'
 	});
-	opt.onchange = this.view.bind(this);
 
 }
 Calendar.prototype = Object.create(Plugin.prototype);
@@ -90,15 +82,16 @@ function Month(strMY, data) {
 				y += w;
 			}
 			var x = this.x + day * w;
+			ctx.save();
 			ctx.beginPath();
 			ctx.rect(x, y, w, w);
 			ctx.closePath();
 			ctx.stroke();
-			if (hasEvent(curDate)) {
-				ctx.fillStyle = '#ccc';
-				ctx.fill();
-			}
-			ctx.fillStyle = '#444';
+			var lvl = hasEvent(curDate),
+				lCount = lvl.mapTo(0, 4, 100, 0);
+			ctx.fillStyle = 'hsl(0,0%,' + lCount + '%)';
+			ctx.fill();
+			ctx.restore();
 			ctx.fillText(curDate.getDate(), x + w / 2, y + w / 2);
 			curDate.setDate(curDate.getDate() + 1);
 		}
@@ -106,15 +99,16 @@ function Month(strMY, data) {
 	}
 
 	function hasEvent(date) {
+		var ct = 0;
 		for (var i in data) {
 			var dt = new Date(data[i].start.dateTime);
 			if (dt.getFullYear() == date.getFullYear() &&
 				dt.getMonth() == date.getMonth() &&
 				dt.getDate() == date.getDate()) {
-				return true;
+				ct++;
 			}
 		}
-		return false;
+		return ct;
 	}
 }
 

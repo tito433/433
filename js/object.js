@@ -61,6 +61,11 @@ Object.defineProperty(Array.prototype, 'unique', {
 	}
 });
 
+Object.defineProperty(Number.prototype, 'mapTo', {
+	value: function(sm, sx, dm, dx) {
+		return (this - sm) / (sx - sm) * (dx - dm) + dm;
+	}
+})
 
 //http://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
 String.prototype.fistCapital = function() {

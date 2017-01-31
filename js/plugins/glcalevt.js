@@ -53,7 +53,6 @@ function Glcalevt() {
 								'maxResults': 999999,
 								'orderBy': 'startTime'
 							}).execute(function(resp) {
-								console.log('store into:', storage, storage.data_key, resp.items)
 								localStorage.setItem(storage.data_key, JSON.stringify(resp.items));
 								window.dispatchEvent(new CustomEvent(storage.event, {
 									'detail': resp.items

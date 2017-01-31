@@ -11,7 +11,8 @@ var Plugin = function() {
 		'storage': {
 			'data_key': '433.storage.data',
 			'event': '433.data.change',
-			'active': '433.state'
+			'active': '433.state',
+			'ui_view': '433.ui.view',
 		}
 	};
 	var _get_storageJson = function(key) {
@@ -22,11 +23,12 @@ var Plugin = function() {
 		return _dt;
 	}
 	var _data = _get_storageJson(this.settings.storage.data_key);
+	var _name = this.getName();
 
-	this.view = function() {}
+	//need deprication, because i know who am i.
 	this.isView = function() {
-		var state = _get_storageJson(this.settings.storage.active);
-		return state && state.view && this.getName() == state.view;
+		var state = _get_storageJson(this.settings.storage.ui_view);
+		return state == this.getName();
 	}
 	this._updateData = function() {
 		if (arguments.length == 1 && arguments[0] instanceof Event) {
@@ -36,10 +38,6 @@ var Plugin = function() {
 	}
 
 	window.addEventListener(this.settings.storage.event, this._updateData.bind(this), false);
-	//check if has focus?
-	setTimeout(function() {
-		if (this.isView()) this.view();
-	}.bind(this), 400);
 	this.data = function() {
 		if (arguments.length > 0 && typeof arguments[0] === Array) {
 			_data = arguments[0];
@@ -105,17 +103,15 @@ var Plugin = function() {
 
 	}
 	this.addView = function(label) {
-		var btn = fn_addUI(this.input.querySelector('.view'), label, {
-			'type': 'submit',
-			'value': label
-		});
+		var label = label || this.getName(),
+			btn = fn_addUI(this.input.querySelector('.view'), label, {
+				'type': 'submit',
+				'value': label
+			});
 		btn.onclick = function() {
-			var state = _get_storageJson(this.settings.storage.active) || {};
-			state.view = this.getName();
-			localStorage.setItem(this.settings.storage.active, JSON.stringify(state));
+			localStorage.setItem(this.settings.storage.ui_view, this.getName());
 			this.view();
 		}.bind(this);
-		return btn;
 	}
 	this.addModel = function(label, options) {
 		var option = {
@@ -129,6 +125,9 @@ var Plugin = function() {
 		}.extend(options);
 
 		var btn = fn_addUI(this.input.querySelector('.model'), label, option);
+		btn.onchange = function() {
+			this.view();
+		}.bind(this)
 		return btn;
 	}
 

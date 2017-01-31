@@ -18,7 +18,6 @@ function Plot(input, output) {
 			'type': 'number',
 			'input.wrap': 'li',
 			'input.group': 'input-group',
-			'type': 'input',
 			'value': 24,
 			'input.class': 'form-control'
 		}),
@@ -27,9 +26,6 @@ function Plot(input, output) {
 		});
 
 	this.view = function() {
-		if (!this.isView()) {
-			return false;
-		}
 		this.clear();
 		for (var i in this._chart) {
 			this._chart[i].grid(inpX.value, inpY.value);
@@ -41,11 +37,7 @@ function Plot(input, output) {
 		this.draw();
 	}
 
-	this.addView('Plot');
-
-	inpX.onchange = this.view.bind(this);
-	inpG.onchange = this.view.bind(this);
-	inpY.onchange = this.view.bind(this);
+	this.addView();
 
 
 	//chart init all
@@ -245,49 +237,6 @@ function Chart() {
 	}
 	this.mapTo = function(x, a, b, c, d) {
 		return (x - a) / (b - a) * (d - c) + c;
-	}
-	this._animate = function() {
-		if (animate && this._data.length) {
-			for (var i = 0, ln = this._data.length; i < ln; i++) {
-				var pt = this._data[i],
-					x = this.mapTo(pt.x, 0, this._grid.x, 0, this.width());
-				y = this.mapTo(pt.y, 0, this._grid.y, this.y + this.height(), this.y);
-				if (y >= this.y + this.height()) {
-					playSound(x * 20);
-					this._data.splice(i, 1);
-					ln--;
-				} else {
-					y += 5; //gravity?
-					pt.y = this.mapTo(y, this.y + this.height(), this.y, 0, this._grid.y);
-				}
-			}
-			this.draw(_ctx);
-
-		} else if (0 == this._data.length) {
-			clearInterval(animate);
-			this._data = _data_backup;
-			this.draw(_ctx);
-			animate = false;
-		} else {
-			_data_backup = JSON.parse(JSON.stringify(this._data));
-			animate = setInterval(this._animate.bind(this), 100);
-		}
-	}
-	this.onClick = function(ctx) {
-		if (!animate) {
-			_ctx = ctx;
-			this._animate();
-		} //noone can pause it?
-	}
-	var context = new(window.AudioContext || window.webkitAudioContext)();
-
-	function playSound(f) {
-		var osc = context.createOscillator();
-		osc.type = 'square';
-		osc.frequency.value = 2000;
-		osc.connect(context.destination);
-		osc.start();
-		osc.stop(context.currentTime + 0.03);
 	}
 
 }
