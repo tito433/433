@@ -14,6 +14,7 @@ function Cycloid() {
 
 	this.view = function() {
 		this.clear();
+
 		var data = this.data;
 		if (!this.data) return false;
 
@@ -33,6 +34,19 @@ function Cycloid() {
 		}
 		this.draw();
 	}
+	var self = this,
+		_view = this.view,
+		_rInterval = false;
+
+	inpRadious.addEventListener("mousedown", function() {
+		_rInterval = setInterval(function() {
+			_view.call(self);
+		}, 1000 / 30);
+	});
+	inpRadious.addEventListener("mouseup", function() {
+		clearInterval(_rInterval);
+	});
+
 	if (this._isView()) this.view();
 }
 Cycloid.prototype = Object.create(Plugin.prototype);

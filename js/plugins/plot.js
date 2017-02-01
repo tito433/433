@@ -7,31 +7,15 @@ function Plot(input, output) {
 	var _layout = new Layout(this.width, this.height);
 	_layout.padding = 20;
 
-	var inpX = this.addModel('Plot nx', {
-			'type': 'number',
-			'input.wrap': 'li',
-			'input.group': 'input-group',
-			'value': 160,
-			'input.class': 'form-control'
-		}),
-		inpY = this.addModel('Plot ny', {
-			'type': 'number',
-			'input.wrap': 'li',
-			'input.group': 'input-group',
-			'value': 24,
-			'input.class': 'form-control'
-		}),
-		inpG = this.addModel('Plot grid', {
-			'type': 'checkbox'
-		});
+	var inpG = this.addModel('Plot grid', {
+		'type': 'checkbox'
+	});
 
 	this.view = function() {
 		this.clear();
 		for (var i in this._chart) {
-			this._chart[i].grid(inpX.value, inpY.value);
 			this._chart[i].grid(inpG.checked);
 			this._chart[i].data(this.data);
-
 			this.add(this._chart[i]);
 		}
 		this.draw();
@@ -83,6 +67,27 @@ function Plot(input, output) {
 	chartGap.data(this.data).title('Gap').size(this.width / 2 - 60, this.height / 2 - 40);
 	this._chart.push(chartGap);
 	_layout.add(chartGap);
+	//daywise events.
+
+	var chartDay = new Chart().title('Days').size(this.width / 2 - 60, this.height / 2 - 40);
+	chartDay.format(function(data) {
+		fmtData = [];
+		if (data instanceof Array && data.length) {
+			for (var i = 0, ln = data.length; i < ln; i++) {
+				var cDate = new Date(data[i].start.dateTime),
+					hour = cDate.getHours(),
+					day = cDate.getDate();
+				fmtData.push(new Point(day, hour));
+			}
+		}
+
+		return fmtData;
+	});
+
+	chartDay.data(this.data);
+	this._chart.push(chartDay);
+	_layout.add(chartDay);
+
 
 	_layout.flowLeft();
 	if (this._isView()) this.view();
@@ -116,16 +121,13 @@ function Chart() {
 			return this._data;
 		}
 	}
-	this.grid = function(x, y) {
-		if (typeof x === 'boolean') {
-			_show_grid = x;
-		} else if (x != null) {
-			this._grid.x = Number(x);
+	this.grid = function(b) {
+		if (typeof b === 'boolean') {
+			_show_grid = b;
+			return this;
+		} else {
+			return _show_grid;
 		}
-		if (y) {
-			this._grid.y = Number(y);
-		}
-		return this;
 	}
 	this.draw = function(ctx) {
 		//i clean my mess!
@@ -145,6 +147,13 @@ function Chart() {
 			h -= 25;
 
 		}
+		this._grid.x = this._data.reduce(function(a, b) {
+			return a > b.x ? a : b.x;
+		}, 0);
+		this._grid.y = this._data.reduce(function(a, b) {
+			return a > b.y ? a : b.y;
+		}, 0);
+
 		if (this._grid.y) {
 			x += 20;
 			w -= 20;
