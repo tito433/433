@@ -30,7 +30,7 @@ function Plot(input, output) {
 		for (var i in this._chart) {
 			this._chart[i].grid(inpX.value, inpY.value);
 			this._chart[i].grid(inpG.checked);
-			this._chart[i].data(this.data());
+			this._chart[i].data(this.data);
 
 			this.add(this._chart[i]);
 		}
@@ -60,7 +60,7 @@ function Plot(input, output) {
 		}
 		return fmtData;
 	});
-	chartOrig.data(this.data()).title('Original').size(this.width / 2 - 60, this.height / 2 - 40);
+	chartOrig.data(this.data).title('Original').size(this.width / 2 - 60, this.height / 2 - 40);
 	this._chart.push(chartOrig);
 	_layout.add(chartOrig);
 
@@ -80,11 +80,12 @@ function Plot(input, output) {
 		return fmtData;
 	});
 
-	chartGap.data(this.data()).title('Gap').size(this.width / 2 - 60, this.height / 2 - 40);
+	chartGap.data(this.data).title('Gap').size(this.width / 2 - 60, this.height / 2 - 40);
 	this._chart.push(chartGap);
 	_layout.add(chartGap);
 
 	_layout.flowLeft();
+	if (this._isView()) this.view();
 }
 
 //make this Chart resizeable.

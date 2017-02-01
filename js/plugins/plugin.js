@@ -22,30 +22,23 @@ var Plugin = function() {
 		} catch (err) {}
 		return _dt;
 	}
-	var _data = _get_storageJson(this.settings.storage.data_key);
-	var _name = this.getName();
+	this.data = _get_storageJson(this.settings.storage.data_key);
+	this._name = this.getName();
 
-	//need deprication, because i know who am i.
-	this.isView = function() {
-		var state = _get_storageJson(this.settings.storage.ui_view);
-		return state == this.getName();
+	//Check storage, is it me showing off?
+	this._isView = function() {
+		var ui_view = localStorage.getItem(this.settings.storage.ui_view);
+		return ui_view == this._name;
 	}
 	this._updateData = function() {
 		if (arguments.length == 1 && arguments[0] instanceof Event) {
-			_data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : [];
-			if (this.isView()) this.view();
+			this.data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : null;
+			if (this._isView()) this.view();
 		}
 	}
 
 	window.addEventListener(this.settings.storage.event, this._updateData.bind(this), false);
-	this.data = function() {
-		if (arguments.length > 0 && typeof arguments[0] === Array) {
-			_data = arguments[0];
-			return this;
-		} else {
-			return _data;
-		}
-	}
+
 	var fn_addUI = function(parent, label, option) {
 		var d = document,
 			btn = d.createElement('input');
@@ -91,7 +84,6 @@ var Plugin = function() {
 			span.innerHTML = option['input.addon'];
 			parent.appendChild(span);
 		}
-
 		if (option.onchange && typeof option.onchange == 'function') {
 			if (btn instanceof HTMLButtonElement) {
 				btn.onclick = option.onchange;
@@ -103,13 +95,13 @@ var Plugin = function() {
 
 	}
 	this.addView = function(label) {
-		var label = label || this.getName(),
+		var label = label || this._name,
 			btn = fn_addUI(this.input.querySelector('.view'), label, {
 				'type': 'submit',
 				'value': label
 			});
 		btn.onclick = function() {
-			localStorage.setItem(this.settings.storage.ui_view, this.getName());
+			localStorage.setItem(this.settings.storage.ui_view, this._name);
 			this.view();
 		}.bind(this);
 	}
@@ -131,8 +123,4 @@ var Plugin = function() {
 		return btn;
 	}
 
-	this.addControl = function(label) {
-		//for now as method not defined. let assume it would be like addView.
-		return this.addView(label, callBack);
-	};
 }

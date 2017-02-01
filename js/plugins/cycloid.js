@@ -3,12 +3,9 @@ function Cycloid() {
 	//adapt drawing
 	Canvas.call(this, this.output);
 
-	var _name = this.getName();
-
-
-	this.addView(_name);
+	this.addView();
 	/* TODO: make rows and cols configurable */
-	var inpRadious = this.addModel(_name + ' Radius', {
+	var inpRadious = this.addModel('Cycloid Radius', {
 		'type': 'number',
 		'value': 43,
 		'input.group': 'input-group',
@@ -17,12 +14,9 @@ function Cycloid() {
 
 	this.view = function() {
 		this.clear();
+		var data = this.data;
+		if (!this.data) return false;
 
-		var data = this.data();
-		if (!data) {
-			console.log("Not engough data!", this);
-			return false;
-		}
 		var centerX = this.width / 2,
 			centerY = this.height / 2,
 			radius = parseInt(inpRadious.value);
@@ -39,7 +33,7 @@ function Cycloid() {
 		}
 		this.draw();
 	}
-
+	if (this._isView()) this.view();
 }
 Cycloid.prototype = Object.create(Plugin.prototype);
 Cycloid.prototype.constructor = Cycloid;

@@ -30,14 +30,12 @@ function SeqCal() {
 		return ct;
 	}
 	this.view = function() {
-		var data = this.data();
-		if (!data) {
-			console.log("Not engough data!", this);
-			return false;
-		}
-
-
 		this.clear();
+		var data = this.data;
+		if (!this.data) return false;
+
+
+
 		layout.clear();
 		var startDate = new Date(data[0].start.dateTime),
 			eDate = new Date(data[data.length - 1].end.dateTime);
@@ -61,7 +59,7 @@ function SeqCal() {
 		this.draw();
 
 	}
-
+	if (this._isView()) this.view();
 }
 SeqCal.prototype = Object.create(Plugin.prototype);
 SeqCal.prototype.constructor = SeqCal;

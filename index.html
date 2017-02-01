@@ -4,7 +4,6 @@
   <title>The 433</title>
   <link rel="stylesheet" href="js/html5.canvas/css/default.css">
   <script src="js/html5.canvas/js/canvas.js"></script>
-  <!-- <script src="js/library/numjs.min.js"></script> -->
   <script src="js/plugins/plugin.js"></script>
   <script src="js/object.js"></script>
 </head>
@@ -23,10 +22,6 @@
           <legend>View:</legend>
           <buttongroup class="view"></buttongroup>
         </fieldset>
-        <fieldset>
-          <legend>Controll:</legend>
-          <buttongroup class="controll"></buttongroup>
-        </fieldset>
       </nav>
     </div>
   </header>
@@ -34,7 +29,7 @@
 <script type="text/javascript">
 
   window.onload =function(){
-    var plugins=['logo','calendar','glcalevt','SeqCal','plot','filter','cycloid'],
+    var plugins=['calendar','glcalevt','SeqCal','plot','filter','cycloid'],
         input=document.getElementById('input'),
         output=document.getElementById('output');
 

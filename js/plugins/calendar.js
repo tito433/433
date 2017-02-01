@@ -8,13 +8,12 @@ function Calendar() {
 	this.view = function() {
 		this.clear();
 
-		var data = this.data();
-		var i = 0,
-			ln = data.length;
+		var data = this.data;
+		if (!this.data) return false;
 
 		layout.clear();
 		var startDate = new Date(data[0].start.dateTime),
-			eDate = new Date(data[ln - 1].end.dateTime);
+			eDate = new Date(data[data.length - 1].end.dateTime);
 
 
 		//list of months
@@ -44,6 +43,7 @@ function Calendar() {
 		'input.class': 'form-control'
 	});
 
+	if (this._isView()) this.view();
 }
 Calendar.prototype = Object.create(Plugin.prototype);
 Calendar.prototype.constructor = Calendar;

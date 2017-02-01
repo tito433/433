@@ -3,7 +3,7 @@ function Glcalevt() {
 
 	var storage = this.settings.storage;
 
-	if (storage && !this.data()) {
+	if (storage && !this.data) {
 		loadScript('https://apis.google.com/js/client.js', function() {
 			var d = document,
 				div = d.createElement('div'),
