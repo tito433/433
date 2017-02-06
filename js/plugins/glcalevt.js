@@ -3,13 +3,16 @@ function Glcalevt() {
 
 	var storage = this.settings.storage;
 
-	if (storage && !this.data) {
+	if (!this.data) {
 		loadScript('https://apis.google.com/js/client.js', function() {
 			var d = document,
 				div = d.createElement('div'),
 				p = d.createElement("p");
+
+
 			div.style.position = 'absolute';
-			div.style.maxWidth = '320px';
+			div.style.textAlign = 'center';
+			div.style.maxWidth = '330px';
 			div.style.padding = '10px';
 			div.style.top = '10%';
 			div.style.background = '#eee';
@@ -21,9 +24,37 @@ function Glcalevt() {
 
 
 			d.body.appendChild(div);
-			div.appendChild(p);
-			p.appendChild(d.createTextNode("Authorize access to Google Calendar API"));
+			var h = d.createElement('H1');
+			h.appendChild(d.createTextNode('Google Calendar'));
+			div.appendChild(h);
 
+
+			p.appendChild(d.createTextNode("Authorize access to Google Calendar to fetch event from following date:"));
+			div.appendChild(p);
+
+			var dPara = d.createElement("p");
+			div.appendChild(dPara);
+			var date_to = new Date(),
+				date_from = new Date();
+			date_from.setDate(date_to.getDate() - 365);
+			var mL = function(ix) {
+				return ix > 9 ? ix : '0' + ix;
+			}
+
+			//start date
+			var calStart = d.createElement('input');
+			calStart.type = "date";
+			var dt = date_from.getUTCFullYear() + "-" + mL(date_from.getUTCMonth()) + "-" + mL(date_from.getUTCDate());
+			calStart.value = dt;
+			console.log(dt)
+			dPara.appendChild(calStart);
+			dPara.appendChild(d.createTextNode(" to "));
+			//end date
+			var calEnd = d.createElement('input');
+			calEnd.type = "date";
+			calEnd.value = date_to.getUTCFullYear() + "-" + mL(date_to.getUTCMonth()) + "-" + mL(date_to.getUTCDate());
+
+			dPara.appendChild(calEnd);
 
 			var btn = d.createElement("button");
 			btn.appendChild(d.createTextNode("Authorize"));
@@ -37,12 +68,8 @@ function Glcalevt() {
 					if (authResult && !authResult.error) {
 						div.parentNode.removeChild(div);
 						gapi.client.load('calendar', 'v3', function() {
-							var date = new Date(),
-								date_to = new Date(),
-								date_from = new Date();
-
-							date_from.setDate(date_to.getDate() - 365);
-
+							var date_from = new Date(calStart.value),
+								date_to = new Date(calEnd.value);
 
 							gapi.client.calendar.events.list({
 								'calendarId': 'primary',
