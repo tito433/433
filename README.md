@@ -27,3 +27,7 @@ In which dimention are you?
 Most people think they are in 3. Try to watch in 2d or give illusion of 3d. 3d movies for example.
 Really is this the best you can do?
 ```
+Note (22-Feb-2017)
+```
+to pass the night, to end up, to keep doing
+```

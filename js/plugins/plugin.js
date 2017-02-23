@@ -118,9 +118,22 @@ var Plugin = function() {
 
 		var btn = fn_addUI(this.input.querySelector('.model'), label, option);
 		btn.onchange = function() {
+			localStorage.setItem(this.settings.storage.ui_view, this._name);
 			this.view();
 		}.bind(this)
 		return btn;
 	}
+	this.addControll = function(label, _callBack) {
+		if (_callBack != undefined) {
+			var label = label || this._name,
+				btn = fn_addUI(this.input.querySelector('.controll'), label, {
+					'type': 'button',
+					'value': label
+				});
+			btn.onclick = _callBack.bind(this);
+			return btn;
+		}
+		return false;
 
+	}
 }

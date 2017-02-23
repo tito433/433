@@ -132,6 +132,9 @@ function Chart() {
 	this.draw = function(ctx) {
 		//i clean my mess!
 		ctx.clearRect(this.x, this.y, this.width(), this.height());
+		if (!this._data.length) {
+			return;
+		}
 		var x = this.x,
 			y = this.y,
 			w = this.width(),

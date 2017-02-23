@@ -3,7 +3,7 @@ function Calendar() {
 	Canvas.call(this, this.output);
 
 	var layout = new Layout(this.width, this.height);
-	layout.padding = 10;
+	layout.padding = 20;
 
 	this.view = function() {
 		this.clear();
@@ -38,7 +38,7 @@ function Calendar() {
 
 	var opt = this.addModel('Calendar Cols', {
 		'type': 'number',
-		'value': 6,
+		'value': 4,
 		'input.group': 'input-group',
 		'input.class': 'form-control'
 	});
@@ -68,7 +68,7 @@ function Month(strMY, data) {
 		ctx.font = 'bold 12pt Courier';
 		ctx.fillStyle = '#444';
 		ctx.textBaseline = "middle";
-		ctx.textAlign = "center"
+		ctx.textAlign = "center";
 		ctx.fillText(mL[mn] + "'" + year, this.x + this.width() / 2, this.y + 10);
 		//draw dates
 		ctx.font = 'normal 12pt Courier';
@@ -88,8 +88,9 @@ function Month(strMY, data) {
 			ctx.closePath();
 			ctx.stroke();
 			var lvl = hasEvent(curDate),
-				lCount = lvl.mapTo(0, 4, 100, 0);
-			ctx.fillStyle = 'hsl(0,0%,' + lCount + '%)';
+				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff'];
+			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
+			ctx.fillStyle = colorCodes[lvl];
 			ctx.fill();
 			ctx.restore();
 			ctx.fillText(curDate.getDate(), x + w / 2, y + w / 2);

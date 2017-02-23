@@ -5,7 +5,7 @@ function SeqCal() {
 
 	var fontSize = 12;
 	var layout = new Layout(this.width, this.height);
-	layout.padding = 3;
+	layout.padding = 10;
 
 
 
@@ -47,9 +47,11 @@ function SeqCal() {
 			var date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 			var rect = new Day(date);
 			rect.fontSize = fontSize;
+
 			var lvl = eventCount(data, date),
-				lCount = lvl.mapTo(0, 4, 100, 0);
-			rect.fillStyle = 'hsl(0,0%,' + lCount + '%)';
+				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff'];
+			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
+			rect.fillStyle = colorCodes[lvl];
 
 			layout.add(rect);
 			this.add(rect);

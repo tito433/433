@@ -39,7 +39,7 @@ function Filter() {
 	filter.onchange = function(ev) {
 		var el = ev.target,
 			val = el.value,
-			data = this.data();
+			data = this.data;
 		if (data) {
 			data = data.filter(function(item) {
 				return hasValue(item, val) != undefined;
