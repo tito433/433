@@ -107,7 +107,9 @@ function Chart() {
 	var _data_backup = [];
 	var _show_grid = true;
 
-	this._fn_data_format = function() {}
+	this._fn_data_format = function(d) {
+		return d;
+	}
 
 	this.format = function(callBack) {
 		this._fn_data_format = callBack;
