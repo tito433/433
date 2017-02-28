@@ -2,29 +2,46 @@ function Fourier(input, output) {
 	Plugin.apply(this, arguments);
 
 	Canvas.call(this, output);
-
+	var inpG = this.addModel('Fourier day/hour', {
+		'type': 'checkbox'
+	});
+	var impZoom = this.addModel('Fourier amp.', {
+		'type': 'number',
+		'value': 10,
+		'input.group': 'input-group',
+		'input.class': 'form-control'
+	});
 	this.view = function() {
 		var ctx = this._ctx;
+		var checkType = inpG.checked ? 0 : 1,
+			lblArr = ['day', 'hour'];
 		this.x = 0;
 		this.y = this.height / 2;
 		ctx.clearRect(0, 0, this.width, this.height);
 		ctx.save();
-		ctx.font = 'bold 10pt Courier';
+		ctx.font = 'bold 14pt Courier';
 		ctx.fillStyle = '#aaa';
 		ctx.textBaseline = "middle";
 		ctx.textAlign = "right"
 		ctx.fillText('Fourier', this.x + this.width, 8);
+		ctx.font = 'bold 10pt Courier';
+		ctx.fillText('Frequency:' + lblArr[checkType], this.x + this.width, 25);
+
 
 		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
 			console.log('Nothing to draw');
 			return false;
 		}
 
-		console.log('Total data found:', this.data.length);
+
 		var freq = this.data.map(function(dt) {
 			var cDate = new Date(dt.start.dateTime),
 				hour = cDate.getHours(),
 				day = cDate.getDate();
+			if (checkType) {
+				day = hour;
+				hour = cDate.getDate();
+			}
 			return {
 				'd': day,
 				'h': hour
@@ -34,12 +51,13 @@ function Fourier(input, output) {
 		ctx.strokeStyle = '#aaa';
 		ctx.lineWidth = 0.5;
 		ctx.moveTo(this.x, this.y);
+		var zoom = Number(impZoom.value);
 		for (var i = 0; i < this.width; i++) {
 			x = i;
 			y = 0;
 			t = i / this.width;
 			for (var fi in freq) {
-				y += freq[fi].h * Math.sin(2 * freq[fi].d * Math.PI * t);
+				y += (freq[fi].h / zoom) * Math.sin(2 * freq[fi].d * Math.PI * t);
 			}
 
 			ctx.lineTo(x, this.y - y);
@@ -54,6 +72,12 @@ function Fourier(input, output) {
 		ctx.lineWidth = 2;
 		ctx.moveTo(this.x, this.y);
 		ctx.lineTo(this.width, this.y);
+		ctx.stroke();
+		//center x
+		ctx.beginPath();
+		ctx.lineWidth = 2;
+		ctx.moveTo(this.x + this.width / 2, 0);
+		ctx.lineTo(this.x + this.width / 2, this.height);
 		ctx.stroke();
 		ctx.restore();
 
