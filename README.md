@@ -31,3 +31,11 @@ Note (22-Feb-2017)
 ```
 to pass the night, to end up, to keep doing
 ```
+Note (28-Feb-2017)
+```
+In Fourier plugin we saw same thing with reverse.
+An wave echos in both dimenstion with same peaks.
+Find the peaks...
+
+No matter how you measure, you will always find yourself in the middlee
+```

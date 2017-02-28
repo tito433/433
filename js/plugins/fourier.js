@@ -10,47 +10,55 @@ function Fourier(input, output) {
 		ctx.clearRect(this.x, this.y, this.width, this.height);
 		ctx.save();
 		ctx.font = 'bold 10pt Courier';
-		ctx.fillStyle = '#444';
+		ctx.fillStyle = '#aaa';
 		ctx.textBaseline = "middle";
 		ctx.textAlign = "right"
 		ctx.fillText('Fourier', this.x + this.width, 8);
+
+		if (!this.data && 0 == this.data.length) {
+			console.log('Nothing to draw');
+			return false;
+		}
+
+		var freq = this.data.map(function(dt) {
+			var cDate = new Date(dt.start.dateTime),
+				hour = cDate.getHours(),
+				day = cDate.getDate();
+			return {
+				'd': day,
+				'h': hour
+			};
+		});
+
+		ctx.beginPath();
+		ctx.strokeStyle = '#aaa';
+		ctx.lineWidth = 0.5;
+		ctx.moveTo(this.x, this.y);
+		for (var i = 0; i < this.width; i++) {
+			x = i;
+			y = 0;
+			t = i / this.width;
+			for (var fi in freq) {
+				y += freq[fi].h * Math.sin(2 * freq[fi].d * Math.PI * t);
+			}
+
+			ctx.lineTo(x, this.y - y);
+
+		}
+		ctx.stroke();
+
 		//x axis
 		ctx.save();
 		ctx.beginPath();
-		ctx.strokeStyle = '#ff0000';
+		ctx.strokeStyle = '#433';
 		ctx.lineWidth = 2;
 		ctx.moveTo(this.x, this.y);
 		ctx.lineTo(this.width, this.y);
 		ctx.stroke();
 		ctx.restore();
 
-		var perY = this.height / (2 * 24);
-
-		if (this.data && this.data.length) {
-			for (var i = 0, ln = this.data.length; i < 20; i++) {
-				var cDate = new Date(this.data[i].start.dateTime),
-					hour = cDate.getHours(),
-					day = cDate.getDate();
-				this._drawSine(ctx, perY * hour, day);
-			}
-		}
-
-		ctx.restore();
-
 	}
-	this._drawSine = function(ctx, amp, freq) {
-		ctx.beginPath();
-		ctx.lineWidth = 0.5;
-		ctx.moveTo(this.x, this.y);
-		for (var i = 0; i <= this.width; i++) {
-			x = i;
-			cx = (2 * freq * Math.PI) / (this.width / i);
-			y = amp * Math.sin(cx);
-			ctx.lineTo(x, this.y - y);
 
-		}
-		ctx.stroke();
-	}
 	this.addView();
 	if (this._isView()) this.view();
 }
