@@ -66,8 +66,20 @@ function Storage() {
 					if (authResult && !authResult.error) {
 						div.parentNode.removeChild(div);
 						gapi.client.load('calendar', 'v3', function() {
-							var date_from = new Date(calStart.value),
-								date_to = new Date(calEnd.value);
+							var date_from2 = new Date(calStart.value),
+								date_to2 = new Date(calEnd.value);
+
+							if (date_from2 == 'Invalid Date') {
+								console.log('Invalid date_from2, ill use previous ones.');
+							} else {
+								date_from = date_from2;
+							}
+							if (date_to2 == 'Invalid Date') {
+								console.log('Invalid date_to2, ill use previous ones.');
+							} else {
+								date_to = date_to2;
+							}
+							console.log('Fetching data from ', date_from, ' to ', date_to);
 
 							gapi.client.calendar.events.list({
 								'calendarId': 'primary',

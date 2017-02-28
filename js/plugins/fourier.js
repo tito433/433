@@ -7,7 +7,7 @@ function Fourier(input, output) {
 		var ctx = this._ctx;
 		this.x = 0;
 		this.y = this.height / 2;
-		ctx.clearRect(this.x, this.y, this.width, this.height);
+		ctx.clearRect(0, 0, this.width, this.height);
 		ctx.save();
 		ctx.font = 'bold 10pt Courier';
 		ctx.fillStyle = '#aaa';
@@ -15,11 +15,12 @@ function Fourier(input, output) {
 		ctx.textAlign = "right"
 		ctx.fillText('Fourier', this.x + this.width, 8);
 
-		if (!this.data && 0 == this.data.length) {
+		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
 			console.log('Nothing to draw');
 			return false;
 		}
 
+		console.log('Total data found:', this.data.length);
 		var freq = this.data.map(function(dt) {
 			var cDate = new Date(dt.start.dateTime),
 				hour = cDate.getHours(),
@@ -29,7 +30,6 @@ function Fourier(input, output) {
 				'h': hour
 			};
 		});
-
 		ctx.beginPath();
 		ctx.strokeStyle = '#aaa';
 		ctx.lineWidth = 0.5;
