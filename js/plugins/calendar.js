@@ -4,10 +4,10 @@ function Calendar() {
 
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 20;
-
-	this.view = function() {
+	var tblCol = 4;
+	this.view = function(param) {
 		this.clear();
-
+		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
 		var data = this.data;
 		if (!this.data) return false;
 
@@ -30,15 +30,16 @@ function Calendar() {
 			layout.add(month);
 			this.add(month);
 		}
-		layout.table(Number(opt.value));
+		layout.table(tblCol);
 		this.draw();
 	}
 
 	this.addView();
 
-	var opt = this.addModel('Calendar Cols', {
+	this.addModel('Calendar Cols', {
 		'type': 'number',
-		'value': 4,
+		'value': tblCol,
+		'input.name': 'tblCol',
 		'input.group': 'input-group',
 		'input.class': 'form-control'
 	});

@@ -1,7 +1,11 @@
-function Storage() {
+function Storage(input, output) {
 	Plugin.apply(this, arguments);
+	Canvas.call(this, output);
 
 	var storage = this.settings.storage;
+	var ctx = this._ctx,
+		ctx_width = this.width,
+		ctx_height = this.height;
 
 	if (!this.data) {
 		loadScript('https://apis.google.com/js/client.js', function() {
@@ -79,7 +83,16 @@ function Storage() {
 							} else {
 								date_to = date_to2;
 							}
-							console.log('Fetching data from ', date_from, ' to ', date_to);
+
+							//show some progress, aye!
+							ctx.clearRect(0, 0, ctx_width, ctx_height);
+							ctx.save();
+							ctx.font = 'bold 14pt Courier';
+							ctx.fillStyle = '#aaa';
+							ctx.textBaseline = "middle";
+							ctx.textAlign = "center"
+							ctx.fillText('Loading data from:' + date_from + ' to:' + date_to, this.x + this.width, 8);
+							ctx.restore();
 
 							gapi.client.calendar.events.list({
 								'calendarId': 'primary',

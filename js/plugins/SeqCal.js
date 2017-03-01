@@ -10,9 +10,11 @@ function SeqCal() {
 
 
 	this.addView();
-	var inpSize = this.addModel('SeqCal Cols', {
+	var inpSize = 8;
+	this.addModel('SeqCal Cols', {
 		'type': 'number',
-		'value': 27,
+		'value': inpSize,
+		'input.name': 'inpSize',
 		'input.group': 'input-group',
 		'input.class': 'form-control'
 	});
@@ -29,8 +31,9 @@ function SeqCal() {
 		}
 		return ct;
 	}
-	this.view = function() {
+	this.view = function(param) {
 		this.clear();
+		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
 		var data = this.data;
 		if (!this.data) return false;
 
@@ -57,7 +60,7 @@ function SeqCal() {
 			this.add(rect);
 			startDate.setDate(startDate.getDate() + 1);
 		}
-		layout.table(parseInt(inpSize.value));
+		layout.table(inpSize);
 		this.draw();
 
 	}
@@ -79,7 +82,7 @@ function Day(date) {
 	var year = date.getFullYear(),
 		month = date.getMonth(),
 		day = date.getDate();
-	this.label = [month + '-' + day, year];
+	this.label = [month + '-' + day + '-' + year];
 
 	this.setDate = function(date) {
 		this.date = date;

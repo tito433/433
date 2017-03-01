@@ -38,7 +38,7 @@ var Plugin = function() {
 	}
 
 	window.addEventListener(this.settings.storage.event, this._updateData.bind(this), false);
-
+	var _ui_settings_cache = [];
 	var fn_addUI = function(parent, label, option) {
 		var d = document,
 			btn = d.createElement('input');
@@ -62,6 +62,7 @@ var Plugin = function() {
 		btn.className = option['input.class'] || '';
 		btn.type = option['type'] || 'input';
 		btn.value = option['value'] || '';
+		btn.name = option['input.name'];
 		parent.appendChild(btn);
 
 		if ("button" === option.type) {
@@ -98,16 +99,50 @@ var Plugin = function() {
 		var label = label || this._name,
 			btn = fn_addUI(this.input.querySelector('.view'), label, {
 				'type': 'submit',
+				'input.name': 'view-' + label,
 				'value': label
 			});
 		btn.onclick = function() {
 			localStorage.setItem(this.settings.storage.ui_view, this._name);
+			fn_showSettings.call(this);
 			this.view();
 		}.bind(this);
+	}
+	var fn_showSettings = function() {
+		var btns = [],
+			parent = this.input.querySelector('.model');
+		while (parent.firstChild) {
+			parent.removeChild(parent.firstChild);
+		}
+		for (var idx in _ui_settings_cache) {
+			var it = _ui_settings_cache[idx];
+			var label = it.lbl,
+				opt = it.opt;
+			var btn = fn_addUI(parent, label, opt);
+			(function(b, self) {
+				b.onchange = function() {
+					localStorage.setItem(self.settings.storage.ui_view, self._name);
+					var btnName = b.name,
+						btnVal = 0;
+					if (b.type == 'checkbox') {
+						btnVal = b.checked;
+					} else {
+						btnVal = b.value;
+					}
+					var op = [];
+					op[btnName] = btnVal;
+					self.view(op);
+				}.bind(self);
+			})(btn, this);
+
+			btns.push(btn);
+		}
+		return btns;
 	}
 	this.addModel = function(label, options) {
 		var option = {
 			'type': 'input',
+			'input.name': 'input-' + label + new Date().getMilliseconds(),
 			'input.wrap': 'li',
 			'input.group': false,
 			'input.type': 'input',
@@ -116,18 +151,20 @@ var Plugin = function() {
 			'input.addon': false
 		}.extend(options);
 
-		var btn = fn_addUI(this.input.querySelector('.model'), label, option);
-		btn.onchange = function() {
-			localStorage.setItem(this.settings.storage.ui_view, this._name);
-			this.view();
-		}.bind(this)
-		return btn;
+		_ui_settings_cache.push({
+			'lbl': label,
+			'opt': option
+		});
+
+		var btns = fn_showSettings.call(this);
+		return btns[btns.length - 1];
 	}
 	this.addControll = function(label, _callBack) {
 		if (_callBack != undefined) {
 			var label = label || this._name,
 				btn = fn_addUI(this.input.querySelector('.controll'), label, {
 					'type': 'button',
+					'input.name': 'input-control-' + label + new Date().getMilliseconds(),
 					'value': label
 				});
 			btn.onclick = _callBack.bind(this);

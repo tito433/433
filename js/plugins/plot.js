@@ -6,18 +6,22 @@ function Plot(input, output) {
 	this._chart = [];
 
 
-	var inpG = this.addModel('Plot grid', {
-		'type': 'checkbox'
+	var showGrid = false;
+	this.addModel('Plot grid', {
+		'type': 'checkbox',
+		'input.name': 'showGrid',
+		'input.value': showGrid
 	});
 
-	this.view = function() {
+	this.view = function(param) {
 		this.clear();
+		showGrid = param && param.showGrid != undefined ? param.showGrid : showGrid;
 		var _layout = new Layout(this.width, this.height);
 		_layout.padding = 20;
 
 		for (var title in this._format) {
 			var chart = new Chart().title(title).size(this.width / 2 - 60, this.height / 2 - 40);
-			chart.format(this._format[title]).grid(inpG.checked).data(this.data);
+			chart.format(this._format[title]).grid(showGrid).data(this.data);
 			this.add(chart);
 			_layout.add(chart);
 		}

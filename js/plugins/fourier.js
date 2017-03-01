@@ -2,18 +2,27 @@ function Fourier(input, output) {
 	Plugin.apply(this, arguments);
 
 	Canvas.call(this, output);
-	var inpG = this.addModel('Fourier day/hour', {
-		'type': 'checkbox'
+	var dayHour = true;
+	this.addModel('Fourier day/hour', {
+		'type': 'checkbox',
+		'input.value': dayHour,
+		'input.name': 'dayHour'
 	});
-	var impZoom = this.addModel('Fourier amp.', {
+	var inpDeg = 360;
+	this.addModel('Fourier span.', {
 		'type': 'number',
-		'value': 10,
+		'value': inpDeg,
+		'input.name': 'inpDeg',
 		'input.group': 'input-group',
-		'input.class': 'form-control'
+		'input.class': 'form-control',
+		'input.addon': '&deg;'
 	});
-	this.view = function() {
+	this.view = function(param) {
+
+		dayHour = param && param.dayHour != undefined ? param.dayHour : dayHour;
+		inpDeg = param && param.inpDeg ? Number(param.inpDeg) : inpDeg;
 		var ctx = this._ctx;
-		var checkType = inpG.checked ? 0 : 1,
+		var checkType = dayHour ? 0 : 1,
 			lblArr = ['day', 'hour'];
 		this.x = 0;
 		this.y = this.height / 2;
@@ -36,7 +45,7 @@ function Fourier(input, output) {
 
 		var freq = this.data.map(function(dt) {
 			var cDate = new Date(dt.start.dateTime),
-				hour = cDate.getHours(),
+				hour = cDate.getHours() + 1,
 				day = cDate.getDate();
 			if (checkType) {
 				day = hour;
@@ -51,13 +60,15 @@ function Fourier(input, output) {
 		ctx.strokeStyle = '#aaa';
 		ctx.lineWidth = 0.5;
 		ctx.moveTo(this.x, this.y);
-		var zoom = Number(impZoom.value);
+		var np = inpDeg / 180;
 		for (var i = 0; i < this.width; i++) {
 			x = i;
 			y = 0;
 			t = i / this.width;
 			for (var fi in freq) {
-				y += (freq[fi].h / zoom) * Math.sin(2 * freq[fi].d * Math.PI * t);
+				var amp = freq[fi].h,
+					fr = freq[fi].d;
+				y += amp * Math.sin(fr * np * Math.PI * t);
 			}
 
 			ctx.lineTo(x, this.y - y);
