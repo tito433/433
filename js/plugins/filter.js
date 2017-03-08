@@ -31,25 +31,20 @@ function Filter() {
 		}
 	};
 
-	var filter = this.addModel('Filter', {
-		'input.type': 'text',
-		'input.group': 'input-group',
-		'input.class': 'form-control',
-	});
-	filter.onchange = function(ev) {
-		var el = ev.target,
-			val = el.value,
-			data = this.data;
-		if (data) {
+	this.view = function() {
+		var input = param && param.filter != undefined ? param.filter : "";
+		var data = this.data;
+		if (data && data.length) {
 			data = data.filter(function(item) {
-				return hasValue(item, val) != undefined;
+				return hasValue(item, input) != undefined;
 			});
 			window.dispatchEvent(new CustomEvent(this.settings.storage.event, {
 				'detail': data
 			}));
 		}
 
-	}.bind(this);
+	}
+
 
 }
 Filter.prototype = Object.create(Plugin.prototype);

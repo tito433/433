@@ -1,9 +1,11 @@
 var Plugin = function() {
 
+
 	if (typeof(Storage) === "undefined") {
 		throw "Storage undefined! This app can't run without localStorage. Can you?";
 	}
 
+	var self = this;
 	this.input = arguments[0] || null;
 	this.output = arguments[1] || null;
 
@@ -104,60 +106,51 @@ var Plugin = function() {
 			});
 		btn.onclick = function() {
 			localStorage.setItem(this.settings.storage.ui_view, this._name);
-			fn_showSettings.call(this);
+			this.showSettings();
 			this.view();
 		}.bind(this);
 	}
-	var fn_showSettings = function() {
-		var btns = [],
-			parent = this.input.querySelector('.model');
+	this.showSettings = function() {
+		var parent = this.input.querySelector('.model');
 		while (parent.firstChild) {
 			parent.removeChild(parent.firstChild);
 		}
-		for (var idx in _ui_settings_cache) {
-			var it = _ui_settings_cache[idx];
-			var label = it.lbl,
-				opt = it.opt;
-			var btn = fn_addUI(parent, label, opt);
-			(function(b, self) {
-				b.onchange = function() {
-					localStorage.setItem(self.settings.storage.ui_view, self._name);
-					var btnName = b.name,
-						btnVal = 0;
-					if (b.type == 'checkbox') {
-						btnVal = b.checked;
-					} else {
-						btnVal = b.value;
-					}
-					var op = [];
-					op[btnName] = btnVal;
-					self.view(op);
-				}.bind(self);
-			})(btn, this);
+		_ui_settings_cache.forEach(function(it) {
+			var option = {
+				'type': 'input',
+				'input.name': 'input-' + it.title + new Date().getMilliseconds(),
+				'input.wrap': 'li',
+				'input.group': false,
+				'input.type': 'input',
+				'input.value': '',
+				'input.class': '',
+				'input.addon': false
+			}.extend(it);
 
-			btns.push(btn);
-		}
-		return btns;
-	}
-	this.addModel = function(label, options) {
-		var option = {
-			'type': 'input',
-			'input.name': 'input-' + label + new Date().getMilliseconds(),
-			'input.wrap': 'li',
-			'input.group': false,
-			'input.type': 'input',
-			'input.value': '',
-			'input.class': '',
-			'input.addon': false
-		}.extend(options);
+			var btn = fn_addUI(parent, it.title, option);
 
-		_ui_settings_cache.push({
-			'lbl': label,
-			'opt': option
+			btn.onchange = function() {
+				var btnName = this.name,
+					btnVal = 0;
+				if (this.type == 'checkbox') {
+					btnVal = this.checked;
+				} else {
+					btnVal = this.value;
+				}
+				var op = [];
+				op[btnName] = btnVal;
+				console.log('calling view:' + this._name)
+				self.view(op);
+			}
 		});
-
-		var btns = fn_showSettings.call(this);
-		return btns[btns.length - 1];
+	}
+	this.addSettings = function(btns) {
+		_ui_settings_cache = [];
+		if (btns.constructor === Array) {
+			_ui_settings_cache = btns;
+		} else {
+			_ui_settings_cache.push(btns);
+		}
 	}
 	this.addControll = function(label, _callBack) {
 		if (_callBack != undefined) {

@@ -3,13 +3,15 @@ function Fourier(input, output) {
 
 	Canvas.call(this, output);
 	var dayHour = true;
-	this.addModel('Fourier day/hour', {
+	this.addSettings({
+		'title': 'Fourier day/hour',
 		'type': 'checkbox',
 		'input.value': dayHour,
 		'input.name': 'dayHour'
 	});
 	var inpDeg = 360;
-	this.addModel('Fourier span.', {
+	this.addSettings({
+		'title': 'Fourier span.',
 		'type': 'number',
 		'value': inpDeg,
 		'input.name': 'inpDeg',

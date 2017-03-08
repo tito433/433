@@ -7,7 +7,8 @@ function Plot(input, output) {
 
 
 	var showGrid = false;
-	this.addModel('Plot grid', {
+	this.addSettings({
+		'title': 'Plot grid',
 		'type': 'checkbox',
 		'input.name': 'showGrid',
 		'input.value': showGrid

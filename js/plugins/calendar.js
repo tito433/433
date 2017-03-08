@@ -35,14 +35,15 @@ function Calendar() {
 	}
 
 	this.addView();
-
-	this.addModel('Calendar Cols', {
-		'type': 'number',
-		'value': tblCol,
-		'input.name': 'tblCol',
-		'input.group': 'input-group',
-		'input.class': 'form-control'
-	});
+	var settings = [{
+		'Calendar Cols': {
+			'type': 'number',
+			'value': tblCol,
+			'input.name': 'tblCol',
+			'input.group': 'input-group',
+			'input.class': 'form-control'
+		}
+	}];
 
 	if (this._isView()) this.view();
 }

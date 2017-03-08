@@ -10,14 +10,23 @@ function SeqCal() {
 
 
 	this.addView();
-	var inpSize = 8;
-	this.addModel('SeqCal Cols', {
+	var inpSize = 8,
+		yoffset = 0;
+	this.addSettings([{
+		'title': 'SeqCal Cols',
 		'type': 'number',
 		'value': inpSize,
 		'input.name': 'inpSize',
 		'input.group': 'input-group',
 		'input.class': 'form-control'
-	});
+	}, {
+		'title': 'Y offset',
+		'type': 'number',
+		'value': yoffset,
+		'input.name': 'yoffset',
+		'input.group': 'input-group',
+		'input.class': 'form-control'
+	}]);
 
 	var eventCount = function(data, date) {
 		var ct = 0;
@@ -34,10 +43,10 @@ function SeqCal() {
 	this.view = function(param) {
 		this.clear();
 		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
+		yoffset = param && param.yoffset ? Number(param.yoffset) : yoffset;
+
 		var data = this.data;
 		if (!this.data) return false;
-
-
 
 		layout.clear();
 		var startDate = new Date(data[0].start.dateTime),
@@ -60,11 +69,15 @@ function SeqCal() {
 			this.add(rect);
 			startDate.setDate(startDate.getDate() + 1);
 		}
+		layout.margin.y = Number(yoffset);
 		layout.table(inpSize);
 		this.draw();
 
 	}
-	if (this._isView()) this.view();
+	if (this._isView()) {
+		this.showSettings();
+		this.view();
+	}
 }
 SeqCal.prototype = Object.create(Plugin.prototype);
 SeqCal.prototype.constructor = SeqCal;
