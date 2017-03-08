@@ -139,16 +139,15 @@ var Plugin = function() {
 				}
 				var op = [];
 				op[btnName] = btnVal;
-				console.log('calling view:' + this._name)
 				self.view(op);
 			}
 		});
 	}
 	this.addSettings = function(btns) {
 		_ui_settings_cache = [];
-		if (btns.constructor === Array) {
+		if (btns && btns.constructor === Array) {
 			_ui_settings_cache = btns;
-		} else {
+		} else if (btns) {
 			_ui_settings_cache.push(btns);
 		}
 	}
