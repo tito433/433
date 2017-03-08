@@ -66,7 +66,7 @@ function Fourier(input, output) {
 		this.y = this.height / 2;
 		ctx.moveTo(this.x, this.y);
 		var np = inpDeg / 180;
-		for (var i = this.x; i < this.width; i++) {
+		for (var i = this.x; i <= this.width; i++) {
 			x = i;
 			y = 0;
 			t = i / this.width;
@@ -103,5 +103,12 @@ function Fourier(input, output) {
 	if (this._isView()) {
 		this.showSettings();
 		this.view();
+	}
+
+	this.onZoom = function(zoom) {
+		if (this._isView()) {
+			inpDeg = inpDeg + zoom * 10;
+			this.view();
+		}
 	}
 }

@@ -10,7 +10,7 @@ function SeqCal() {
 
 
 	this.addView();
-	var inpSize = 8,
+	var inpSize = 17,
 		yoffset = 0;
 	this.addSettings([{
 		'title': 'SeqCal Cols',
@@ -41,6 +41,7 @@ function SeqCal() {
 		return ct;
 	}
 	this.view = function(param) {
+
 		this.clear();
 		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
 		yoffset = param && param.yoffset ? Number(param.yoffset) : yoffset;
@@ -64,7 +65,7 @@ function SeqCal() {
 				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff'];
 			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
 			rect.fillStyle = colorCodes[lvl];
-
+			rect.height(30);
 			layout.add(rect);
 			this.add(rect);
 			startDate.setDate(startDate.getDate() + 1);
@@ -77,6 +78,12 @@ function SeqCal() {
 	if (this._isView()) {
 		this.showSettings();
 		this.view();
+	}
+	this.onZoom = function(zoom) {
+		if (this._isView()) {
+			inpSize = inpSize + zoom;
+			this.view();
+		}
 	}
 }
 SeqCal.prototype = Object.create(Plugin.prototype);
