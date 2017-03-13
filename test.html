@@ -36,24 +36,48 @@
 // table.addEventListener("click",function(e){
 //     console.log('table click');
 // });
-var div=document.getElementById('table');
+// var div=document.getElementById('table');
 
-document.getElementById('add').addEventListener('click',function(e){
-    var template='<p><button>X</button></p>';
+// document.getElementById('add').addEventListener('click',function(e){
+//     var template='<p><button>X</button></p>';
     
-    div.innerHTML+=template;
-});
+//     div.innerHTML+=template;
+// });
 
-div.addEventListener("click",function cb(e){
-    var btn=e.target,p=btn.parentNode;
-    if(btn instanceof HTMLButtonElement){
-        div.removeChild(p);
-    }
+// div.addEventListener("click",function cb(e){
+//     var btn=e.target,p=btn.parentNode;
+//     if(btn instanceof HTMLButtonElement){
+//         div.removeChild(p);
+//     }
     
-});
+// });
+
+//13-Mar-2017
+// try to find can i modify my parent.
 
 
 
+
+
+
+
+
+
+var dna_data=new (function(){
+    this.count=43;
+    this.description='Complex storage system contains '+this.count+' segments.';
+    this.data=new Array(this.count).fill(0).map(Math.random);
+})();
+
+dna_data.data.map(function(v,i,arr){
+    arr[i]+=1;
+    return arr;
+})
+console.log(dna_data.data)
+
+var sm=15;
+var rem = sm % 10;
+                    console.log(String.fromCharCode(65+rem));
 </script>
 </body>
 </html>

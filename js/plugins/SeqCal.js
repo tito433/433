@@ -3,14 +3,14 @@ function SeqCal() {
 	//adapt drawing
 	Canvas.call(this, this.output);
 
-	var fontSize = 12;
+
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 10;
 
 
 
 	this.addView();
-	var inpSize = 17,
+	var inpSize = 16,
 		yoffset = 0;
 	this.addSettings([{
 		'title': 'SeqCal Cols',
@@ -48,6 +48,7 @@ function SeqCal() {
 
 		var data = this.data;
 		if (!this.data) return false;
+		var rects = [];
 
 		layout.clear();
 		var startDate = new Date(data[0].start.dateTime),
@@ -57,24 +58,63 @@ function SeqCal() {
 		startDate.setHours(0);
 
 		while (startDate <= eDate) {
-			var date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+			var date = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
 			var rect = new Day(date);
-			rect.fontSize = fontSize;
 
-			var lvl = eventCount(data, date),
-				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff'];
-			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
-			rect.fillStyle = colorCodes[lvl];
-			rect.height(30);
-			layout.add(rect);
+			rect.lvl = eventCount(data, date);
+			rects.push(rect);
+
 			this.add(rect);
+			layout.add(rect);
 			startDate.setDate(startDate.getDate() + 1);
 		}
 		layout.margin.y = Number(yoffset);
 		layout.table(inpSize);
-		this.draw();
+		this._getMeaning(rects);
+		this.draw(rects);
 
 	}
+	this._getMeaning = function(rects) {
+		var dt = rects.map(function(obj) {
+			return obj.lvl;
+		});
+		var bites = dt.chunk(16);
+
+		var fnGetHex = function(arr) {
+
+			var bite = arr.chunk(4, true);
+			console.log(arr, bite)
+				//fix lastbit
+			var last = bite[bite.length - 1];
+			var ln = 4 - last.length;
+			bite[bite.length - 1] = last.unshift(new Array(ln).fill(0));
+			var res = bite.reduce(function(acc, val) {
+				var sm = 0;
+				val.forEach(function(v, idx) {
+					if (Number(v) == 1) {
+						sm += Math.pow(2, idx);
+					}
+				});
+				if (sm > 9) {
+					var rem = sm % 10;
+					acc = String.fromCharCode(65 + rem);
+				} else {
+					acc = sm;
+				}
+				return acc;
+
+			});
+			return res;
+
+		}
+		var message = bites.reduce(function(acc, bits) {
+			var h = fnGetHex(bits);
+			return acc + String.fromCharCode(parseInt(h, 16));
+		}, '');
+		console.log(message);
+
+	}
+
 	if (this._isView()) {
 		this.showSettings();
 		this.view();
@@ -98,11 +138,14 @@ function Day(date) {
 	this.fontColor = '#888';
 	this.evts = [];
 	this.marked = false;
-
+	this.fontSize = 10;
+	this.h = 30;
+	this.lvl = 0;
+	var colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#7f1ae5'];
 	var year = date.getFullYear(),
-		month = date.getMonth(),
+		month = date.getMonth() + 1,
 		day = date.getDate();
-	this.label = [month + '-' + day + '-' + year];
+	this.label = [day + '-' + month + '-' + year];
 
 	this.setDate = function(date) {
 		this.date = date;
@@ -115,24 +158,15 @@ function Day(date) {
 		ctx.rect(this.x, this.y, this.w, this.h);
 		ctx.closePath();
 		ctx.stroke();
+
+		var lvl = this.lvl >= colorCodes.length ? colorCodes.length - 1 : this.lvl;
+		ctx.fillStyle = colorCodes[lvl];
 		ctx.fill();
 		ctx.restore();
 		Drawable.prototype.draw.call(this, ctx);
 
 	}
-	this.events = function() {
-		if (arguments.length == 0) {
-			return this.evts;
-		} else {
-			this.evts = this.evts.concat(Array.prototype.slice.call(arguments));
-			this.label = [this.date.getMonth() + '-' + this.date.getDate()];
-			this.label = this.label.concat(this.evts);
-			this.fillStyle = '#888';
-			this.fontColor = '#fff';
-			this.marked = true;
-			return this;
-		}
-	}
+
 }
 
 Day.prototype = Object.create(Drawable.prototype);

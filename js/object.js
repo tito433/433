@@ -36,7 +36,15 @@ Object.defineProperty(Object.prototype, 'filter', {
 		return results;
 	}
 });
-
+Object.defineProperty(Array.prototype, 'chunk', {
+	value: function(chunkSize, show) {
+		var R = [];
+		for (var i = 0; i < this.length; i += chunkSize) {
+			R.push(this.slice(i, i + chunkSize));
+		}
+		return R;
+	}
+});
 //http://stackoverflow.com/questions/332422/how-do-i-get-the-name-of-an-objects-type-in-javascript
 Object.defineProperty(Object.prototype, 'getName', {
 	value: function() {
