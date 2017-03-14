@@ -82,10 +82,17 @@ String.prototype.fistCapital = function() {
 
 window.loadScript = function(u, c) {
 	if (!u && typeof u !== "String") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
+	var newJs = u.startsWith('http') ? u : 'js/' + u + '.js';
 
+	var scripts = document.getElementsByTagName('script');
+	for (var i = 0, ln = scripts.length; i < ln; i++) {
+		if (scripts[i].src == newJs) {
+			return c.call(c);
+		}
+	}
 	var d = document,
 		j = d.createElement('script');
-	j.src = u.startsWith('http') ? u : 'js/' + u + '.js';
+	j.src = newJs;
 
 	if (c && typeof c === 'function') {
 		j.addEventListener('load', function cb(e) {

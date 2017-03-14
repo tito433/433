@@ -3,6 +3,9 @@
 ### To run:
 Clone this repo then update submodules then host it to a webserver(wamp,xamp,apache).
 
+### References:
+1. Google Picker for Google Drive
+
 Note:
 ```
 When you crossover, your each property gets multiplied. 4
