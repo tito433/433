@@ -138,17 +138,19 @@ function SoundWave(buffer) {
 
 	var bufferLength = analyser.frequencyBinCount;
 	source.connect(audioCtx.destination);
-	source.start(0);
 
+	var scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
+	source.connect(scriptNode);
+	scriptNode.connect(audioCtx.destination);
+	source.onended = function() {
+		source.disconnect(scriptNode);
+		scriptNode.disconnect(audioCtx.destination);
+	}
 	this.draw = function(ctx) {
 		var WIDTH = this.width(),
 			HEIGHT = this.height();
 
-
-		javascriptNode = audioCtx.createScriptProcessor(2048, 1, 1);
-
-
-		javascriptNode.onaudioprocess = function() {
+		scriptNode.onaudioprocess = function() {
 
 			var array = new Uint8Array(bufferLength);
 			analyser.getByteFrequencyData(array);
@@ -173,9 +175,8 @@ function SoundWave(buffer) {
 
 			ctx.stroke();
 		}
-		analyser.connect(javascriptNode);
-		javascriptNode.connect(audioCtx.destination);
 
+		source.start();
 	}
 
 }
