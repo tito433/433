@@ -4,29 +4,28 @@ function Calendar() {
 
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 20;
-	var tblCol = 4;
+	var tblCol = 1;
 	this.view = function(param) {
 		this.clear();
 		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
-		var data = this.data;
-		if (!this.data) return false;
 
+		if (!this.data || !this.data.length) return false;
 		layout.clear();
-		var startDate = new Date(data[0].start.dateTime),
-			eDate = new Date(data[data.length - 1].end.dateTime);
+		var months = this.data.map(function(el) {
+			var dt = new Date(el.date);
+			return dt.getMonth() + '_' + dt.getFullYear();
+		}).unique();
 
-
-		//list of months
-		var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1),
-			eDate = new Date(eDate.getFullYear(), eDate.getMonth() + 1, 1),
-			months = [];
-		while (sDate < eDate) {
-			months.push(sDate.getMonth() + '_' + sDate.getFullYear());
-			sDate.setDate(sDate.getDate() + 1);
-		}
-		months = months.unique();
 		for (var idx in months) {
-			var month = new Month(months[idx], data);
+			var sp = months[idx].split('_'),
+				mn = Number(sp[0]),
+				y = Number(sp[1]);
+			var monthData = this.data.filter(function(ev) {
+				var dt = new Date(ev.date);
+				return dt.getMonth() == mn && dt.getFullYear() == y;
+			});
+
+			var month = new Month(new Date(y, mn, 1), monthData);
 			layout.add(month);
 			this.add(month);
 		}
@@ -35,34 +34,45 @@ function Calendar() {
 	}
 
 	this.addView();
-	var settings = [{
-		'Calendar Cols': {
-			'type': 'number',
-			'value': tblCol,
-			'input.name': 'tblCol',
-			'input.group': 'input-group',
-			'input.class': 'form-control'
-		}
-	}];
+	this.addSettings([{
+		'title': 'Columns',
+		'type': 'number',
+		'value': tblCol,
+		'input.name': 'tblCol',
+		'input.group': 'input-group',
+		'input.class': 'form-control'
 
-	if (this._isView()) this.view();
+	}]);
+
+	if (this._isView()) {
+		this.showSettings();
+		this.view();
+	}
+	this.onZoom = function(zoom) {
+		if (this._isView()) {
+			tblCol = tblCol + zoom;
+			this.view();
+		}
+	}
 }
 Calendar.prototype = Object.create(Plugin.prototype);
 Calendar.prototype.constructor = Calendar;
 
 
-function Month(strMY, data) {
+function Month(date, data) {
 	Drawable.call(this);
-	var _sp = strMY.split('_'),
-		mn = Number(_sp[0]),
-		year = Number(_sp[1]);
+
+	this.date = date;
+	this.data = data;
+
+	var mn = this.date.getMonth(),
+		year = this.date.getFullYear();
 
 	var mL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 	this.fillStyle = '#fff';
 	this.fontColor = '#888';
 
-	var date = new Date(year, mn, 1);
 
 	this.draw = function(ctx) {
 		ctx.save();
@@ -71,27 +81,44 @@ function Month(strMY, data) {
 		ctx.fillStyle = '#444';
 		ctx.textBaseline = "middle";
 		ctx.textAlign = "center";
-		ctx.fillText(mL[mn] + "'" + year, this.x + this.width() / 2, this.y + 10);
+		ctx.fillText(mL[mn] + "'" + year, this.x + this.width() / 2, this.y);
 		//draw dates
 		ctx.font = 'normal 12pt Courier';
 		var w = this.width() / 7,
+			h = this.height() - 25,
 			y = this.y + 25,
-			curDate = new Date(date.getFullYear(), date.getMonth(), 1),
-			endDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+			curDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1),
+			endDate = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 1),
+			lastDay = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate(),
+			startDay = curDate.getDay(),
+			numRows = (startDay + lastDay) / 7;
+		if ((startDay + lastDay - 1) % 7 != 0) numRows += 1;
+		h = h / numRows;
 		while (curDate < endDate) {
 			var day = curDate.getDay();
 			if (day === 0 && curDate.getDate() > 1) {
-				y += w;
+				y += h;
 			}
 			var x = this.x + day * w;
 			ctx.save();
 			ctx.beginPath();
-			ctx.rect(x, y, w, w);
+			ctx.rect(x, y, w, h);
 			ctx.closePath();
 			ctx.stroke();
-			var lvl = hasEvent(curDate),
+			var todays = this.data.find(function(ev) {
+					var dt = new Date(ev.date);
+					return dt.getFullYear() == curDate.getFullYear() &&
+						dt.getMonth() == curDate.getMonth() &&
+						dt.getDate() == curDate.getDate();
+				}) || {
+					events: []
+				},
 				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff'];
+
+			var lvl = todays.events.length > 0 ? todays.events.length : 0;
 			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
+
+
 			ctx.fillStyle = colorCodes[lvl];
 			ctx.fill();
 			ctx.restore();
@@ -101,18 +128,6 @@ function Month(strMY, data) {
 		ctx.restore();
 	}
 
-	function hasEvent(date) {
-		var ct = 0;
-		for (var i in data) {
-			var dt = new Date(data[i].start.dateTime);
-			if (dt.getFullYear() == date.getFullYear() &&
-				dt.getMonth() == date.getMonth() &&
-				dt.getDate() == date.getDate()) {
-				ct++;
-			}
-		}
-		return ct;
-	}
 }
 
 Month.prototype = Object.create(Drawable.prototype);

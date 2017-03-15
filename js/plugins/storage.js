@@ -3,9 +3,6 @@ function Storage(input, output) {
 	Canvas.call(this, output);
 
 	var storage = this.settings.storage;
-	var ctx = this._ctx,
-		ctx_width = this.width,
-		ctx_height = this.height;
 
 	if (!this.data) {
 		loadScript('https://apis.google.com/js/client.js', function() {
@@ -63,7 +60,7 @@ function Storage(input, output) {
 			div.appendChild(btn);
 			btn.addEventListener("click", function() {
 				gapi.auth.authorize({
-					'client_id': '169881026239-62ks55c662hlrf6hnkui6uspmom0mj9i.apps.googleusercontent.com',
+					'client_id': '247361126631-qeqsa7osg41g90q2f78ld3a1mhj3lv2l.apps.googleusercontent.com',
 					'scope': "https://www.googleapis.com/auth/calendar.readonly",
 					'immediate': false
 				}, function(authResult) {
@@ -74,25 +71,16 @@ function Storage(input, output) {
 								date_to2 = new Date(calEnd.value);
 
 							if (date_from2 == 'Invalid Date') {
-								console.log('Invalid date_from2, ill use previous ones.');
+								console.log('Invalid date_from2, ill use previous ones.', date_from);
 							} else {
 								date_from = date_from2;
 							}
 							if (date_to2 == 'Invalid Date') {
-								console.log('Invalid date_to2, ill use previous ones.');
+								console.log('Invalid date_to2, ill use previous ones.', date_to);
 							} else {
 								date_to = date_to2;
 							}
 
-							//show some progress, aye!
-							ctx.clearRect(0, 0, ctx_width, ctx_height);
-							ctx.save();
-							ctx.font = 'bold 14pt Courier';
-							ctx.fillStyle = '#aaa';
-							ctx.textBaseline = "middle";
-							ctx.textAlign = "center"
-							ctx.fillText('Loading data from:' + date_from + ' to:' + date_to, this.x + this.width, 8);
-							ctx.restore();
 
 							gapi.client.calendar.events.list({
 								'calendarId': 'primary',
@@ -103,9 +91,35 @@ function Storage(input, output) {
 								'maxResults': 999999,
 								'orderBy': 'startTime'
 							}).execute(function(resp) {
-								localStorage.setItem(storage.data_key, JSON.stringify(resp.items));
+								var data = resp.items;
+								var startDate = new Date(data[0].start.dateTime),
+									eDate = new Date(data[data.length - 1].end.dateTime);
+								var getEvents = function(data, date) {
+									var ct = [];
+									for (var i in data) {
+										var dt = new Date(data[i].start.dateTime);
+										if (dt.getFullYear() == date.getFullYear() &&
+											dt.getMonth() == date.getMonth() &&
+											dt.getDate() == date.getDate()) {
+											ct.push(data[i].start.dateTime);
+										}
+									}
+									return ct;
+								}
+								startDate.setMinutes(0);
+								startDate.setHours(0);
+								var dataFormated = [];
+								while (startDate <= eDate) {
+									var rect = {
+										'date': '' + startDate,
+										events: getEvents(data, startDate)
+									};
+									dataFormated.push(rect);
+									startDate.setDate(startDate.getDate() + 1);
+								}
+								localStorage.setItem(storage.data_key, JSON.stringify(dataFormated));
 								window.dispatchEvent(new CustomEvent(storage.event, {
-									'detail': resp.items
+									'detail': dataFormated
 								}));
 							});
 						});

@@ -5,6 +5,7 @@ function Fourier(input, output) {
 	var dayHour = false;
 	this.addSettings();
 	var inpDeg = 360;
+	var inpAmp = 1;
 	this.addSettings([{
 		'title': 'Fourier span.',
 		'type': 'number',
@@ -62,7 +63,7 @@ function Fourier(input, output) {
 		ctx.beginPath();
 		ctx.strokeStyle = '#aaa';
 		ctx.lineWidth = 0.5;
-		this.x = this.width / 2;
+		this.x = 0;
 		this.y = this.height / 2;
 		ctx.moveTo(this.x, this.y);
 		var np = inpDeg / 180;
@@ -71,7 +72,7 @@ function Fourier(input, output) {
 			y = 0;
 			t = i / this.width;
 			for (var fi in freq) {
-				var amp = freq[fi].a,
+				var amp = inpAmp * freq[fi].a,
 					fr = freq[fi].f;
 				y += amp * Math.sin(fr * np * t * Math.PI);
 			}
@@ -89,13 +90,7 @@ function Fourier(input, output) {
 		ctx.moveTo(0, this.y);
 		ctx.lineTo(this.width, this.y);
 		ctx.stroke();
-		//center x
-		ctx.beginPath();
-		ctx.lineWidth = 2;
-		ctx.moveTo(this.x, this.height);
-		ctx.lineTo(this.x, 0);
-		ctx.stroke();
-		ctx.restore();
+
 
 	}
 
@@ -107,7 +102,7 @@ function Fourier(input, output) {
 
 	this.onZoom = function(zoom) {
 		if (this._isView()) {
-			inpDeg = inpDeg + zoom * 10;
+			inpAmp += zoom / 10;
 			this.view();
 		}
 	}

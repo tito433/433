@@ -44,76 +44,29 @@ function SeqCal() {
 
 		this.clear();
 		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
-		yoffset = param && param.yoffset ? Number(param.yoffset) : yoffset;
+		yoffset = param && param.yoffset ? Number(param.yoffset) * 10 : yoffset;
 
 		var data = this.data;
 		if (!this.data) return false;
 		var rects = [];
-
 		layout.clear();
-		var startDate = new Date(data[0].start.dateTime),
-			eDate = new Date(data[data.length - 1].end.dateTime);
 
-		startDate.setMinutes(0);
-		startDate.setHours(0);
-
-		while (startDate <= eDate) {
-			var date = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
-			var rect = new Day(date);
-
-			rect.lvl = eventCount(data, date);
+		for (var i in this.data) {
+			var dt = new Date(this.data[i].date);
+			var rect = new Day(dt);
+			rect.lvl = this.data[i].events.length;
 			rects.push(rect);
-
 			this.add(rect);
 			layout.add(rect);
-			startDate.setDate(startDate.getDate() + 1);
 		}
+
 		layout.margin.y = Number(yoffset);
 		layout.table(inpSize);
-		this._getMeaning(rects);
+
 		this.draw(rects);
 
 	}
-	this._getMeaning = function(rects) {
-		var dt = rects.map(function(obj) {
-			return obj.lvl;
-		});
-		var bites = dt.chunk(16);
 
-		var fnGetHex = function(arr) {
-
-			var bite = arr.chunk(4, true);
-			console.log(arr, bite)
-				//fix lastbit
-			var last = bite[bite.length - 1];
-			var ln = 4 - last.length;
-			bite[bite.length - 1] = last.unshift(new Array(ln).fill(0));
-			var res = bite.reduce(function(acc, val) {
-				var sm = 0;
-				val.forEach(function(v, idx) {
-					if (Number(v) == 1) {
-						sm += Math.pow(2, idx);
-					}
-				});
-				if (sm > 9) {
-					var rem = sm % 10;
-					acc = String.fromCharCode(65 + rem);
-				} else {
-					acc = sm;
-				}
-				return acc;
-
-			});
-			return res;
-
-		}
-		var message = bites.reduce(function(acc, bits) {
-			var h = fnGetHex(bits);
-			return acc + String.fromCharCode(parseInt(h, 16));
-		}, '');
-		console.log(message);
-
-	}
 
 	if (this._isView()) {
 		this.showSettings();

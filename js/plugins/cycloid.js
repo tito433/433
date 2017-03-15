@@ -5,8 +5,7 @@ function Cycloid() {
 
 	var self = this;
 
-
-	this.addView();
+	var inpRadius = 0;
 
 	this.view = function() {
 		this.clear();
@@ -20,14 +19,25 @@ function Cycloid() {
 			var date = new Date(this.data[i].start.dateTime);
 			var day = date.getDate(),
 				hour = date.getHours();
-			var layer = new PeripheralCircle(centerX, centerY, day.mapTo(1, 31, 0, maxR));
+			var layer = new PeripheralCircle(centerX, centerY, inpRadius + day.mapTo(1, 31, 0, maxR));
 			layer.size = hour;
 			this.add(layer);
 		}
 		this.draw();
 	}
 
-	if (this._isView()) this.view();
+	this.addView();
+	if (this._isView()) {
+		this.showSettings();
+		this.view();
+	}
+
+	this.onZoom = function(zoom) {
+		if (this._isView()) {
+			inpRadius += zoom * 10;
+			this.view();
+		}
+	}
 }
 Cycloid.prototype = Object.create(Plugin.prototype);
 Cycloid.prototype.constructor = Cycloid;
@@ -52,9 +62,9 @@ function PeripheralCircle(x, y, r) {
 
 		var clrIndx = Math.round(spec.mapTo(430, 740, 255, 16711680));
 		var clr = '#' + clrIndx.toString(16)
-		// ctx.strokeStyle = clr;
-		// ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
-		// ctx.stroke();
+			// ctx.strokeStyle = clr;
+			// ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+			// ctx.stroke();
 
 		var sr = this.r / this.size,
 			k = this.size + 1;
