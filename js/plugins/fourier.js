@@ -42,23 +42,30 @@ function Fourier(input, output) {
 
 
 		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
-			console.log('Nothing to draw');
 			return false;
 		}
 
 
-		var freq = this.data.map(function(dt) {
-			var cDate = new Date(dt.start.dateTime),
-				a = cDate.getHours() + 1,
-				f = cDate.getDate();
-			if (checkType) {
-				f = cDate.getHours() + 1;
-				a = cDate.getDate();
+		var freq = [];
+		this.data.forEach(function(dt) {
+			var events = dt.events;
+			if (events && events.length) {
+				var fr = events.map(function(ev) {
+					var cDate = new Date(ev);
+					var a = cDate.getHours() + 1,
+						f = cDate.getDate();
+
+					if (checkType) {
+						f = cDate.getHours() + 1;
+						a = cDate.getDate();
+					}
+					return {
+						'a': a,
+						'f': f
+					};
+				});
+				freq = freq.concat(fr);
 			}
-			return {
-				'a': a,
-				'f': f
-			};
 		});
 		ctx.beginPath();
 		ctx.strokeStyle = '#aaa';

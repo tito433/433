@@ -10,20 +10,12 @@ function SeqCal() {
 
 
 	this.addView();
-	var inpSize = 16,
-		yoffset = 0;
+	var inpSize = 16;
 	this.addSettings([{
 		'title': 'SeqCal Cols',
 		'type': 'number',
 		'value': inpSize,
 		'input.name': 'inpSize',
-		'input.group': 'input-group',
-		'input.class': 'form-control'
-	}, {
-		'title': 'Y offset',
-		'type': 'number',
-		'value': yoffset,
-		'input.name': 'yoffset',
 		'input.group': 'input-group',
 		'input.class': 'form-control'
 	}]);
@@ -44,7 +36,6 @@ function SeqCal() {
 
 		this.clear();
 		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
-		yoffset = param && param.yoffset ? Number(param.yoffset) * 10 : yoffset;
 
 		var data = this.data;
 		if (!this.data) return false;
@@ -60,7 +51,6 @@ function SeqCal() {
 			layout.add(rect);
 		}
 
-		layout.margin.y = Number(yoffset);
 		layout.table(inpSize);
 
 		this.draw(rects);

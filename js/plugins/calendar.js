@@ -66,7 +66,7 @@ function Month(date, data) {
 	this.data = data;
 
 	var mn = this.date.getMonth(),
-		year = this.date.getFullYear();
+		year = this.date.getYear() - 100;
 
 	var mL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
