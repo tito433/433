@@ -33,30 +33,23 @@ function Plot(input, output) {
 	this.addView();
 
 	this._format = {
-		'Original': function(data) {
+		'Event Count': function(data) {
 			var fmtData = [];
 			if (data instanceof Array && data.length) {
-				var date = new Date(data[0].start.dateTime),
-					startDate = new Date(date - 86400000),
-					endDate = new Date(data[data.length - 1].end.dateTime);
-
-				startDate.setMinutes(0);
-				startDate.setHours(0);
-
-				for (var i = 0, ln = data.length; i < ln; i++) {
-					var cDate = new Date(data[i].start.dateTime),
-						offsetY = cDate.getHours() + (cDate.getMinutes() / 60);
-					fmtData.push(new Point(i, offsetY));
-				}
+				data.forEach(function(dt, idx) {
+					if (dt.events.length > 0)
+						fmtData[idx] = new Point(idx, dt.events.length);
+				});
 			}
+			console.log(fmtData)
 			return fmtData;
 		},
 		'Gap': function(data) {
 			var fmtData = [];
 			if (data instanceof Array && data.length) {
-				var date = new Date(data[0].start.dateTime);
+				var date = new Date(data[0].date);
 				for (var i = 0, ln = data.length; i < ln; i++) {
-					var cDate = new Date(data[i].start.dateTime),
+					var cDate = new Date(data[i].date),
 						offsetY = Math.round((cDate - date) / 86400000);
 					date = cDate;
 					fmtData.push(new Point(i, offsetY));
@@ -68,19 +61,20 @@ function Plot(input, output) {
 		'Days': function(data) {
 			var fmtData = [];
 			if (data instanceof Array && data.length) {
-				for (var i = 0, ln = data.length; i < ln; i++) {
-					var cDate = new Date(data[i].start.dateTime),
-						hour = cDate.getHours(),
-						day = cDate.getDate();
-					fmtData.push(new Point(day, hour));
-				}
+				data.forEach(function(dt, idx) {
+					if (dt.events.length > 0)
+						fmtData[idx] = new Point(idx, dt.events.length);
+				});
 			}
 
 			return fmtData;
 		}
 	}
 
-	if (this._isView()) this.view();
+	if (this._isView()) {
+		this.showSettings();
+		this.view();
+	}
 }
 
 //make this Chart resizeable.

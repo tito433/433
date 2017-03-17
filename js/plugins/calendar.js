@@ -113,7 +113,7 @@ function Month(date, data) {
 				}) || {
 					events: []
 				},
-				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff'];
+				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#7f1ae5'];
 
 			var lvl = todays.events.length > 0 ? todays.events.length : 0;
 			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
