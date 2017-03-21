@@ -15,6 +15,7 @@ var Plugin = function() {
 			'event': '433.data.change',
 			'active': '433.state',
 			'ui_view': '433.ui.view',
+			'ui_controll': '433.data.controll',
 		}
 	};
 	var _get_storageJson = function(key) {
@@ -25,12 +26,19 @@ var Plugin = function() {
 		return _dt;
 	}
 	this.data = _get_storageJson(this.settings.storage.data_key);
+	this.getData = function($key) {
+		return _get_storageJson($key);
+	}
 	this._name = this.getName();
 
 	//Check storage, is it me showing off?
 	this._isView = function() {
 		var ui_view = localStorage.getItem(this.settings.storage.ui_view);
 		return ui_view == this._name;
+	}
+	this._isControll = function() {
+		var ui_controll = localStorage.getItem(this.settings.storage.ui_controll);
+		return ui_controll == this._name;
 	}
 	this._updateData = function() {
 		if (arguments.length == 1 && arguments[0] instanceof Event) {
@@ -151,18 +159,20 @@ var Plugin = function() {
 			_ui_settings_cache.push(btns);
 		}
 	}
-	this.addControll = function(label, _callBack) {
-		if (_callBack != undefined) {
-			var label = label || this._name,
-				btn = fn_addUI(this.input.querySelector('.controll'), label, {
-					'type': 'button',
-					'input.name': 'input-control-' + label + new Date().getMilliseconds(),
-					'value': label
-				});
-			btn.onclick = _callBack.bind(this);
-			return btn;
-		}
-		return false;
+	this.addControll = function(label) {
+		var label = label || this._name,
+			btn = fn_addUI(this.input.querySelector('.controll'), label, {
+				'type': 'button',
+				'input.name': 'input-control-' + label + new Date().getMilliseconds(),
+				'value': label
+			});
+		btn.onclick = function() {
+			localStorage.setItem(this.settings.storage.ui_controll, this._name);
+			this.showSettings();
+			this.view();
+		}.bind(this);
+
+		return btn;
 
 	}
 }

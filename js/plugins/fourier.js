@@ -2,29 +2,42 @@ function Fourier(input, output) {
 	Plugin.apply(this, arguments);
 
 	Canvas.call(this, output);
-	var dayHour = false;
+	var dayHour = true;
 	this.addSettings();
 	var inpDeg = 360;
 	var inpAmp = 1;
-	this.addSettings([{
-		'title': 'Fourier span.',
-		'type': 'number',
-		'value': inpDeg,
-		'input.name': 'inpDeg',
-		'input.group': 'input-group',
-		'input.class': 'form-control',
-		'input.addon': '&deg;'
-	}, {
-		'title': 'Fourier day/hour',
-		'type': 'checkbox',
-		'input.value': dayHour,
-		'input.name': 'dayHour'
-	}]);
+	var startDeg = 0;
 
 	this.view = function(param) {
 
 		dayHour = param && param.dayHour != undefined ? param.dayHour : dayHour;
 		inpDeg = param && param.inpDeg ? Number(param.inpDeg) : inpDeg;
+		inpAmp = param && param.inpAmp ? Number(param.inpAmp) : inpAmp;
+
+		this.addSettings([{
+			'title': 'Fourier span.',
+			'type': 'number',
+			'value': inpDeg,
+			'input.name': 'inpDeg',
+			'input.group': 'input-group',
+			'input.class': 'form-control',
+			'input.addon': '&deg;'
+		}, {
+			'title': 'Fourier day/hour',
+			'type': 'checkbox',
+			'input.value': dayHour,
+			'input.name': 'dayHour'
+		}, {
+			'title': 'Amplitude',
+			'type': 'number',
+			'value': inpAmp,
+			'input.name': 'inpAmp',
+			'input.group': 'input-group',
+			'input.class': 'form-control',
+			'input.addon': 'x'
+		}]);
+		this.showSettings();
+
 		var ctx = this._ctx;
 		var checkType = dayHour ? 0 : 1,
 			lblArr = ['day', 'hour'];
@@ -52,11 +65,11 @@ function Fourier(input, output) {
 			if (events && events.length) {
 				var fr = events.map(function(ev) {
 					var cDate = new Date(ev);
-					var a = cDate.getHours() + 1,
+					var a = cDate.getHours(),
 						f = cDate.getDate();
 
 					if (checkType) {
-						f = cDate.getHours() + 1;
+						f = cDate.getHours();
 						a = cDate.getDate();
 					}
 					return {
@@ -68,12 +81,14 @@ function Fourier(input, output) {
 			}
 		});
 		ctx.beginPath();
-		ctx.strokeStyle = '#aaa';
-		ctx.lineWidth = 0.5;
+		ctx.strokeStyle = '#000';
+		ctx.lineWidth = 2;
 		this.x = 0;
 		this.y = this.height / 2;
 		ctx.moveTo(this.x, this.y);
 		var np = inpDeg / 180;
+		var points = [];
+
 		for (var i = this.x; i <= this.width; i++) {
 			x = i;
 			y = 0;
@@ -83,11 +98,36 @@ function Fourier(input, output) {
 					fr = freq[fi].f;
 				y += amp * Math.sin(fr * np * t * Math.PI);
 			}
-
-			ctx.lineTo(x, this.y - y);
+			points.push(new Point(x, y));
 
 		}
-		ctx.stroke();
+
+
+
+		ctx.lineWidth = 0.5;
+		for (var i = 0, ln = points.length; i < ln; i++) {
+			var point = points[i];
+
+			ctx.beginPath();
+			var x = point.x,
+				y = point.y,
+				ay = Math.min(this.y, Math.abs(y));
+
+			ctx.moveTo(x, this.y);
+
+			var py = (ay * (100 / this.y));
+			var clrn = 255 + 16711425 * (py / 100);
+			clrn = clrn.toFixed(0);
+
+			ctx.strokeStyle = '#' + Number(clrn).toString(16);
+
+
+
+			ctx.lineTo(x, this.y - y);
+			ctx.stroke();
+		}
+
+
 
 		//x axis
 		ctx.save();
@@ -97,7 +137,15 @@ function Fourier(input, output) {
 		ctx.moveTo(0, this.y);
 		ctx.lineTo(this.width, this.y);
 		ctx.stroke();
+		//x axis
 
+		ctx.beginPath();
+		ctx.strokeStyle = '#433';
+		ctx.lineWidth = 2;
+		ctx.moveTo(this.width / 2, this.y - 10);
+		ctx.lineTo(this.width / 2, this.y + 10);
+		ctx.stroke();
+		ctx.restore();
 
 	}
 
@@ -106,10 +154,12 @@ function Fourier(input, output) {
 		this.showSettings();
 		this.view();
 	}
-
+	this.onDrag = function(dx, dy) {
+		startDeg += dx;
+	}
 	this.onZoom = function(zoom) {
 		if (this._isView()) {
-			inpAmp += zoom / 10;
+			inpDeg += zoom * 10;
 			this.view();
 		}
 	}
