@@ -9,19 +9,28 @@ function Cycloid() {
 
 	this.view = function() {
 		this.clear();
+		var data = this.data;
+		if (!data || (data instanceof Array && data.length == 0)) {
+			return false;
+		}
+
 		var centerX = this.width / 2,
 			centerY = this.height / 2;
 		var maxR = this.height / 2;
 
-		var data = this.data;
-		if (!this.data) return false;
 		for (var i = 0, ln = this.data.length; i < ln; i++) {
-			var date = new Date(this.data[i].start.dateTime);
-			var day = date.getDate(),
-				hour = date.getHours();
-			var layer = new PeripheralCircle(centerX, centerY, inpRadius + day.mapTo(1, 31, 0, maxR));
-			layer.size = hour;
-			this.add(layer);
+			var events = this.data[i].events || [];
+			for (var ei = 0, ez = events.length; ei < ez; ei++) {
+				var evt = events[ei],
+					date = new Date(evt.date),
+					day = date.getDate(),
+					hour = date.getHours();
+
+				var layer = new PeripheralCircle(centerX, centerY, inpRadius + day.mapTo(1, 31, 0, maxR));
+				layer.size = hour;
+				this.add(layer);
+			}
+
 		}
 		this.draw();
 	}

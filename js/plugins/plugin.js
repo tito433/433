@@ -159,6 +159,17 @@ var Plugin = function() {
 			_ui_settings_cache.push(btns);
 		}
 	}
+	this.addData = function(label) {
+		var label = label || this._name,
+			btn = fn_addUI(this.input.querySelector('.data'), label, {
+				'type': 'button',
+				'input.name': 'input-control-' + label + new Date().getMilliseconds(),
+				'value': label
+			});
+		btn.onclick = this.view.bind(this);
+		return btn;
+	}
+
 	this.addControll = function(label) {
 		var label = label || this._name,
 			btn = fn_addUI(this.input.querySelector('.controll'), label, {
@@ -167,12 +178,8 @@ var Plugin = function() {
 				'value': label
 			});
 		btn.onclick = function() {
-			localStorage.setItem(this.settings.storage.ui_controll, this._name);
-			this.showSettings();
-			this.view();
+			this.view.call(this, label);
 		}.bind(this);
-
 		return btn;
-
 	}
 }

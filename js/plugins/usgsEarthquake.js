@@ -11,14 +11,12 @@ function UsgsEarthquake(input, output) {
 			data.features.forEach(function(fea) {
 				var prop = fea.properties;
 				events.push({
-					'date': new Date(prop.time),
-					'quake': {
-						'title': prop.title,
-						'mag': prop.mag,
-						'tsunami': prop.tsunami,
-						'lat': fea.geometry.coordinates[0],
-						'lon': fea.geometry.coordinates[1]
-					}
+					'date': prop.time,
+					'title': prop.title,
+					'mag': prop.mag,
+					'tsunami': prop.tsunami,
+					'lat': fea.geometry.coordinates[0],
+					'lon': fea.geometry.coordinates[1]
 				});
 			});
 			localStorage.setItem(storage.data_key, JSON.stringify(events));
@@ -30,31 +28,26 @@ function UsgsEarthquake(input, output) {
 		}
 	}
 
-	this.view = function(param) {
-		console.log('Inside view')
-		this.clear();
-		var data = this.data;
-		if (!data || (data instanceof Array && data.length == 0)) {
-			this._fetchData();
-			return false;
-		}
-		console.log("we have data!", data)
-		this.draw();
-	}
-
-
-
-	this._fetchData = function() {
-		console.log('Going to fetch data')
+	var _fetchData = function(start, end) {
 		var script = document.createElement('script');
-		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2014-01-01&endtime=2014-01-02&minmagnitude=3&callback=' + cb_method
+		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + start + '&endtime=' + end + '&minmagnitude=3&callback=' + cb_method
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
+	this.view = function(param) {
+		require('library/ui', function() {
+			var t = new Date(),
+				date_to = new Date(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59),
+				date_from = new Date(t.getFullYear(), t.getMonth(), 1, 23, 59, 59);
 
-	this.addControll("USGS Earthquake");
-
-	if (this._isControll()) {
-		this.showSettings();
-		this.view();
+			new DateRangePicker('USGS Earthquake', 'Please select date range to fetch data:', function(startdate, enddate) {
+				var st = new Date(startdate),
+					ed = new Date(enddate);
+				_fetchData(st.getFullYear() + '-' + (st.getMonth() + 1) + '-' + st.getDate(), ed.getFullYear() + '-' + (ed.getMonth() + 1) + '-' + ed.getDate());
+			}, date_from, date_to);
+		});
 	}
+
+
+
+	this.addData("USGS Earthquake");
 }

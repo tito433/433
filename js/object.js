@@ -80,11 +80,13 @@ String.prototype.fistCapital = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
-window.loadScript = function(u, c) {
-	if (!u && typeof u !== "String") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
-	var newJs = u.startsWith('http') ? u : 'js/' + u + '.js';
 
+window.require = function(u, c) {
+	if (typeof u !== "string") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
+
+	var newJs = u.startsWith('http') ? u : 'js/' + u + '.js';
 	var scripts = document.getElementsByTagName('script');
+
 	for (var i = 0, ln = scripts.length; i < ln; i++) {
 		if (scripts[i].src == newJs) {
 			return c.call(c);

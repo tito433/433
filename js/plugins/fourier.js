@@ -4,8 +4,8 @@ function Fourier(input, output) {
 	Canvas.call(this, output);
 	var dayHour = true;
 	this.addSettings();
-	var inpDeg = 360;
-	var inpAmp = 1;
+	var inpDeg = 180;
+	var inpAmp = 0.21;
 	var startDeg = 0;
 
 	this.view = function(param) {
@@ -64,7 +64,7 @@ function Fourier(input, output) {
 			var events = dt.events;
 			if (events && events.length) {
 				var fr = events.map(function(ev) {
-					var cDate = new Date(ev);
+					var cDate = new Date(ev.date);
 					var a = cDate.getHours(),
 						f = cDate.getDate();
 
@@ -87,16 +87,17 @@ function Fourier(input, output) {
 		this.y = this.height / 2;
 		ctx.moveTo(this.x, this.y);
 		var np = inpDeg / 180;
-		var points = [];
+		var points = [],
+			rad = Math.PI / 180;
 
 		for (var i = this.x; i <= this.width; i++) {
 			x = i;
 			y = 0;
 			t = i / this.width;
 			for (var fi in freq) {
-				var amp = inpAmp * freq[fi].a,
-					fr = freq[fi].f;
-				y += amp * Math.sin(fr * np * t * Math.PI);
+				var A = inpAmp * freq[fi].a,
+					f = freq[fi].f;
+				y += A * Math.sin(np * Math.PI * f * t + (rad * startDeg));
 			}
 			points.push(new Point(x, y));
 
@@ -114,19 +115,13 @@ function Fourier(input, output) {
 				ay = Math.min(this.y, Math.abs(y));
 
 			ctx.moveTo(x, this.y);
-
 			var py = (ay * (100 / this.y));
 			var clrn = 255 + 16711425 * (py / 100);
 			clrn = clrn.toFixed(0);
-
 			ctx.strokeStyle = '#' + Number(clrn).toString(16);
-
-
-
 			ctx.lineTo(x, this.y - y);
 			ctx.stroke();
 		}
-
 
 
 		//x axis
@@ -137,15 +132,7 @@ function Fourier(input, output) {
 		ctx.moveTo(0, this.y);
 		ctx.lineTo(this.width, this.y);
 		ctx.stroke();
-		//x axis
 
-		ctx.beginPath();
-		ctx.strokeStyle = '#433';
-		ctx.lineWidth = 2;
-		ctx.moveTo(this.width / 2, this.y - 10);
-		ctx.lineTo(this.width / 2, this.y + 10);
-		ctx.stroke();
-		ctx.restore();
 
 	}
 
@@ -155,7 +142,11 @@ function Fourier(input, output) {
 		this.view();
 	}
 	this.onDrag = function(dx, dy) {
-		startDeg += dx;
+		if (this._isView()) {
+			startDeg += dx;
+			this.view();
+		}
+
 	}
 	this.onZoom = function(zoom) {
 		if (this._isView()) {

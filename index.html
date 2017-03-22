@@ -15,17 +15,23 @@
       <h1>The 433</h1>
       <nav id="input">
         <fieldset>
-          <legend>Settings:</legend>
-          <ul id="settings" class="list model"></ul>
+          <legend>Data:</legend>
+          <buttongroup class="data"></buttongroup>
+        </fieldset>
+        <fieldset>
+          <legend>Controll:</legend>
+          <buttongroup class="controll"></buttongroup>
         </fieldset>
         <fieldset>
           <legend>View:</legend>
           <buttongroup class="view"></buttongroup>
         </fieldset>
         <fieldset>
-          <legend>Data:</legend>
-          <buttongroup class="controll"></buttongroup>
+          <legend>Settings:</legend>
+          <ul id="settings" class="list model"></ul>
         </fieldset>
+        
+        
       </nav>
     </div>
   </header>
@@ -33,12 +39,12 @@
 <script type="text/javascript">
 
   window.onload =function(){
-    var plugins=['calendar','googleCalendar','SeqCal','plot','filter','cycloid','fourier','usgsEarthquake'],
+    var plugins=['calendar','googleCalendar','SeqCal','plot','filter','cycloid','fourier','usgsEarthquake','StorageUtils'],
         input=document.getElementById('input'),
         output=document.getElementById('output');
 
     plugins.forEach(function(sClass){
-      loadScript('plugins/'+sClass, 
+      require('plugins/'+sClass, 
         function(){
           var className=sClass.fistCapital();
           if(typeof window[className] === "function"){
