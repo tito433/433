@@ -1,15 +1,6 @@
 "use strict";
 
-Object.defineProperty(Object.prototype, 'extend', {
-	value: function() {
-		var target = this;
-		for (var i = 0; i < arguments.length; i++)
-			for (var key in arguments[i])
-				if (arguments[i].hasOwnProperty(key))
-					target[key] = arguments[i][key];
-		return target;
-	}
-});
+
 Object.defineProperty(Object.prototype, 'forEach', {
 	value: function(callBack) {
 		for (var name in this) {
@@ -17,16 +8,7 @@ Object.defineProperty(Object.prototype, 'forEach', {
 		}
 	}
 });
-Object.defineProperty(Object.prototype, 'map', {
-	value: function(predicateFunction) {
-		var results = {};
-		this.forEach(function(name, val) {
-			var resp = predicateFunction(name, val);
-			if (resp && resp.name && resp.val) results[resp.name] = resp.val;
-		});
-		return results;
-	}
-});
+
 Object.defineProperty(Object.prototype, 'filter', {
 	value: function(predicateFunction) {
 		var results = {};
@@ -80,6 +62,17 @@ String.prototype.fistCapital = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
+Object.defineProperty(Image.prototype, 'isOk', {
+	value: function() {
+		if (!this.complete) {
+			return false;
+		}
+		if (typeof this.naturalWidth !== "undefined" && this.naturalWidth === 0) {
+			return false;
+		}
+		return true;
+	}
+});
 
 window.require = function(u, c) {
 	if (typeof u !== "string") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
@@ -89,7 +82,7 @@ window.require = function(u, c) {
 
 	for (var i = 0, ln = scripts.length; i < ln; i++) {
 		if (scripts[i].src == newJs) {
-			return c.call(c);
+			return c.call(null);
 		}
 	}
 	var d = document,
@@ -99,7 +92,7 @@ window.require = function(u, c) {
 	if (c && typeof c === 'function') {
 		j.addEventListener('load', function cb(e) {
 			e.currentTarget.removeEventListener(e.type, cb);
-			return c.call(c);
+			return c.call(null);
 		}, false);
 	}
 	d.body.appendChild(j);

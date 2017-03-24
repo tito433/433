@@ -42,7 +42,7 @@ var Plugin = function() {
 	}
 	this._updateData = function() {
 		if (arguments.length == 1 && arguments[0] instanceof Event) {
-			this.data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : null;
+			this.data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : [];
 			if (this._isView()) this.view();
 		}
 	}
