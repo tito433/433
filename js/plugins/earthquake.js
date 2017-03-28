@@ -11,8 +11,7 @@ function Earthquake(input, output) {
 		this.clear();
 		var width = this.width;
 		var height = this.height;
-		var earth = new Earth(Math.abs(distance));
-		earth.position(width / 2, height / 2).rotate(xRotate, yRotate);
+		var earth = new Sphere3D(Math.abs(distance));
 		this.add(earth);
 		this.draw();
 	}
@@ -38,61 +37,130 @@ function Earthquake(input, output) {
 	}
 }
 
-function Earth(r) {
-	Drawable.call(this);
-	this.r = r;
-	this.rotation = {
-		x: 0,
-		y: 0
-	};
 
-	this.rotate = function(dx, dy) {
-		if (undefined !== dx && undefined != dy) {
-			this.rotation.x += dx;
-			this.rotation.y += dy;
-			return this;
-		} else {
-			return this.rotation;
+function Point3D(x, y, z) {
+	this.x = isNaN(x) ? 0 : x;
+	this.y = isNaN(y) ? 0 : y;
+	this.z = isNaN(z) ? 0 : z;
+	console.log(this)
+}
+
+function Sphere3D(radius) {
+	Drawable.call(this);
+
+	this.vertices = new Array();
+	this.radius = (typeof(radius) == "undefined" || typeof(radius) != "number") ? 20.0 : radius;
+	this.rings = 16;
+	this.slices = 32;
+	this.numberOfVertices = 0;
+
+	var M_PI_2 = Math.PI / 2;
+	var dTheta = (Math.PI * 2) / this.slices;
+	var dPhi = Math.PI / this.rings;
+	var width = radius * 2;
+	var height = radius * 2;
+	var rotation = new Point3D();
+	var lastX = -1;
+	var lastY = -1;
+	// Iterate over latitudes (rings)
+	for (var lat = 0; lat < this.rings + 1; ++lat) {
+		var phi = M_PI_2 - lat * dPhi;
+		var cosPhi = Math.cos(phi);
+		var sinPhi = Math.sin(phi);
+
+		// Iterate over longitudes (slices)
+		for (var lon = 0; lon < this.slices + 1; ++lon) {
+			var theta = lon * dTheta;
+			var cosTheta = Math.cos(theta);
+			var sinTheta = Math.sin(theta);
+			this.vertices[this.numberOfVertices] = new Point3D(this.radius * cosTheta * cosPhi,
+				this.radius * sinPhi,
+				this.radius * sinTheta * cosPhi);
+
+			this.numberOfVertices++;
 		}
 	}
-	var drawPoint = function(ctx, point) {
-		ctx.save();
-		ctx.beginPath();
-		ctx.lineWidth = 2;
-		ctx.strokeStyle = '#FF0000';
-		ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI, false);
-		ctx.stroke();
-		ctx.restore();
+	this.rotation = function(dx, dy) {
+		rotation.x += dx;
+		rotation.y += dy;
 	}
 	this.draw = function(ctx) {
-		var rad = Math.PI / 180;
-		ctx.save();
-		ctx.beginPath();
-		ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
-		ctx.lineWidth = 2;
-		ctx.strokeStyle = '#003300';
-		ctx.stroke();
-		//axis
-		ctx.lineWidth = 3;
-		ctx.strokeStyle = '#003300';
-		for (var i = 0; i < 360; i += 1) {
-			var x1 = this.x + this.r * Math.cos((this.rotation.x + i) * rad);
-			var x2 = this.x + this.r * Math.cos((this.rotation.x + i + 180) * rad);
-			var y1 = this.y + this.r * Math.sin((this.rotation.y + i) * rad);
-			var y2 = this.y + this.r * Math.sin((this.rotation.y + i + 180) * rad);
-
-			var clrn = 255 + 16711425 * (i / 360);
-			clrn = clrn.toFixed(0);
-			ctx.beginPath();
-			ctx.strokeStyle = '#' + Number(clrn).toString(16);
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.stroke();
+		// draw each vertex to get the first sphere skeleton
+		for (i = 0; i < this.numberOfVertices; i++) {
+			this.strokeSegment(i, ctx, width, height);
 		}
-		ctx.restore();
 
+		// now walk through rings to draw the slices
+		for (i = 0; i < this.slices + 1; i++) {
+			for (var j = 0; j < this.rings + 1; j++) {
+				this.strokeSegment(this.vertices, i + (j * (this.slices + 1)), ctx, width, height);
+			}
+		}
 	}
 
+	this.strokeSegment = function(index, ctx, width, height) {
+		var x, y;
+		var p = this.vertices[index];
+
+		rotateX(p, this.rotation.x);
+		rotateY(p, this.rotation.y);
+		rotateZ(p, this.rotation.z);
+
+		x = projection(p.x, p.z, width / 2.0, 100.0, this.radius);
+		y = projection(p.y, p.z, height / 2.0, 100.0, this.radius);
+
+		if (lastX == -1 && lastY == -1) {
+			lastX = x;
+			lastY = y;
+			return;
+		}
+
+		if (x >= 0 && x < width && y >= 0 && y < height) {
+			if (p.z < 0) {
+				ctx.strokeStyle = "gray";
+			} else {
+				ctx.strokeStyle = "black";
+			}
+			ctx.beginPath();
+			ctx.moveTo(lastX, lastY);
+			ctx.lineTo(x, y);
+			ctx.stroke();
+			ctx.closePath();
+			lastX = x;
+			lastY = y;
+		}
+	}
 }
-Earth.prototype = Object.create(Drawable.prototype);
-Earth.prototype.constructor = Earth;
+Sphere3D.prototype = Object.create(Drawable.prototype);
+Sphere3D.prototype.constructor = Sphere3D;
+
+function rotateX(point, radians) {
+
+	var y = point.y;
+	point.y = (y * Math.cos(radians)) + (point.z * Math.sin(radians) * -1.0);
+	point.z = (y * Math.sin(radians)) + (point.z * Math.cos(radians));
+
+
+}
+
+function rotateY(point, radians) {
+
+	var x = point.x;
+	point.x = (x * Math.cos(radians)) + (point.z * Math.sin(radians) * -1.0);
+	point.z = (x * Math.sin(radians)) + (point.z * Math.cos(radians));
+
+
+}
+
+function rotateZ(point, radians) {
+
+	var x = point.x;
+	point.x = (x * Math.cos(radians)) + (point.y * Math.sin(radians) * -1.0);
+	point.y = (x * Math.sin(radians)) + (point.y * Math.cos(radians));
+
+
+}
+
+function projection(xy, z, xyOffset, zOffset, distance) {
+	return ((distance * xy) / (z - zOffset)) + xyOffset;
+}
