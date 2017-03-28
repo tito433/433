@@ -2,7 +2,7 @@ function Earthquake(input, output) {
 	Plugin.apply(this, arguments);
 	Canvas.call(this, output);
 
-	var distance = this.height / 2 - 100;
+	var distance = this.height / 2;
 	var rotation = new Point3D();
 
 
@@ -94,16 +94,16 @@ function Sphere3D(radius) {
 	}
 	this.draw = function(ctx) {
 		// draw each vertex to get the first sphere skeleton
-		// for (i = 0, iz = this.vertices.length; i < iz; i++) {
-		// 	this.strokeSegment(i, ctx, width, height);
-		// }
+		for (i = 0, iz = this.vertices.length; i < iz; i++) {
+			this.strokeSegment(i, ctx, this.width(), this.height());
+		}
 
 		// now walk through rings to draw the slices
-		for (i = 0; i < this.slices + 1; i++) {
-			for (var j = 0; j < this.rings + 1; j++) {
-				this.strokeSegment(i + (j * (this.slices + 1)), ctx, this.width(), this.height());
-			}
-		}
+		// for (i = 0; i < this.slices + 1; i++) {
+		// 	for (var j = 0; j < this.rings + 1; j++) {
+		// 		this.strokeSegment(i + (j * (this.slices + 1)), ctx, this.width(), this.height());
+		// 	}
+		// }
 	}
 
 	this.strokeSegment = function(index, ctx, width, height) {
@@ -119,6 +119,8 @@ function Sphere3D(radius) {
 		if (lastX == -1 && lastY == -1) {
 			lastX = x;
 			lastY = y;
+			ctx.beginPath();
+			ctx.moveTo(lastX, lastY);
 			return;
 		}
 		if (x >= 0 && x < width && y >= 0 && y < height) {
@@ -127,13 +129,17 @@ function Sphere3D(radius) {
 			} else {
 				ctx.strokeStyle = "black";
 			}
-			ctx.beginPath();
-			ctx.moveTo(lastX, lastY);
+
+
 			ctx.lineTo(x, y);
 			ctx.stroke();
-			ctx.closePath();
 			lastX = x;
 			lastY = y;
+		} else {
+
+			ctx.closePath();
+			lastX = -1;
+			lastY = -1;
 		}
 	}
 }
@@ -162,8 +168,6 @@ function rotateZ(point, radians) {
 	var x = point.x;
 	point.x = (x * Math.cos(radians)) + (point.y * Math.sin(radians) * -1.0);
 	point.y = (x * Math.sin(radians)) + (point.y * Math.cos(radians));
-
-
 }
 
 function projection(xy, z, xyOffset, zOffset, distance) {
