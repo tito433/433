@@ -2,13 +2,13 @@ function Earthquake(input, output) {
 	Plugin.apply(this, arguments);
 	Canvas.call(this, output);
 
-	var distance = this.height / 2;
+	var distance = 1000;
 	var rotation = new Point3D();
 
 
 	this.view = function(param) {
 		this.clear();
-		var earth = new Sphere3D(Math.abs(distance));
+		var earth = new Earth(distance);
 		earth.rotation(rotation).size(this.width, this.height);
 		this.add(earth);
 		this.draw();
@@ -29,7 +29,8 @@ function Earthquake(input, output) {
 	}
 	this.onZoom = function(zoom) {
 		if (this._isView()) {
-			distance += zoom * 10;
+			distance += zoom * 2;
+			console.log(distance)
 			this.view();
 		}
 	}
@@ -42,13 +43,13 @@ function Point3D(x, y, z) {
 	this.z = isNaN(Number(z)) ? 0 : z;
 }
 
-function Sphere3D(radius) {
+function Earth(radius) {
 	Drawable.call(this);
 
 	this.vertices = new Array();
 	this.radius = radius;
-	this.rings = 18;
-	this.slices = 18;
+	this.rings = 10;
+	this.slices = 10;
 
 
 	var M_PI_2 = Math.PI / 2;
@@ -58,13 +59,13 @@ function Sphere3D(radius) {
 	var lastX = -1;
 	var lastY = -1;
 	// Iterate over latitudes (rings)
-	for (var lat = 0; lat < this.rings + 1; ++lat) {
+	for (var lat = 0; lat < this.rings; ++lat) {
 		var phi = M_PI_2 - lat * dPhi;
 		var cosPhi = Math.cos(phi);
 		var sinPhi = Math.sin(phi);
 
 		// Iterate over longitudes (slices)
-		for (var lon = 0; lon < this.slices + 1; ++lon) {
+		for (var lon = 0; lon < this.slices; ++lon) {
 			var theta = lon * dTheta;
 			var cosTheta = Math.cos(theta);
 			var sinTheta = Math.sin(theta);
@@ -93,22 +94,31 @@ function Sphere3D(radius) {
 
 	}
 	this.draw = function(ctx) {
+		lastX = -1;
+		lastY = -1;
 		// draw each vertex to get the first sphere skeleton
-		for (i = 0, iz = this.vertices.length; i < iz; i++) {
+		for (var i = 0, iz = this.vertices.length; i < iz; i++) {
 			this.strokeSegment(i, ctx, this.width(), this.height());
 		}
 
 		// now walk through rings to draw the slices
-		// for (i = 0; i < this.slices + 1; i++) {
-		// 	for (var j = 0; j < this.rings + 1; j++) {
+		// for (var i = 0; i < this.slices; i++) {
+		// 	for (var j = 0; j < this.rings; j++) {
 		// 		this.strokeSegment(i + (j * (this.slices + 1)), ctx, this.width(), this.height());
 		// 	}
 		// }
 	}
 
 	this.strokeSegment = function(index, ctx, width, height) {
+		if (index > this.vertices.length) {
+			console.log('Invalid index', index, this.vertices.length);
+			return;
+		}
 		var x, y;
 		var p = this.vertices[index];
+		if (p == undefined) {
+			console.log(this, index, this.vertices.length)
+		}
 		rotateX(p, this._rotation.x);
 		rotateY(p, this._rotation.y);
 		rotateZ(p, this._rotation.z);
@@ -119,8 +129,7 @@ function Sphere3D(radius) {
 		if (lastX == -1 && lastY == -1) {
 			lastX = x;
 			lastY = y;
-			ctx.beginPath();
-			ctx.moveTo(lastX, lastY);
+
 			return;
 		}
 		if (x >= 0 && x < width && y >= 0 && y < height) {
@@ -130,29 +139,34 @@ function Sphere3D(radius) {
 				ctx.strokeStyle = "black";
 			}
 
-
+			ctx.beginPath();
+			ctx.moveTo(lastX, lastY);
 			ctx.lineTo(x, y);
 			ctx.stroke();
+			ctx.closePath();
 			lastX = x;
 			lastY = y;
 		} else {
 
-			ctx.closePath();
 			lastX = -1;
 			lastY = -1;
 		}
 	}
+
+	var rotateX = function(point, radians) {
+		if (point == undefined || point.y == undefined) {
+			console.log(this, point, radians);
+			return;
+		}
+		var y = point.y;
+		point.y = (y * Math.cos(radians)) + (point.z * Math.sin(radians) * -1.0);
+		point.z = (y * Math.sin(radians)) + (point.z * Math.cos(radians));
+	}
 }
-Sphere3D.prototype = Object.create(Drawable.prototype);
-Sphere3D.prototype.constructor = Sphere3D;
-
-function rotateX(point, radians) {
-	var y = point.y;
-	point.y = (y * Math.cos(radians)) + (point.z * Math.sin(radians) * -1.0);
-	point.z = (y * Math.sin(radians)) + (point.z * Math.cos(radians));
+Earth.prototype = Object.create(Drawable.prototype);
+Earth.prototype.constructor = Earth;
 
 
-}
 
 function rotateY(point, radians) {
 
