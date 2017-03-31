@@ -98,25 +98,23 @@ function Earth(radius) {
 		}
 	}
 	this.draw = function(ctx) {
-		ctx.font = "12px Arial";
-		ctx.textAlign = "center";
 		ctx.save();
-		ctx.strokeStyle = '#F00';
-		for (var i = 0, sz = this._data.length; i < sz; i++) {
-			var dt = this._data[i],
-				lat = Number(dt.lat),
-				lon = Number(dt.lon) * -1,
-				mag = dt.mag,
-				plon = (this._rotation.y + lon),
-				plat = this._rotation.x + lat;
-			if (true || plon % 360 >= -90 && plon % 360 <= 90) {
-				var x = this.r * Math.sin(plat * rad),
-					y = this.r * Math.cos(plon * rad);
+		ctx.font = "12px Arial";
 
-				ctx.moveTo(this.x, this.y);
-				ctx.lineTo(this.x + x, this.y + y);
-				ctx.stroke();
-			}
+		for (var i = 0, sz = Math.min(150, this._data.length); i < sz; i++) {
+			var dt = this._data[i],
+				lat = this._rotation.x - dt.lat - 90,
+				lon = this._rotation.y - dt.lon - 90,
+				mag = dt.mag;
+
+			var x = this.r * Math.sin(lon * rad) * Math.cos(lat * rad),
+				y = this.r * Math.sin(lon * rad) * Math.sin(lat * rad);
+			ctx.beginPath();
+			ctx.strokeStyle = '#F00';
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.x + x, this.y + y);
+			ctx.stroke();
+
 
 		}
 		ctx.restore();
