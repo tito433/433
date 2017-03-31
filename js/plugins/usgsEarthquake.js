@@ -15,8 +15,8 @@ function UsgsEarthquake(input, output) {
 					'title': prop.title,
 					'mag': prop.mag,
 					'tsunami': prop.tsunami,
-					'lat': fea.geometry.coordinates[0],
-					'lon': fea.geometry.coordinates[1]
+					'lon': fea.geometry.coordinates[0],
+					'lat': fea.geometry.coordinates[1]
 				});
 			});
 			localStorage.setItem(storage.data_key, JSON.stringify(events));
@@ -30,7 +30,7 @@ function UsgsEarthquake(input, output) {
 
 	var _fetchData = function(start, end) {
 		var script = document.createElement('script');
-		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + start + '&endtime=' + end + '&minmagnitude=3&callback=' + cb_method
+		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + start + '&endtime=' + end + '&minmagnitude=4&callback=' + cb_method
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
 	this.view = function(param) {
