@@ -4,8 +4,6 @@ function Earthquake(input, output) {
 
 	var distance = this.height / 2 - 100;
 	var rotation = new Point3D();
-
-
 	this.view = function(param) {
 		this.clear();
 		var earth = new Earth(distance);
@@ -22,8 +20,8 @@ function Earthquake(input, output) {
 	}
 	this.onDrag = function(dx, dy) {
 		if (this._isView()) {
-			rotation.y += dy / 10;
-			rotation.x += Math.round(dx) / 10;
+			rotation.y -= Math.round(dy) / 50;
+			rotation.x += Math.round(dx) / 30;
 			this.view();
 		}
 
@@ -49,7 +47,7 @@ function Earth(radius) {
 	this._grid_y = new Array();
 	this._grid_x = new Array();
 	this.r = Math.abs(radius);
-	this.rings = 10;
+	this.rings = 20;
 	this._data = [];
 
 	var rad = Math.PI / 180;
@@ -98,31 +96,39 @@ function Earth(radius) {
 		}
 	}
 	this.draw = function(ctx) {
+		this._drawRotation(ctx);
 		ctx.save();
 		ctx.font = "12px Arial";
+		ctx.textAlign = "center";
+		var cos = Math.cos,
+			sin = Math.sin;
+		for (var i = 0, sz = Math.min(300, this._data.length); i < sz; i++) {
+			var dt = this._data[i];
 
-		for (var i = 0, sz = Math.min(150, this._data.length); i < sz; i++) {
-			var dt = this._data[i],
-				lat = this._rotation.x - dt.lat - 90,
-				lon = this._rotation.y - dt.lon - 90,
-				mag = dt.mag;
+			var th0 = this._rotation.x,
+				phi0 = this._rotation.y,
+				theta = dt.lat,
+				phi = dt.lon;
 
-			var x = this.r * Math.sin(lon * rad) * Math.cos(lat * rad),
-				y = this.r * Math.sin(lon * rad) * Math.sin(lat * rad);
+
+
+			var x = this.r * cos(phi * rad) * Math.sin((theta - th0) * rad),
+				tmp = sin(phi0 * rad) * cos(phi * rad) * cos((theta - th0) * rad),
+				y = this.r * (cos(phi0 * rad) * sin(phi * rad) - tmp);
+
 			ctx.beginPath();
-			ctx.strokeStyle = '#F00';
+			ctx.lineWidth = dt.mag;
+			ctx.strokeStyle = '#00F';
 			ctx.moveTo(this.x, this.y);
-			ctx.lineTo(this.x + x, this.y + y);
+			ctx.lineTo(this.x + x, this.y - y);
 			ctx.stroke();
-
-
 		}
-		ctx.restore();
+
 
 		ctx.lineWidth = 0.5;
 		for (var i = 0, iz = this._grid_x.length; i < iz; i++) {
 			var crl = this._grid_x[i];
-			// ctx.fillText(crl.t, this.x, this.y + crl.y);
+			ctx.fillStyle = '#F00';
 			ctx.beginPath();
 			ctx.strokeStyle = crl.c;
 			ctx.ellipse(this.x, this.y, crl.x, Math.abs(crl.y), 0, 0, Math.PI, crl.y < 0);
@@ -131,14 +137,21 @@ function Earth(radius) {
 		//lon
 		for (var i = 0, iz = this._grid_y.length; i < iz; i++) {
 			var crl = this._grid_y[i];
-			// ctx.fillText(crl.t, this.x + crl.x, this.y - 100);
 			ctx.beginPath();
 			ctx.strokeStyle = crl.c;
 			ctx.ellipse(this.x, this.y, Math.abs(crl.x), crl.y, 0, -Math.PI / 2, Math.PI / 2, crl.x < 0);
 			ctx.stroke();
 		}
 		//draw data
+		ctx.restore();
 
+	}
+	this._drawRotation = function(ctx) {
+		ctx.save();
+		ctx.font = "18px Arial";
+		ctx.textAlign = "center";
+		ctx.fillText(Math.round(this._rotation.x) + ',' + Math.round(this._rotation.y), this.x, this.y - this.r - 20);
+		ctx.restore();
 	}
 	this.data = function(dt) {
 		if (undefined != dt) {
