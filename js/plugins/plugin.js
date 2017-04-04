@@ -114,49 +114,51 @@ var Plugin = function() {
 			});
 		btn.onclick = function() {
 			localStorage.setItem(this.settings.storage.ui_view, this._name);
-			this.showSettings();
 			this.view();
 		}.bind(this);
 	}
-	this.showSettings = function() {
+
+	this.addSettings = function(btns) {
+		var option = {
+			'type': 'input',
+			'input.name': 'input-' + new Date().getTime(),
+			'input.wrap': 'li',
+			'input.group': false,
+			'input.type': 'input',
+			'input.value': '',
+			'input.class': '',
+			'input.addon': false,
+			'title': 'Option'
+		};
+
 		var parent = this.input.querySelector('.model');
+
 		while (parent.firstChild) {
 			parent.removeChild(parent.firstChild);
 		}
-		_ui_settings_cache.forEach(function(it) {
-			var option = {
-				'type': 'input',
-				'input.name': 'input-' + it.title + new Date().getMilliseconds(),
-				'input.wrap': 'li',
-				'input.group': false,
-				'input.type': 'input',
-				'input.value': '',
-				'input.class': '',
-				'input.addon': false
-			}.extend(it);
 
-			var btn = fn_addUI(parent, it.title, option);
 
-			btn.onchange = function() {
-				var btnName = this.name,
-					btnVal = 0;
-				if (this.type == 'checkbox') {
-					btnVal = this.checked;
-				} else {
-					btnVal = this.value;
+		if (btns) {
+			var self = this;
+			if (btns.constructor === Array) {
+				for (var bi = 0, bz = btns.length; bi < bz; bi++) {
+					var op = option.extend(btns[bi]);
+					var btn = fn_addUI(parent, op.title, op);
+					btn.onchange = function() {
+						var p = [];
+						p[this.name] = this.type === 'checkbox' ? this.checked : this.value;
+						self.view(p);
+					};
 				}
-				var op = [];
-				op[btnName] = btnVal;
-				self.view(op);
+			} else if (btns.constructor === Object) {
+				var op = option.extend(btns);
+				var btn = fn_addUI(parent, op.title, op);
+				btn.onchange = function() {
+					var p = [];
+					p[this.name] = this.type === 'checkbox' ? this.checked : this.value;
+					self.view(p);
+				};
 			}
-		});
-	}
-	this.addSettings = function(btns) {
-		_ui_settings_cache = [];
-		if (btns && btns.constructor === Array) {
-			_ui_settings_cache = btns;
-		} else if (btns) {
-			_ui_settings_cache.push(btns);
 		}
 	}
 	this.addData = function(label) {

@@ -4,12 +4,23 @@ function Calendar() {
 
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 20;
-	var tblCol = 1;
+	var tblCol = 6;
 	this.view = function(param) {
+		this.addSettings([{
+			'title': 'Columns',
+			'type': 'number',
+			'value': tblCol,
+			'input.name': 'tblCol',
+			'input.group': 'input-group',
+			'input.class': 'form-control'
+
+		}]);
 		this.clear();
+
 		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
 
 		if (!this.data || !this.data.length) return false;
+
 		layout.clear();
 		var months = this.data.map(function(el) {
 			var dt = new Date(el.date);
@@ -34,18 +45,9 @@ function Calendar() {
 	}
 
 	this.addView();
-	this.addSettings([{
-		'title': 'Columns',
-		'type': 'number',
-		'value': tblCol,
-		'input.name': 'tblCol',
-		'input.group': 'input-group',
-		'input.class': 'form-control'
 
-	}]);
 
 	if (this._isView()) {
-		this.showSettings();
 		this.view();
 	}
 	this.onZoom = function(zoom) {
@@ -105,17 +107,16 @@ function Month(date, data) {
 			ctx.rect(x, y, w, h);
 			ctx.closePath();
 			ctx.stroke();
-			var todays = this.data.find(function(ev) {
+
+			var events = this.data.filter(function(ev) {
 					var dt = new Date(ev.date);
-					return dt.getFullYear() == curDate.getFullYear() &&
-						dt.getMonth() == curDate.getMonth() &&
-						dt.getDate() == curDate.getDate();
-				}) || {
-					events: []
-				},
+					return dt.getFullYear() === curDate.getFullYear() &&
+						dt.getMonth() === curDate.getMonth() &&
+						dt.getDate() === curDate.getDate();
+				}),
 				colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#7f1ae5'];
 
-			var lvl = todays.events.length > 0 ? todays.events.length : 0;
+			var lvl = events && events.length > 0 ? events.length : 0;
 			lvl = lvl >= colorCodes.length ? colorCodes.length - 1 : lvl;
 
 

@@ -13,7 +13,6 @@ function Fourier(input, output) {
 		dayHour = param && param.dayHour != undefined ? param.dayHour : dayHour;
 		inpDeg = param && param.inpDeg ? Number(param.inpDeg) : inpDeg;
 		inpAmp = param && param.inpAmp ? Number(param.inpAmp) : inpAmp;
-
 		this.addSettings([{
 			'title': 'Fourier span.',
 			'type': 'number',
@@ -23,10 +22,11 @@ function Fourier(input, output) {
 			'input.class': 'form-control',
 			'input.addon': '&deg;'
 		}, {
-			'title': 'Fourier day/hour',
+			'title': 'Day or Hour',
 			'type': 'checkbox',
 			'input.value': dayHour,
-			'input.name': 'dayHour'
+			'input.name': 'dayHour',
+			'input.addon': false
 		}, {
 			'title': 'Amplitude',
 			'type': 'number',
@@ -36,7 +36,6 @@ function Fourier(input, output) {
 			'input.class': 'form-control',
 			'input.addon': 'x'
 		}]);
-		this.showSettings();
 
 		var ctx = this._ctx;
 		var checkType = dayHour ? 0 : 1,
@@ -55,30 +54,26 @@ function Fourier(input, output) {
 
 
 		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
+			console.log('No data exit now.')
 			return false;
 		}
 
 
 		var freq = [];
 		this.data.forEach(function(dt) {
-			var events = dt.events;
-			if (events && events.length) {
-				var fr = events.map(function(ev) {
-					var cDate = new Date(ev.date);
-					var a = cDate.getHours(),
-						f = cDate.getDate();
+			var date = new Date(dt.date);
+			var a = date.getHours(),
+				f = date.getDate();
 
-					if (checkType) {
-						f = cDate.getHours();
-						a = cDate.getDate();
-					}
-					return {
-						'a': a,
-						'f': f
-					};
-				});
-				freq = freq.concat(fr);
+			if (dayHour) {
+				f = date.getHours();
+				a = date.getDate();
 			}
+			freq.push({
+				'a': a,
+				'f': f
+			});
+
 		});
 		ctx.beginPath();
 		ctx.strokeStyle = '#000';
@@ -138,7 +133,6 @@ function Fourier(input, output) {
 
 	this.addView();
 	if (this._isView()) {
-		this.showSettings();
 		this.view();
 	}
 	this.onDrag = function(dx, dy) {
@@ -150,7 +144,7 @@ function Fourier(input, output) {
 	}
 	this.onZoom = function(zoom) {
 		if (this._isView()) {
-			inpDeg += zoom * 10;
+			inpAmp += zoom / 360;
 			this.view();
 		}
 	}

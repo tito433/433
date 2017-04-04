@@ -15,7 +15,6 @@ function Earthquake(input, output) {
 
 	this.addView();
 	if (this._isView()) {
-		this.showSettings();
 		this.view();
 	}
 	this.onDrag = function(dx, dy) {

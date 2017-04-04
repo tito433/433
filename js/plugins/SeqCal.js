@@ -11,14 +11,7 @@ function SeqCal() {
 
 	this.addView();
 	var inpSize = 16;
-	this.addSettings([{
-		'title': 'SeqCal Cols',
-		'type': 'number',
-		'value': inpSize,
-		'input.name': 'inpSize',
-		'input.group': 'input-group',
-		'input.class': 'form-control'
-	}]);
+
 
 	var eventCount = function(data, date) {
 		var ct = 0;
@@ -37,30 +30,57 @@ function SeqCal() {
 		this.clear();
 		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
 
-		var data = this.data;
-		if (!this.data) return false;
+		this.addSettings([{
+			'title': 'SeqCal Cols',
+			'type': 'number',
+			'value': inpSize,
+			'input.name': 'inpSize',
+			'input.group': 'input-group',
+			'input.class': 'form-control'
+		}]);
+
+
+		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
+			console.log('No data exit now.')
+			return false;
+		}
 		var rects = [];
 		layout.clear();
 
-		for (var i in this.data) {
-			var dt = new Date(this.data[i].date);
-			var rect = new Day(dt);
-			rect.lvl = this.data[i].events.length;
+		var curDate = new Date(this.data[0].date),
+			endDate = new Date(this.data[this.data.length - 1].date);
+		while (curDate < endDate) {
+			var events = this.data.filter(function(ev) {
+				var dt = new Date(ev.date);
+				return dt.getFullYear() === curDate.getFullYear() &&
+					dt.getMonth() === curDate.getMonth() &&
+					dt.getDate() === curDate.getDate();
+			});
+
+			var rect = new Day(curDate);
+			rect.lvl = events && events.length > 0 ? events.length : 0;
 			rects.push(rect);
 			this.add(rect);
 			layout.add(rect);
+			curDate.setDate(curDate.getDate() + 1);
 		}
 
 		layout.table(inpSize);
-
 		this.draw(rects);
 
 	}
 
 
 	if (this._isView()) {
-		this.showSettings();
 		this.view();
+	}
+	this.onDrag = function(dx, dy) {
+		if (this._isView()) {
+			layout.margin.x -= dx;
+			layout.margin.y -= dy;
+			this.view();
+		}
+
 	}
 	this.onZoom = function(zoom) {
 		if (this._isView()) {
@@ -84,7 +104,6 @@ function Day(date) {
 	this.fontSize = 10;
 	this.h = 30;
 	this.lvl = 0;
-	var colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#7f1ae5'];
 	var year = date.getFullYear(),
 		month = date.getMonth() + 1,
 		day = date.getDate();
@@ -101,12 +120,17 @@ function Day(date) {
 		ctx.rect(this.x, this.y, this.w, this.h);
 		ctx.closePath();
 		ctx.stroke();
-
+		var colorCodes = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#7f1ae5'];
 		var lvl = this.lvl >= colorCodes.length ? colorCodes.length - 1 : this.lvl;
 		ctx.fillStyle = colorCodes[lvl];
 		ctx.fill();
+		//draw lablel
+		ctx.font = "12px Arial";
+		ctx.textAlign = "center";
+		ctx.fillStyle = 'black';
+		ctx.textBaseline = "middle";
+		ctx.fillText(this.label, this.x + this.width() / 2, this.y + this.height() / 2)
 		ctx.restore();
-		Drawable.prototype.draw.call(this, ctx);
 
 	}
 

@@ -34,6 +34,19 @@ function GoogleCalendar(input, output) {
 			window.dispatchEvent(new CustomEvent(storage.event, {
 				'detail': dataFormated
 			}));
+
+			// require('http://maps.google.com/maps/api/js?sensor=false', function() {
+			// 	var geocoder = new google.maps.Geocoder();
+			// 	geocoder.geocode({
+			// 		'address': ??
+			// 	}, function(results, status) {
+			// 		if (status == google.maps.GeocoderStatus.OK) {
+			// 			var latitude = results[0].geometry.location.latitude;
+			// 			var longitude = results[0].geometry.location.longitude;
+
+			// 		}
+			// 	});
+			// });
 		});
 	}
 	this.view = function() {

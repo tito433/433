@@ -1,5 +1,15 @@
 "use strict";
 
+Object.defineProperty(Object.prototype, 'extend', {
+	value: function() {
+		var target = this;
+		for (var i = 0; i < arguments.length; i++)
+			for (var key in arguments[i])
+				if (arguments[i].hasOwnProperty(key))
+					target[key] = arguments[i][key];
+		return target;
+	}
+});
 
 Object.defineProperty(Object.prototype, 'forEach', {
 	value: function(callBack) {
