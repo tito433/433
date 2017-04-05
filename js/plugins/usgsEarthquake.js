@@ -30,20 +30,18 @@ function UsgsEarthquake(input, output) {
 
 	var _fetchData = function(start, end) {
 		var script = document.createElement('script');
-		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + start + '&endtime=' + end + '&minmagnitude=4&callback=' + cb_method
+		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + start + '&endtime=' + end + '&minmagnitude=6&callback=' + cb_method
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
 	this.view = function(param) {
 		require('library/ui', function() {
-			var t = new Date(),
-				date_to = new Date(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59),
-				date_from = new Date(t.getFullYear(), t.getMonth(), 1, 23, 59, 59);
+
 
 			new DateRangePicker('USGS Earthquake', 'Please select date range to fetch data:', function(startdate, enddate) {
 				var st = new Date(startdate),
 					ed = new Date(enddate);
 				_fetchData(st.getFullYear() + '-' + (st.getMonth() + 1) + '-' + st.getDate(), ed.getFullYear() + '-' + (ed.getMonth() + 1) + '-' + ed.getDate());
-			}, date_from, date_to);
+			});
 		});
 	}
 

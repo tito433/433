@@ -6,6 +6,8 @@ function Calendar() {
 	layout.padding = 20;
 	var tblCol = 6;
 	this.view = function(param) {
+		this.clear();
+		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
 		this.addSettings([{
 			'title': 'Columns',
 			'type': 'number',
@@ -15,9 +17,6 @@ function Calendar() {
 			'input.class': 'form-control'
 
 		}]);
-		this.clear();
-
-		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
 
 		if (!this.data || !this.data.length) return false;
 
@@ -40,19 +39,19 @@ function Calendar() {
 			layout.add(month);
 			this.add(month);
 		}
-		layout.table(tblCol);
+		layout.table(tblCol, 2);
 		this.draw();
 	}
 
 	this.addView();
 
-
 	if (this._isView()) {
 		this.view();
 	}
+
 	this.onZoom = function(zoom) {
 		if (this._isView()) {
-			tblCol = tblCol + zoom;
+			layout.margin.y += zoom * 10;
 			this.view();
 		}
 	}
@@ -82,20 +81,23 @@ function Month(date, data) {
 		ctx.font = 'bold 12pt Courier';
 		ctx.fillStyle = '#444';
 		ctx.textBaseline = "middle";
+		ctx.textBaseline = "middle";
 		ctx.textAlign = "center";
-		ctx.fillText(mL[mn] + "'" + year, this.x + this.width() / 2, this.y);
+		ctx.fillText(mL[mn] + "'" + year, this.x + this.width() / 2, this.y + 8);
 		//draw dates
 		ctx.font = 'normal 12pt Courier';
 		var w = this.width() / 7,
-			h = this.height() - 25,
-			y = this.y + 25,
+			h = this.height() - 18,
+			y = this.y + 18,
 			curDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1),
 			endDate = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 1),
 			lastDay = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate(),
-			startDay = curDate.getDay(),
-			numRows = (startDay + lastDay) / 7;
-		if ((startDay + lastDay - 1) % 7 != 0) numRows += 1;
-		h = h / numRows;
+			startDay = curDate.getDay();
+
+
+		ctx.strokeStyle = '#ccc';
+
+		h = h / 6;
 		while (curDate < endDate) {
 			var day = curDate.getDay();
 			if (day === 0 && curDate.getDate() > 1) {
