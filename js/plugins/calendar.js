@@ -4,7 +4,7 @@ function Calendar() {
 
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 20;
-	var tblCol = 6;
+	var tblCol = 4;
 	this.view = function(param) {
 		this.clear();
 		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;

@@ -71,10 +71,10 @@ function Plot(input, output) {
 		}
 	}
 
-	if (this._isView()) {
-		this.showSettings();
-		this.view();
-	}
+	// if (this._isView()) {
+	// 	this.showSettings();
+	// 	this.view();
+	// }
 }
 
 //make this Chart resizeable.
