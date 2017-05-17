@@ -4,15 +4,42 @@ function Fourier(input, output) {
 	Canvas.call(this, output);
 	var dayHour = true;
 	this.addSettings();
+
 	var inpDeg = 180;
 	var inpAmp = 0.21;
 	var startDeg = 0;
 
-	this.view = function(param) {
+	this.draw = function(param) {
+		this.clear();
+		if (!this.data || !this.data.length) return false;
 
-		dayHour = param && param.dayHour != undefined ? param.dayHour : dayHour;
-		inpDeg = param && param.inpDeg ? Number(param.inpDeg) : inpDeg;
-		inpAmp = param && param.inpAmp ? Number(param.inpAmp) : inpAmp;
+		if (param) {
+			dayHour = param.dayHour != undefined ? param.dayHour : dayHour;
+			inpDeg = param.inpDeg ? Number(param.inpDeg) : inpDeg;
+			inpAmp = param.inpAmp ? Number(param.inpAmp) : inpAmp;
+		}
+
+
+		//move bottom to a drwable object and put it to screen?
+
+		var freq = this.data.map(function(dt) {
+			var date = new Date(dt.date);
+			var a = date.getHours(),
+				f = date.getDate();
+			return {
+				'a': a,
+				'f': f
+			};
+		});
+		var drawer = new MFourier(freq, {
+			'dayHour': dayHour,
+			'inpDeg': inpDeg,
+			'inpAmp': inpAmp
+		});
+		this.add(drawer);
+
+	}
+	this.view = function() {
 		this.addSettings([{
 			'title': 'Fourier span.',
 			'type': 'number',
@@ -36,53 +63,29 @@ function Fourier(input, output) {
 			'input.class': 'form-control',
 			'input.addon': 'x'
 		}]);
+		this.draw();
+	}
+	this.addView();
 
-		var ctx = this._ctx;
-		var checkType = dayHour ? 0 : 1,
-			lblArr = ['day', 'hour'];
-		this.x = 0;
-		this.y = 0;
-		ctx.clearRect(0, 0, this.width, this.height);
-		ctx.save();
-		ctx.font = 'bold 14pt Courier';
-		ctx.fillStyle = '#aaa';
-		ctx.textBaseline = "middle";
-		ctx.textAlign = "right"
-		ctx.fillText('Fourier', this.x + this.width, 8);
-		ctx.font = 'bold 10pt Courier';
-		ctx.fillText('Frequency:' + lblArr[checkType], this.x + this.width, 25);
-
-
-		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
-			console.log('No data exit now.')
-			return false;
+	this.onZoom = function(zoom) {
+		if (this.isView()) {
+			inpAmp += zoom / 360;
+			this.draw();
 		}
+	}
+}
 
+function MFourier(freq, settings) {
+	Drawable.call(this);
+	this.draw = function(ctx) {
 
-		var freq = [];
-		this.data.forEach(function(dt) {
-			var date = new Date(dt.date);
-			var a = date.getHours(),
-				f = date.getDate();
-
-			if (dayHour) {
-				f = date.getHours();
-				a = date.getDate();
-			}
-			freq.push({
-				'a': a,
-				'f': f
-			});
-
-		});
 		ctx.beginPath();
 		ctx.strokeStyle = '#000';
 		ctx.lineWidth = 2;
-		this.x = 0;
-		this.y = this.height / 2;
-		ctx.moveTo(this.x, this.y);
-		var np = inpDeg / 180;
-		var points = [],
+		var y = this.y + this.height / 2;
+		ctx.moveTo(this.x, y);
+		var np = settings.inpDeg / 180,
+			points = [],
 			rad = Math.PI / 180;
 
 		for (var i = this.x; i <= this.width; i++) {
@@ -90,7 +93,7 @@ function Fourier(input, output) {
 			y = 0;
 			t = i / this.width;
 			for (var fi in freq) {
-				var A = inpAmp * freq[fi].a,
+				var A = settings.inpAmp * freq[fi].a,
 					f = freq[fi].f;
 				y += A * Math.sin(np * Math.PI * f * t + (rad * startDeg));
 			}
@@ -127,25 +130,7 @@ function Fourier(input, output) {
 		ctx.moveTo(0, this.y);
 		ctx.lineTo(this.width, this.y);
 		ctx.stroke();
-
-
-	}
-
-	this.addView();
-	if (this._isView()) {
-		this.view();
-	}
-	this.onDrag = function(dx, dy) {
-		if (this._isView()) {
-			startDeg += dx;
-			this.view();
-		}
-
-	}
-	this.onZoom = function(zoom) {
-		if (this._isView()) {
-			inpAmp += zoom / 360;
-			this.view();
-		}
 	}
 }
+MFourier.prototype = Object.create(Drawable.prototype);
+MFourier.prototype.constructor = MFourier;

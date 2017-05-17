@@ -10,30 +10,27 @@ function Earthquake(input, output) {
 
 	var distance = this.height / 2 - 100;
 	var rotation = new Point3D();
-	this.view = function(param) {
+	this.draw = function(param) {
 		this.clear();
 		var earth = new Earth(distance);
 		earth.position(this.width / 2, this.height / 2);
 		this.add(earth);
-		this.animate();
 	}
 
 	this.addView();
-	if (this._isView()) {
-		this.view();
-	}
+
 	this.onDrag = function(dx, dy) {
-		if (this._isView()) {
+		if (this.isView()) {
 			rotation.y -= Math.round(dy) / 50;
 			rotation.x += Math.round(dx) / 30;
-			this.view();
+			this.draw();
 		}
 
 	}
 	this.onZoom = function(zoom) {
-		if (this._isView()) {
+		if (this.isView()) {
 			distance += zoom * 10;
-			this.view();
+			this.draw();
 		}
 	}
 }

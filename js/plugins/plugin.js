@@ -11,11 +11,9 @@ var Plugin = function() {
 
 	this.settings = {
 		'storage': {
-			'data_key': '433.storage.data',
+			'data': '433.storage.data',
 			'event': '433.data.change',
-			'active': '433.state',
-			'ui_view': '433.ui.view',
-			'ui_controll': '433.data.controll',
+			'active': '433.state'
 		}
 	};
 	var _get_storageJson = function(key) {
@@ -25,29 +23,27 @@ var Plugin = function() {
 		} catch (err) {}
 		return _dt;
 	}
-	this.data = _get_storageJson(this.settings.storage.data_key);
-	this.getData = function($key) {
-		return _get_storageJson($key);
-	}
-	this._name = this.getName();
+	this.data = _get_storageJson(this.settings.storage.data);
+	this.draw = function() {};
 
-	//Check storage, is it me showing off?
-	this._isView = function() {
-		var ui_view = localStorage.getItem(this.settings.storage.ui_view);
-		return ui_view == this._name;
+	this.getData = function() {
+			return this.data;
+		}
+		//Check storage, is it me showing off?
+	this.isView = function() {
+		var state = localStorage.getItem(this.settings.storage.active);
+		return state == this.getName();
 	}
-	this._isControll = function() {
-		var ui_controll = localStorage.getItem(this.settings.storage.ui_controll);
-		return ui_controll == this._name;
-	}
+
 	this._updateData = function() {
 		if (arguments.length == 1 && arguments[0] instanceof Event) {
 			this.data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : [];
-			if (this._isView()) this.view();
+			if (this.isView()) this.draw();
 		}
 	}
 
 	window.addEventListener(this.settings.storage.event, this._updateData.bind(this), false);
+
 	var _ui_settings_cache = [];
 	var fn_addUI = function(parent, label, option) {
 		var d = document,
@@ -106,14 +102,14 @@ var Plugin = function() {
 
 	}
 	this.addView = function(label) {
-		var label = label || this._name,
+		var label = label || this.getName(),
 			btn = fn_addUI(this.input.querySelector('.view'), label, {
 				'type': 'submit',
 				'input.name': 'view-' + label,
 				'value': label
 			});
 		btn.onclick = function() {
-			localStorage.setItem(this.settings.storage.ui_view, this._name);
+			localStorage.setItem(this.settings.storage.active, this.getName());
 			this.view();
 		}.bind(this);
 	}
@@ -147,7 +143,7 @@ var Plugin = function() {
 					btn.onchange = function() {
 						var p = [];
 						p[this.name] = this.type === 'checkbox' ? this.checked : this.value;
-						self.view(p);
+						self.draw(p);
 					};
 				}
 			} else if (btns.constructor === Object) {
@@ -156,22 +152,11 @@ var Plugin = function() {
 				btn.onchange = function() {
 					var p = [];
 					p[this.name] = this.type === 'checkbox' ? this.checked : this.value;
-					self.view(p);
+					self.draw(p);
 				};
 			}
 		}
 	}
-	this.addData = function(label) {
-		var label = label || this._name,
-			btn = fn_addUI(this.input.querySelector('.data'), label, {
-				'type': 'button',
-				'input.name': 'input-control-' + label + new Date().getMilliseconds(),
-				'value': label
-			});
-		btn.onclick = this.view.bind(this);
-		return btn;
-	}
-
 	this.addControll = function(label) {
 		var label = label || this._name,
 			btn = fn_addUI(this.input.querySelector('.controll'), label, {
@@ -184,4 +169,15 @@ var Plugin = function() {
 		}.bind(this);
 		return btn;
 	}
+	this.addData = function(label) {
+		var label = label || this._name,
+			btn = fn_addUI(this.input.querySelector('.data'), label, {
+				'type': 'button',
+				'input.name': 'input-control-' + label + new Date().getMilliseconds(),
+				'value': label
+			});
+		btn.onclick = this.view.bind(this);
+		return btn;
+	}
+
 }

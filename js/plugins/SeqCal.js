@@ -1,30 +1,12 @@
 function SeqCal() {
 	Plugin.apply(this, arguments);
-	//adapt drawing
 	Canvas.call(this, this.output);
-
 
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 10;
-
-
-
 	this.addView();
-	var inpSize = 16;
+	var inpSize = 3;
 
-
-	var eventCount = function(data, date) {
-		var ct = 0;
-		for (var i in data) {
-			var dt = new Date(data[i].start.dateTime);
-			if (dt.getFullYear() == date.getFullYear() &&
-				dt.getMonth() == date.getMonth() &&
-				dt.getDate() == date.getDate()) {
-				ct++;
-			}
-		}
-		return ct;
-	}
 	this.view = function(param) {
 
 		this.clear();
@@ -56,23 +38,21 @@ function SeqCal() {
 					dt.getMonth() === curDate.getMonth() &&
 					dt.getDate() === curDate.getDate();
 			});
+			if (events.length) {
+				var rect = new Day(events);
 
-			var rect = new Day(curDate);
-			rect.lvl = events && events.length > 0 ? events.length : 0;
-			rects.push(rect);
-			this.add(rect);
-			layout.add(rect);
+				rects.push(rect);
+				this.add(rect);
+				layout.add(rect);
+
+			}
 			curDate.setDate(curDate.getDate() + 1);
+
 		}
 
 		layout.table(inpSize);
 		this.draw(rects);
 
-	}
-
-
-	if (this._isView()) {
-		this.view();
 	}
 	this.onDrag = function(dx, dy) {
 		if (this._isView()) {
@@ -83,9 +63,9 @@ function SeqCal() {
 
 	}
 	this.onZoom = function(zoom) {
-		if (this._isView()) {
+		if (this.isView()) {
 			inpSize = inpSize + zoom;
-			this.view();
+			this.draw();
 		}
 	}
 }
@@ -93,26 +73,21 @@ SeqCal.prototype = Object.create(Plugin.prototype);
 SeqCal.prototype.constructor = SeqCal;
 
 
-function Day(date) {
+function Day(evts) {
 	Drawable.call(this);
 
-	this.date = date;
 	this.fillStyle = '#fff';
-	this.fontColor = '#888';
-	this.evts = [];
+	this.fontColor = '#fff';
+	this.evts = evts;
 	this.marked = false;
 	this.fontSize = 10;
 	this.h = 30;
 	this.lvl = 0;
-	var year = date.getFullYear(),
-		month = date.getMonth() + 1,
-		day = date.getDate();
-	this.label = [day + '-' + month + '-' + year];
-
-	this.setDate = function(date) {
-		this.date = date;
-	}
-
+	this.label = this.evts.map(function(dt, index) {
+		var dd = new Date(dt.date);
+		return dd.getHours();
+	});
+	this.lvl = this.evts.length;
 	this.draw = function(ctx) {
 		ctx.save();
 		ctx.beginPath();
@@ -127,7 +102,7 @@ function Day(date) {
 		//draw lablel
 		ctx.font = "12px Arial";
 		ctx.textAlign = "center";
-		ctx.fillStyle = 'black';
+		ctx.fillStyle = this.fontColor;
 		ctx.textBaseline = "middle";
 		ctx.fillText(this.label, this.x + this.width() / 2, this.y + this.height() / 2)
 		ctx.restore();

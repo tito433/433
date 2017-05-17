@@ -7,15 +7,16 @@ function Plot(input, output) {
 
 
 	var showGrid = false;
-	this.addSettings({
-		'title': 'Plot grid',
-		'type': 'checkbox',
-		'input.name': 'showGrid',
-		'input.value': showGrid
-	});
+
 
 	this.view = function(param) {
 		this.clear();
+		this.addSettings({
+			'title': 'Plot grid',
+			'type': 'checkbox',
+			'input.name': 'showGrid',
+			'input.value': showGrid
+		});
 		showGrid = param && param.showGrid != undefined ? param.showGrid : showGrid;
 		var _layout = new Layout(this.width, this.height);
 		_layout.padding = 20;

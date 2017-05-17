@@ -3,48 +3,36 @@ function Cycloid() {
 	//adapt drawing
 	Canvas.call(this, this.output);
 
-	var self = this;
-
 	var inpRadius = 0;
 
-	this.view = function() {
+	this.draw = function() {
 		this.clear();
 		var data = this.data;
-		if (!data || (data instanceof Array && data.length == 0)) {
-			return false;
-		}
+		if (!this.data || !this.data.length) return false;
 
 		var centerX = this.width / 2,
 			centerY = this.height / 2;
 		var maxR = this.height / 2;
 
 		for (var i = 0, ln = this.data.length; i < ln; i++) {
-			var events = this.data[i].events || [];
-			for (var ei = 0, ez = events.length; ei < ez; ei++) {
-				var evt = events[ei],
-					date = new Date(evt.date),
-					day = date.getDate(),
-					hour = date.getHours();
+			var evt = this.data[i],
+				date = new Date(evt.date),
+				day = date.getDate(),
+				hour = date.getHours();
 
-				var layer = new PeripheralCircle(centerX, centerY, inpRadius + day.mapTo(1, 31, 0, maxR));
-				layer.size = hour;
-				this.add(layer);
-			}
+			var layer = new PeripheralCircle(centerX, centerY, inpRadius + day.mapTo(1, 31, 0, maxR));
+			layer.size = hour;
+			this.add(layer);
 
 		}
-		this.draw();
 	}
 
 	this.addView();
-	if (this._isView()) {
-		this.showSettings();
-		this.view();
-	}
 
 	this.onZoom = function(zoom) {
-		if (this._isView()) {
+		if (this.isView()) {
 			inpRadius += zoom * 10;
-			this.view();
+			this.draw();
 		}
 	}
 }

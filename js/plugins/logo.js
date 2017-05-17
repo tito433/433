@@ -67,20 +67,16 @@ function Logo(input, output) {
 
 
 	//save screen?
-
 	this.screenShoot = function(ctx, x, y, w, h) {
-		var data = ctx.getImageData(x, y, w, h);
-		var tc = document.createElement('canvas');
-		tc.width = w;
-		tc.height = h;
+			var data = ctx.getImageData(x, y, w, h);
+			var tc = document.createElement('canvas');
+			tc.width = w;
+			tc.height = h;
 
-		var tcc = tc.getContext("2d");
-		tcc.putImageData(data, 0, 0);
+			var tcc = tc.getContext("2d");
+			tcc.putImageData(data, 0, 0);
 
-		window.open(tc.toDataURL("image/png"), '_blank');
-	}
-
-
-
-	// this.screenShoot(ctx, center.x - radius, center.y - radius, 2 * radius, 2 * radius);
+			window.open(tc.toDataURL("image/png"), '_blank');
+		}
+		// this.screenShoot(ctx, center.x - radius, center.y - radius, 2 * radius, 2 * radius);
 }

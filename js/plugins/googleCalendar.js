@@ -30,7 +30,7 @@ function GoogleCalendar(input, output) {
 				}
 			}
 
-			localStorage.setItem(storage.data_key, JSON.stringify(dataFormated));
+			localStorage.setItem(storage.data, JSON.stringify(dataFormated));
 			window.dispatchEvent(new CustomEvent(storage.event, {
 				'detail': dataFormated
 			}));
