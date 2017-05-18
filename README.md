@@ -42,3 +42,8 @@ Find the peaks...
 
 No matter how you measure, you will always find yourself in the middlee
 ```
+Note (18-May-2017)
+```
+You can ask four question
+Among  them three should be right.
+```
