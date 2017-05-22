@@ -4,45 +4,19 @@ function Plot(input, output) {
 	Canvas.call(this, output);
 
 	this._chart = [];
-
-
+	var _layout = new Layout(this.width, this.height);
 	var showGrid = false;
-
-
-	this.view = function(param) {
-		this.clear();
-		this.addSettings({
-			'title': 'Plot grid',
-			'type': 'checkbox',
-			'input.name': 'showGrid',
-			'input.value': showGrid
-		});
-		showGrid = param && param.showGrid != undefined ? param.showGrid : showGrid;
-		var _layout = new Layout(this.width, this.height);
-		_layout.padding = 20;
-
-		for (var title in this._format) {
-			var chart = new Chart().title(title).size(this.width / 2 - 60, this.height / 2 - 40);
-			chart.format(this._format[title]).grid(showGrid).data(this.data);
-			this.add(chart);
-			_layout.add(chart);
-		}
-		_layout.flowLeft();
-		this.draw();
-	}
-
-	this.addView();
+	_layout.padding = 20;
 
 	this._format = {
 		'Event Count': function(data) {
 			var fmtData = [];
 			if (data instanceof Array && data.length) {
 				data.forEach(function(dt, idx) {
-					if (dt.events.length > 0)
-						fmtData[idx] = new Point(idx, dt.events.length);
+					var dt = new Date(dt.date);
+					fmtData.push(new Point(idx, dt.getHours()));
 				});
 			}
-			console.log(fmtData)
 			return fmtData;
 		},
 		'Gap': function(data) {
@@ -62,20 +36,38 @@ function Plot(input, output) {
 		'Days': function(data) {
 			var fmtData = [];
 			if (data instanceof Array && data.length) {
-				data.forEach(function(dt, idx) {
-					if (dt.events.length > 0)
-						fmtData[idx] = new Point(idx, dt.events.length);
+				data.forEach(function(dt) {
+					var dt = new Date(dt.date);
+					var idx = dt.getDate();
+					var pval = fmtData[idx] ? fmtData[idx].y : 0;
+					fmtData[idx] = new Point(idx, pval + 1);
 				});
 			}
-
 			return fmtData;
 		}
 	}
+	this.draw = function(param) {
+		this.clear();
+		showGrid = param && param.showGrid != undefined ? param.showGrid : showGrid;
+		for (var title in this._format) {
+			var chart = new Chart().title(title).size(this.width / 2 - 60, this.height / 2 - 40);
+			chart.grid(showGrid).data(this._format[title](this.data));
+			_layout.add(chart);
+		}
+		_layout.table(2, 2);
+		this.add(_layout);
+	}
+	this.view = function() {
+		this.addSettings({
+			'title': 'Plot grid',
+			'type': 'checkbox',
+			'input.name': 'showGrid',
+			'input.value': showGrid
+		});
+		this.draw();
+	}
 
-	// if (this._isView()) {
-	// 	this.showSettings();
-	// 	this.view();
-	// }
+	this.addView();
 }
 
 //make this Chart resizeable.
@@ -87,19 +79,8 @@ function Chart() {
 		'y': 24
 	};
 	this._title = false;
-	var animate = false;
-	var _ctx = false;
-	var _data_backup = [];
 	var _show_grid = true;
 
-	this._fn_data_format = function(d) {
-		return d;
-	}
-
-	this.format = function(callBack) {
-		this._fn_data_format = callBack;
-		return this;
-	}
 	this.data = function() {
 		if (arguments.length == 1) {
 			this._data = arguments[0];
@@ -117,12 +98,9 @@ function Chart() {
 		}
 	}
 	this.draw = function(ctx) {
-		//i clean my mess!
-		var data = this._fn_data_format(this._data);
-		ctx.clearRect(this.x, this.y, this.width(), this.height());
-		if (!data.length) {
-			return;
-		}
+		var data = this._data;
+
+
 		var x = this.x,
 			y = this.y,
 			w = this.width(),
@@ -136,14 +114,13 @@ function Chart() {
 			ctx.fillText(this._title, this.x + this.width() / 2, this.y + 8);
 			y += 25;
 			h -= 25;
-
 		}
 		this._grid.x = data.reduce(function(a, b) {
 			return a > b.x ? a : b.x;
-		}, 0);
+		}, 365);
 		this._grid.y = data.reduce(function(a, b) {
 			return a > b.y ? a : b.y;
-		}, 0);
+		}, 24);
 
 		if (this._grid.y) {
 			x += 20;

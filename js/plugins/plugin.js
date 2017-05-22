@@ -1,3 +1,4 @@
+'use strict';
 var Plugin = function() {
 
 	if (typeof(Storage) === "undefined") {

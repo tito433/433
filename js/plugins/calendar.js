@@ -65,7 +65,6 @@ function Month(date, data) {
 
 	this.date = date;
 	this.data = data;
-
 	var mn = this.date.getMonth(),
 		year = this.date.getYear() - 100;
 

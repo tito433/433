@@ -49,17 +49,9 @@ function SeqCal() {
 		this.draw();
 
 	}
-	this.onDrag = function(dx, dy) {
-		if (this._isView()) {
-			layout.margin.x -= dx;
-			layout.margin.y -= dy;
-			this.view();
-		}
-
-	}
 	this.onZoom = function(zoom) {
 		if (this.isView()) {
-			inpSize = inpSize + zoom;
+			layout.margin.y += zoom * 100;
 			this.draw();
 		}
 	}

@@ -7,7 +7,6 @@ function Cycloid() {
 
 	this.draw = function() {
 		this.clear();
-		var data = this.data;
 		if (!this.data || !this.data.length) return false;
 
 		var centerX = this.width / 2,
@@ -26,12 +25,25 @@ function Cycloid() {
 
 		}
 	}
+	this.view = function() {
+		this.addSettings([{
+			'title': 'Radius',
+			'type': 'number',
+			'value': inpRadius,
+			'input.name': 'tblCol',
+			'input.group': 'input-group',
+			'input.class': 'form-control'
+
+		}]);
+
+		this.draw();
+	}
 
 	this.addView();
 
 	this.onZoom = function(zoom) {
 		if (this.isView()) {
-			inpRadius += zoom * 10;
+			inpRadius += zoom;
 			this.draw();
 		}
 	}
