@@ -1,11 +1,9 @@
 var Plugin = function() {
 
-
 	if (typeof(Storage) === "undefined") {
 		throw "Storage undefined! This app can't run without localStorage. Can you?";
 	}
 
-	var self = this;
 	this.input = arguments[0] || null;
 	this.output = arguments[1] || null;
 
@@ -24,12 +22,12 @@ var Plugin = function() {
 		return _dt;
 	}
 	this.data = _get_storageJson(this.settings.storage.data);
+
 	this.draw = function() {};
 
 	this.getData = function() {
-			return this.data;
-		}
-		//Check storage, is it me showing off?
+		return this.data;
+	}
 	this.isView = function() {
 		var state = localStorage.getItem(this.settings.storage.active);
 		return state == this.getName();

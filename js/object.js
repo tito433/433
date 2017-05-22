@@ -87,11 +87,14 @@ Object.defineProperty(Image.prototype, 'isOk', {
 window.require = function(u, c) {
 	if (typeof u !== "string") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
 
-	var newJs = u.startsWith('http') ? u : 'js/' + u + '.js';
-	var scripts = document.getElementsByTagName('script');
+	if (!u.endsWith('.js')) {
+		u = u + '.js';
+	}
 
+	var newJs = u.startsWith('http') ? u : 'js/' + u;
+	var scripts = document.getElementsByTagName('script');
 	for (var i = 0, ln = scripts.length; i < ln; i++) {
-		if (scripts[i].src == newJs) {
+		if (scripts[i].src.endsWith(newJs)) {
 			return c.call(null);
 		}
 	}

@@ -7,23 +7,9 @@ function SeqCal() {
 	this.addView();
 	var inpSize = 3;
 
-	this.view = function(param) {
-
-		this.clear();
-		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
-
-		this.addSettings([{
-			'title': 'SeqCal Cols',
-			'type': 'number',
-			'value': inpSize,
-			'input.name': 'inpSize',
-			'input.group': 'input-group',
-			'input.class': 'form-control'
-		}]);
-
+	this.draw = function() {
 
 		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
-			console.log('No data exit now.')
 			return false;
 		}
 		var rects = [];
@@ -39,19 +25,28 @@ function SeqCal() {
 					dt.getDate() === curDate.getDate();
 			});
 			if (events.length) {
-				var rect = new Day(events);
-
-				rects.push(rect);
-				this.add(rect);
-				layout.add(rect);
-
+				layout.add(new Day(events));
 			}
 			curDate.setDate(curDate.getDate() + 1);
-
 		}
 
 		layout.table(inpSize);
-		this.draw(rects);
+		this.add(layout);
+	}
+	this.view = function(param) {
+
+		this.clear();
+		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
+
+		this.addSettings([{
+			'title': 'SeqCal Cols',
+			'type': 'number',
+			'value': inpSize,
+			'input.name': 'inpSize',
+			'input.group': 'input-group',
+			'input.class': 'form-control'
+		}]);
+		this.draw();
 
 	}
 	this.onDrag = function(dx, dy) {

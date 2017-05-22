@@ -8,7 +8,6 @@ function Calendar() {
 
 
 	this.draw = function(param) {
-
 		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
 		if (!this.data || !this.data.length) return false;
 		this.clear();
@@ -31,10 +30,9 @@ function Calendar() {
 
 			var month = new Month(new Date(y, mn, 1), monthData);
 			layout.add(month);
-			this.add(month);
 		}
 		layout.table(tblCol, 2);
-
+		this.add(layout);
 	}
 	this.view = function() {
 		this.addSettings([{
