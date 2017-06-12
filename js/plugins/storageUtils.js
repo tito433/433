@@ -4,25 +4,22 @@ function StorageUtils(input, output) {
 
 	this.view = function() {
 		var cmd = arguments.length ? arguments[0] : '';
+		if (typeof this[cmd] === "function") {
+			this[cmd](this._ctx);
+			return true;
+		}
+
 		switch (cmd) {
-			case 'Full Reset':
+			case 'RESET':
 				localStorage.clear();
 				window.location.href = window.location.href;
 				break;
-			case 'Clear Data':
-				localStorage.removeItem(this.settings.storage.data_key);
-				window.location.href = window.location.href;
-				break;
-			case 'Save PNG':
-				this.saveAsPng();
-				break;
 			default:
 				console.log("I dont know what to do with it.");
-
 		}
 	}
-	this.addControll("Full Reset");
-	this.addControll("Clear Data");
-	this.addControll("Save PNG");
+	this.addControll("RESET");
+	this.addControll("saveAsPng");
+	this.addControll("clear");
 
 }

@@ -10,7 +10,6 @@ function Calendar() {
 	this.draw = function(param) {
 		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
 		if (!this.data || !this.data.length) return false;
-		this.clear();
 		layout.clear();
 
 		var months = this.data.reduce(function(acc, val) {

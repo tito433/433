@@ -7,14 +7,15 @@ function SeqCal() {
 	this.addView();
 	var inpSize = 3;
 
-	this.draw = function() {
-
+	this.draw = function(param) {
+		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
 		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
+			console.log('No data exit.' + this.getName())
 			return false;
 		}
 		var rects = [];
 		layout.clear();
-
+		console.log('Drawing..' + inpSize)
 		var curDate = new Date(this.data[0].date),
 			endDate = new Date(this.data[this.data.length - 1].date);
 		while (curDate < endDate) {
@@ -33,21 +34,16 @@ function SeqCal() {
 		layout.table(inpSize);
 		this.add(layout);
 	}
-	this.view = function(param) {
-
-		this.clear();
-		inpSize = param && param.inpSize ? Number(param.inpSize) : inpSize;
-
-		this.addSettings([{
+	this.view = function() {
+		this.addSettings({
 			'title': 'SeqCal Cols',
 			'type': 'number',
 			'value': inpSize,
 			'input.name': 'inpSize',
 			'input.group': 'input-group',
 			'input.class': 'form-control'
-		}]);
+		});
 		this.draw();
-
 	}
 	this.onZoom = function(zoom) {
 		if (this.isView()) {

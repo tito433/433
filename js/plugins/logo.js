@@ -8,7 +8,6 @@ function Logo(input, output) {
 	var mlogo = new MLogo(this.width, this.height);
 	mlogo.position(center.x, center.y);
 	this.add(mlogo);
-	this.draw();
 
 	// radius /= 2;
 

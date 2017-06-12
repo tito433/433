@@ -134,27 +134,40 @@ var Plugin = function() {
 
 
 		if (btns) {
-			var self = this;
 			if (btns.constructor === Array) {
 				for (var bi = 0, bz = btns.length; bi < bz; bi++) {
 					var op = option.extend(btns[bi]);
 					var btn = fn_addUI(parent, op.title, op);
-					btn.onchange = function() {
-						var p = [];
-						p[this.name] = this.type === 'checkbox' ? this.checked : this.value;
-						self.draw(p);
-					};
+					btn.onchange = function(evt) {
+						var tr = evt.target,
+							val = tr.type === 'checkbox' ? (tr.checked) : tr.value;
+						this.draw({
+							[tr.name]: val
+						});
+					}.bind(this);
 				}
 			} else if (btns.constructor === Object) {
 				var op = option.extend(btns);
 				var btn = fn_addUI(parent, op.title, op);
-				btn.onchange = function() {
-					var p = [];
-					p[this.name] = this.type === 'checkbox' ? this.checked : this.value;
-					self.draw(p);
-				};
+				btn.onchange = function(evt) {
+					var tr = evt.target,
+						val = tr.type === 'checkbox' ? (tr.checked) : tr.value;
+					this.draw({
+						[tr.name]: val
+					});
+				}.bind(this);
 			}
 		}
+	}
+	this.getParamFromEvent = function(event, prmName) {
+		if (event instanceof Event) {
+			var elem = event.target;
+			if (elem.name === prmName) {
+				return elem.type === 'checkbox' ? elem.checked : elem.value;
+			}
+
+		}
+
 	}
 	this.addControll = function(label) {
 		var label = label || this._name,

@@ -3,11 +3,18 @@ function Cycloid() {
 	//adapt drawing
 	Canvas.call(this, this.output);
 
-	var inpRadius = 0;
+	var inpRadius = 50;
+	var keepAll = false;
+	// var blockSize = 20;
 
-	this.draw = function() {
-		this.clear();
+	this.draw = function(param) {
+
+		inpRadius = Number(this.getParamFromEvent(param, 'inpRadius')) || inpRadius;
+		keepAll = this.getParamFromEvent(param, 'keepAll') || keepAll;
+
 		if (!this.data || !this.data.length) return false;
+		if (!keepAll) this.clear();
+
 
 		var centerX = this.width / 2,
 			centerY = this.height / 2;
@@ -22,15 +29,26 @@ function Cycloid() {
 			var layer = new PeripheralCircle(centerX, centerY, inpRadius + day.mapTo(1, 31, 0, maxR));
 			layer.size = hour;
 			this.add(layer);
-
 		}
+		//var grid = new Grid(blockSize);
+		// this.add(grid);
+
 	}
+
 	this.view = function() {
 		this.addSettings([{
 			'title': 'Radius',
 			'type': 'number',
 			'value': inpRadius,
-			'input.name': 'tblCol',
+			'input.name': 'inpRadius',
+			'input.group': 'input-group',
+			'input.class': 'form-control'
+
+		}, {
+			'title': 'Keep All',
+			'type': 'checkbox',
+			'value': keepAll,
+			'input.name': 'keepAll',
 			'input.group': 'input-group',
 			'input.class': 'form-control'
 
