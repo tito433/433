@@ -9,8 +9,8 @@ function Cycloid() {
 
 	this.draw = function(param) {
 
-		inpRadius = Number(this.getParamFromEvent(param, 'inpRadius')) || inpRadius;
-		keepAll = this.getParamFromEvent(param, 'keepAll') || keepAll;
+		inpRadius = arguments.length > 0 && "inpRadius" in param ? Number(param.inpRadius) : inpRadius;
+		keepAll = arguments.length > 0 && "keepAll" in param ? param.keepAll : keepAll;
 
 		if (!this.data || !this.data.length) return false;
 		if (!keepAll) this.clear();
