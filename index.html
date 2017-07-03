@@ -40,12 +40,13 @@
 <script type="text/javascript">
 
   window.onload =function(){
-    var plugins=['logo','calendar','googleCalendar','SeqCal','plot','filter','cycloid','fourier','usgsEarthquake','StorageUtils','earthquake','cefaloAttend'],
-        input=document.getElementById('input'),
+    var input=document.getElementById('input'),
         output=document.getElementById('output');
 
-    plugins.forEach(function(sClass){
-      require('plugins/'+sClass, 
+    ['logo','calendar','googleCalendar','SeqCal','plot','filter','cycloid',
+    'fourier','usgsEarthquake','StorageUtils','globe']
+    .forEach(function(sClass){
+      loadScript('plugins/'+sClass, 
         function(){
           var className=sClass.fistCapital();
           if(typeof window[className] === "function"){

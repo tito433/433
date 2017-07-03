@@ -1,7 +1,7 @@
-function UsgsEarthquake(input, output) {
+function UsgsEarthquake() {
 	Plugin.apply(this, arguments);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
-	Canvas.call(this, output);
 	var storage = this.settings.storage;
 
 	var cb_method = this._name + '_cb_' + new Date().getMilliseconds();
@@ -34,7 +34,7 @@ function UsgsEarthquake(input, output) {
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
 	this.view = function(param) {
-		require('library/ui', function() {
+		loadScript('library/ui', function() {
 
 
 			new DateRangePicker('USGS Earthquake', 'Please select date range to fetch data:', function(startdate, enddate) {

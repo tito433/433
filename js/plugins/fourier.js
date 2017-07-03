@@ -1,5 +1,6 @@
-function Fourier(input, output) {
+function Fourier() {
 	Plugin.apply(this, arguments);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	Canvas.call(this, output);
 	var dayHour = true;

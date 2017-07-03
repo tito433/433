@@ -1,6 +1,6 @@
-function GoogleCalendar(input, output) {
+function GoogleCalendar() {
 	Plugin.apply(this, arguments);
-	Canvas.call(this, output);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	var storage = this.settings.storage;
 	var fetchEvents = function(startdate, enddate) {
@@ -50,9 +50,9 @@ function GoogleCalendar(input, output) {
 		});
 	}
 	this.view = function() {
-		require('library/ui', function() {
+		loadScript('library/ui', function() {
 			new DateRangePicker('Google Calendar', 'Authorize access to Google Calendar to fetch event from following date:', function(startdate, enddate) {
-				require('http://apis.google.com/js/api.js', function() {
+				loadScript('http://apis.google.com/js/api.js', function() {
 					gapi.load('client:auth2', function() {
 						gapi.client.init({
 							'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],

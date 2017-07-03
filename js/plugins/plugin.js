@@ -192,4 +192,19 @@ var Plugin = function() {
 		return btn;
 	}
 
+	//do need?
+	// this.UI = {
+	// 	menu: {
+	// 		menuDom: document.getElementById('nav-toggle'),
+
+	// 		get show() {
+	// 			if (!this.menuDom) return undefined;
+	// 			return this.menuDom;
+	// 		},
+	// 		set show(val) {
+	// 			if (!this.menuDom) return undefined;
+	// 			this.menuDom.checked = val;
+	// 		},
+	// 	}
+	// };
 }

@@ -84,7 +84,7 @@ Object.defineProperty(Image.prototype, 'isOk', {
 	}
 });
 
-window.require = function(u, c) {
+window.loadScript = function(u, c) {
 	if (typeof u !== "string") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
 
 	if (!u.endsWith('.js')) {

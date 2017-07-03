@@ -1,6 +1,6 @@
-function Sound(input, output) {
+function Sound() {
 	Plugin.apply(this, arguments);
-	Canvas.call(this, output);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	this.view = function() {
 		var self = this;

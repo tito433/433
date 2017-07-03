@@ -1,7 +1,6 @@
 function Cycloid() {
 	Plugin.apply(this, arguments);
-	//adapt drawing
-	Canvas.call(this, this.output);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	var inpRadius = 50;
 	var keepAll = false;

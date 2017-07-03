@@ -1,5 +1,6 @@
-function Logo(input, output) {
-	Canvas.call(this, output);
+function Logo() {
+	Plugin.apply(this, arguments);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 
 
@@ -8,17 +9,6 @@ function Logo(input, output) {
 	var mlogo = new MLogo(this.width, this.height);
 	mlogo.position(center.x, center.y);
 	this.add(mlogo);
-
-	// radius /= 2;
-
-	// for (var i = 0, sz = centerA.length; i < sz; i++) {
-	// 	var crp = centerA[i];
-	// 	var lc = [new Point(crp.x, crp.y), new Point(crp.x, crp.y)];
-	// 	drawCircle(lc, radius / 2, 360);
-	// }
-
-
-
 	//save screen?
 	this.screenShoot = function(ctx, x, y, w, h) {
 			var data = ctx.getImageData(x, y, w, h);

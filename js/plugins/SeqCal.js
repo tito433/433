@@ -1,6 +1,6 @@
 function SeqCal() {
 	Plugin.apply(this, arguments);
-	Canvas.call(this, this.output);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	var layout = new Layout(this.width, this.height);
 	layout.padding = 10;

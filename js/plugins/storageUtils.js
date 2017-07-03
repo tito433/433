@@ -1,6 +1,6 @@
-function StorageUtils(input, output) {
+function StorageUtils() {
 	Plugin.apply(this, arguments);
-	Canvas.call(this, this.output);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	this.view = function() {
 		var cmd = arguments.length ? arguments[0] : '';

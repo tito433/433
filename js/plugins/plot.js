@@ -1,7 +1,6 @@
-function Plot(input, output) {
+function Plot() {
 	Plugin.apply(this, arguments);
-
-	Canvas.call(this, output);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	this._chart = [];
 	var _layout = new Layout(this.width, this.height);

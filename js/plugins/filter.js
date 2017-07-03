@@ -1,5 +1,6 @@
 function Filter() {
 	Plugin.apply(this, arguments);
+	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
 	var hasValue = function(data, findValue, index) {
 		switch (typeof data) {
