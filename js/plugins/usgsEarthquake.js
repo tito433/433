@@ -19,7 +19,7 @@ function UsgsEarthquake() {
 					'lat': fea.geometry.coordinates[1]
 				});
 			});
-			localStorage.setItem(storage.data_key, JSON.stringify(events));
+			localStorage.setItem(storage.data, JSON.stringify(events));
 			window.dispatchEvent(new CustomEvent(storage.event, {
 				'detail': events
 			}));

@@ -2,26 +2,19 @@ function Fourier() {
 	Plugin.apply(this, arguments);
 	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
-	Canvas.call(this, output);
 	var dayHour = true;
-	this.addSettings();
-
-	var inpDeg = 180;
-	var inpAmp = 0.21;
+	var inpDeg = 360;
+	var inpAmp = 1;
 	var startDeg = 0;
 
 	this.draw = function(param) {
 		this.clear();
-		if (!this.data || !this.data.length) return false;
-
-		if (param) {
-			dayHour = param.dayHour != undefined ? param.dayHour : dayHour;
-			inpDeg = param.inpDeg ? Number(param.inpDeg) : inpDeg;
-			inpAmp = param.inpAmp ? Number(param.inpAmp) : inpAmp;
+		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
+			return false;
 		}
-
-
-		//move bottom to a drwable object and put it to screen?
+		dayHour = arguments.length > 0 && "dayHour" in param ? Number(param.dayHour) : dayHour;
+		inpDeg = arguments.length > 0 && "inpDeg" in param ? param.inpDeg : inpDeg;
+		inpAmp = arguments.length > 0 && "inpAmp" in param ? param.inpAmp : inpAmp;
 
 		var freq = this.data.map(function(dt) {
 			var date = new Date(dt.date);
@@ -32,12 +25,12 @@ function Fourier() {
 				'f': f
 			};
 		});
-		var drawer = new MFourier(freq, {
-			'dayHour': dayHour,
+		var fourier = new MFourier(freq, {
 			'inpDeg': inpDeg,
 			'inpAmp': inpAmp
 		});
-		this.add(drawer);
+		fourier.width(this.width).position(0, this.height / 2);
+		this.add(fourier);
 
 	}
 	this.view = function() {
@@ -70,7 +63,7 @@ function Fourier() {
 
 	this.onZoom = function(zoom) {
 		if (this.isView()) {
-			inpAmp += zoom / 360;
+			inpDeg += zoom;
 			this.draw();
 		}
 	}
@@ -78,6 +71,8 @@ function Fourier() {
 
 function MFourier(freq, settings) {
 	Drawable.call(this);
+	this.freq = freq;
+	this.settings = settings;
 	this.draw = function(ctx) {
 
 		ctx.beginPath();
@@ -85,23 +80,21 @@ function MFourier(freq, settings) {
 		ctx.lineWidth = 2;
 		var y = this.y + this.height / 2;
 		ctx.moveTo(this.x, y);
-		var np = settings.inpDeg / 180,
+		var np = this.settings.inpDeg / 180,
 			points = [],
 			rad = Math.PI / 180;
-
-		for (var i = this.x; i <= this.width; i++) {
+		for (var i = this.x, sz = this.width(); i <= sz; i++) {
 			x = i;
 			y = 0;
-			t = i / this.width;
-			for (var fi in freq) {
-				var A = settings.inpAmp * freq[fi].a,
-					f = freq[fi].f;
-				y += A * Math.sin(np * Math.PI * f * t + (rad * startDeg));
+			t = i / sz;
+			for (var fi in this.freq) {
+				var A = this.settings.inpAmp * this.freq[fi].a,
+					f = this.freq[fi].f;
+				y += A * Math.sin(Math.PI * np * f * t);
 			}
 			points.push(new Point(x, y));
 
 		}
-
 
 
 		ctx.lineWidth = 0.5;
@@ -114,8 +107,8 @@ function MFourier(freq, settings) {
 				ay = Math.min(this.y, Math.abs(y));
 
 			ctx.moveTo(x, this.y);
-			var py = (ay * (100 / this.y));
-			var clrn = 255 + 16711425 * (py / 100);
+			var py = (Math.abs(ay) * (100 / this.y));
+			var clrn = 16711425 * (py / 100);
 			clrn = clrn.toFixed(0);
 			ctx.strokeStyle = '#' + Number(clrn).toString(16);
 			ctx.lineTo(x, this.y - y);

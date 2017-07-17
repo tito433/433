@@ -7,13 +7,12 @@ function DateRangePicker(title, subtitle, callBack, startdate, enddate) {
 	div.style.textAlign = 'center';
 	div.style.maxWidth = '330px';
 	div.style.padding = '10px';
-	div.style.top = '10%';
+	div.style.top = '50%';
 	div.style.background = '#eee';
 	div.style.border = '1px solid #ccc';
 	div.style.left = '0';
 	div.style.right = '0';
-	div.style.marginRight = 'auto';
-	div.style.marginLeft = 'auto';
+	div.style.margin = '-117px auto 0';
 
 
 	d.body.appendChild(div);
