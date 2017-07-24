@@ -1,63 +1,43 @@
-function Calendar() {
-	Plugin.apply(this, arguments);
-	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
-
-	var layout = new Layout(this.width, this.height);
-	layout.padding = 20;
-	var tblCol = 4;
+function Draw(param) {
 
 
-	this.draw = function(param) {
-		tblCol = param && param.tblCol ? Number(param.tblCol) : tblCol;
-		if (!this.data || !this.data.length) return false;
-		layout.clear();
+	var months = this.data.reduce(function(acc, val) {
+		var dt = new Date(val.date);
+		acc[dt.getMonth() + '_' + dt.getFullYear()] = 1;
+		return acc;
+	}, []);
 
-		var months = this.data.reduce(function(acc, val) {
-			var dt = new Date(val.date);
-			acc[dt.getMonth() + '_' + dt.getFullYear()] = 1;
-			return acc;
-		}, []);
+	for (var idx in months) {
+		var sp = idx.split('_'),
+			mn = Number(sp[0]),
+			y = Number(sp[1]);
+		var monthData = this.data.filter(function(ev) {
+			var dt = new Date(ev.date);
+			return dt.getMonth() == mn && dt.getFullYear() == y;
+		});
 
-		for (var idx in months) {
-			var sp = idx.split('_'),
-				mn = Number(sp[0]),
-				y = Number(sp[1]);
-			var monthData = this.data.filter(function(ev) {
-				var dt = new Date(ev.date);
-				return dt.getMonth() == mn && dt.getFullYear() == y;
-			});
-
-			var month = new Month(new Date(y, mn, 1), monthData);
-			layout.add(month);
-		}
-		layout.table(tblCol, 2);
-		this.add(layout);
+		var month = new Month(new Date(y, mn, 1), monthData);
+		layout.add(month);
 	}
-	this.view = function() {
-		this.addSettings([{
-			'title': 'Columns',
-			'type': 'number',
-			'value': tblCol,
-			'input.name': 'tblCol',
-			'input.group': 'input-group',
-			'input.class': 'form-control'
-
-		}]);
-		this.draw();
-	}
-
-	this.addView();
-
-	this.onZoom = function(zoom) {
-		if (this.isView()) {
-			layout.margin.y += zoom * 10;
-			this.draw();
-		}
-	}
+	layout.table(tblCol, 2);
+	this.add(layout);
 }
-Calendar.prototype = Object.create(Plugin.prototype);
-Calendar.prototype.constructor = Calendar;
+self.addEventListener('message', function(e) {
+	switch (e) {
+		case 'stop':
+			self.postMessage('Exit 0');
+			self.close(); // Terminates the worker.
+			break;
+		default:
+			var layout = new Layout(this.width, this.height);
+			layout.padding = 20;
+			var tblCol = 4;
+			tblCol = param.tblCol ? Number(param.tblCol) : tblCol;
+			if (!this.data || !this.data.length) return false;
+			layout.clear();
+	};
 
+}, false);
 
 function Month(date, data) {
 	Drawable.call(this);

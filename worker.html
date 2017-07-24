@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>The Worker</title>
+</head>
+<body>
+<output id="result"></output>
+<script>
+  var worker = new Worker('js/doWork.js');
+  var worker1 = new Worker('js/doWork.js');
+
+  worker.addEventListener('message', function(e) {
+    document.getElementById('result').innerHTML +='worker1 ' +e.data+"<br/>";
+  }, false);
+
+  worker1.addEventListener('message', function(e) {
+    document.getElementById('result').innerHTML +='worker2 '+ e.data+"<br/>";
+  }, false);
+
+  for(var i=0;i<4;i++){
+    console.log(i)
+    worker.postMessage(i);
+    worker1.postMessage(i);
+  }
+
+</script>
+</body>
+</html>
