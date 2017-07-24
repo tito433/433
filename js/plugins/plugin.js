@@ -6,7 +6,6 @@ var Plugin = function() {
 	}
 
 	this.input = arguments[0] || null;
-	this.output = arguments[1] || null;
 
 	this.settings = {
 		'storage': {
