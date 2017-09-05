@@ -1,8 +1,5 @@
 function GoogleCalendar() {
-	Plugin.apply(this, arguments);
-	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
 
-	var storage = this.settings.storage;
 	var fetchEvents = function(startdate, enddate) {
 		gapi.client.calendar.events.list({
 			'calendarId': 'primary',
@@ -29,28 +26,12 @@ function GoogleCalendar() {
 					})
 				}
 			}
+			Application.addData(dataFormated);
 
-			localStorage.setItem(storage.data, JSON.stringify(dataFormated));
-			window.dispatchEvent(new CustomEvent(storage.event, {
-				'detail': dataFormated
-			}));
-
-			// require('http://maps.google.com/maps/api/js?sensor=false', function() {
-			// 	var geocoder = new google.maps.Geocoder();
-			// 	geocoder.geocode({
-			// 		'address': ??
-			// 	}, function(results, status) {
-			// 		if (status == google.maps.GeocoderStatus.OK) {
-			// 			var latitude = results[0].geometry.location.latitude;
-			// 			var longitude = results[0].geometry.location.longitude;
-
-			// 		}
-			// 	});
-			// });
 		});
 	}
-	this.view = function() {
-		loadScript('library/ui', function() {
+	Application.UIButton('data', 'GoogleCalendar', function(e) {
+		loadScript('js/library/ui.js', function() {
 			new DateRangePicker('Google Calendar', 'Authorize access to Google Calendar to fetch event from following date:', function(startdate, enddate) {
 				loadScript('http://apis.google.com/js/api.js', function() {
 					gapi.load('client:auth2', function() {
@@ -72,10 +53,9 @@ function GoogleCalendar() {
 				});
 			})
 		});
-	}
+	});
 
-	this.addData('Google Calendar');
+};
 
-}
-Storage.prototype = Object.create(Plugin.prototype);
-Storage.prototype.constructor = Storage;
+
+new GoogleCalendar();

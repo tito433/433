@@ -1,13 +1,13 @@
 'use strict';
-var Plugin = function() {
+var Plugin = (function(self) {
 
 	if (typeof(Storage) === "undefined") {
-		throw "Storage undefined! This app can't run without localStorage. Can you?";
+		throw "Storage undefined! self app can't run without localStorage. Can you?";
 	}
 
-	this.input = arguments[0] || null;
-
-	this.settings = {
+	self.input = document.getElementById('input');
+	self.output = document.getElementById('output');
+	self.settings = {
 		'storage': {
 			'data': '433.storage.data',
 			'event': '433.data.change',
@@ -21,26 +21,26 @@ var Plugin = function() {
 		} catch (err) {}
 		return _dt;
 	}
-	this.data = _get_storageJson(this.settings.storage.data);
+	self.data = _get_storageJson(self.settings.storage.data);
 
-	this.draw = function() {};
+	self.draw = function() {};
 
-	this.getData = function() {
-		return this.data;
+	self.getData = function() {
+		return self.data;
 	}
-	this.isView = function() {
-		var state = localStorage.getItem(this.settings.storage.active);
-		return state == this.getName();
+	self.isView = function() {
+		var state = localStorage.getItem(self.settings.storage.active);
+		return state == self.getName();
 	}
 
-	this._updateData = function() {
+	self._updateData = function() {
 		if (arguments.length == 1 && arguments[0] instanceof Event) {
-			this.data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : [];
-			if (this.isView()) this.draw();
+			self.data = arguments[0].detail && arguments[0].detail instanceof Array ? arguments[0].detail : [];
+			if (self.isView()) self.draw();
 		}
 	}
 
-	window.addEventListener(this.settings.storage.event, this._updateData.bind(this), false);
+	window.addEventListener(self.settings.storage.event, self._updateData.bind(self), false);
 
 	var _ui_settings_cache = [];
 	var fn_addUI = function(parent, label, option) {
@@ -99,20 +99,20 @@ var Plugin = function() {
 		return btn;
 
 	}
-	this.addView = function(label) {
-		var label = label || this.getName(),
-			btn = fn_addUI(this.input.querySelector('.view'), label, {
+	self.addView = function(label) {
+		var label = label || self.getName(),
+			btn = fn_addUI(self.input.querySelector('.view'), label, {
 				'type': 'submit',
 				'input.name': 'view-' + label,
 				'value': label
 			});
 		btn.onclick = function() {
-			localStorage.setItem(this.settings.storage.active, this.getName());
-			this.view();
-		}.bind(this);
+			localStorage.setItem(self.settings.storage.active, self.getName());
+			self.view();
+		}.bind(self);
 	}
 
-	this.addSettings = function(btns) {
+	self.addSettings = function(btns) {
 		var option = {
 			'type': 'input',
 			'input.name': 'input-' + new Date().getTime(),
@@ -125,7 +125,7 @@ var Plugin = function() {
 			'title': 'Option'
 		};
 
-		var parent = this.input.querySelector('.model');
+		var parent = self.input.querySelector('.model');
 
 		while (parent.firstChild) {
 			parent.removeChild(parent.firstChild);
@@ -140,10 +140,10 @@ var Plugin = function() {
 					btn.onchange = function(evt) {
 						var tr = evt.target,
 							val = tr.type === 'checkbox' ? (tr.checked) : tr.value;
-						this.draw({
+						self.draw({
 							[tr.name]: val
 						});
-					}.bind(this);
+					}.bind(self);
 				}
 			} else if (btns.constructor === Object) {
 				var op = option.extend(btns);
@@ -151,14 +151,14 @@ var Plugin = function() {
 				btn.onchange = function(evt) {
 					var tr = evt.target,
 						val = tr.type === 'checkbox' ? (tr.checked) : tr.value;
-					this.draw({
+					self.draw({
 						[tr.name]: val
 					});
-				}.bind(this);
+				}.bind(self);
 			}
 		}
 	}
-	this.getParamFromEvent = function(event, prmName) {
+	self.getParamFromEvent = function(event, prmName) {
 		if (event instanceof Event) {
 			var elem = event.target;
 			if (elem.name === prmName) {
@@ -168,42 +168,44 @@ var Plugin = function() {
 		}
 
 	}
-	this.addControll = function(label) {
-		var label = label || this._name,
-			btn = fn_addUI(this.input.querySelector('.controll'), label, {
+	self.addControll = function(label) {
+		var label = label || self._name,
+			btn = fn_addUI(self.input.querySelector('.controll'), label, {
 				'type': 'button',
 				'input.name': 'input-control-' + label + new Date().getMilliseconds(),
 				'value': label
 			});
 		btn.onclick = function() {
-			this.view.call(this, label);
-		}.bind(this);
+			self.view.call(self, label);
+		}.bind(self);
 		return btn;
 	}
-	this.addData = function(label) {
-		var label = label || this._name,
-			btn = fn_addUI(this.input.querySelector('.data'), label, {
+	self.addData = function(label) {
+		var label = label || self._name,
+			btn = fn_addUI(self.input.querySelector('.data'), label, {
 				'type': 'button',
 				'input.name': 'input-control-' + label + new Date().getMilliseconds(),
 				'value': label
 			});
-		btn.onclick = this.view.bind(this);
+		btn.onclick = self.view.bind(self);
 		return btn;
 	}
 
 	//do need?
-	// this.UI = {
+	// self.UI = {
 	// 	menu: {
 	// 		menuDom: document.getElementById('nav-toggle'),
 
 	// 		get show() {
-	// 			if (!this.menuDom) return undefined;
-	// 			return this.menuDom;
+	// 			if (!self.menuDom) return undefined;
+	// 			return self.menuDom;
 	// 		},
 	// 		set show(val) {
-	// 			if (!this.menuDom) return undefined;
-	// 			this.menuDom.checked = val;
+	// 			if (!self.menuDom) return undefined;
+	// 			self.menuDom.checked = val;
 	// 		},
 	// 	}
 	// };
-}
+
+	return self;
+})(Plugin || {});

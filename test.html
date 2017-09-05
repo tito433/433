@@ -1,83 +1,16 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Test page for js</title>
-    <style type="text/css">
-        #table p{
-            border: 1px solid #444;
-            padding: 10px;
-            text-align: right;
-        }
-    </style>
-</head>
 <body>
-
-<div id="table">
-    
-</div>
-<button type="button" id="add">Add</button>
 <script type="text/javascript">
+for(var i=0;i<100;i++){
+    var A=Math.floor(Math.random()*100),
+        B=Math.floor(Math.random()*100),
+        C=Math.floor(Math.random()*100);
 
-// function modifyText() {
-//     console.log('click');
-//   var t2 = document.getElementById("t2");
-//   if (t2.firstChild.nodeValue == "three") {
-//     t2.firstChild.nodeValue = "two";
-//   } else {
-//     t2.firstChild.nodeValue = "three";
-//   }
-// }
+    var x=A*(B*C),
+        y=B*(C*A),
+        z=C*(A*B);
 
-// // add event listener to table
-// var el = document.getElementById("output");
-// el.addEventListener("click", modifyText, {'capture':true,'once':true});
-
-// var table=document.getElementById('output');
-// table.addEventListener("click",function(e){
-//     console.log('table click');
-// });
-// var div=document.getElementById('table');
-
-// document.getElementById('add').addEventListener('click',function(e){
-//     var template='<p><button>X</button></p>';
-    
-//     div.innerHTML+=template;
-// });
-
-// div.addEventListener("click",function cb(e){
-//     var btn=e.target,p=btn.parentNode;
-//     if(btn instanceof HTMLButtonElement){
-//         div.removeChild(p);
-//     }
-    
-// });
-
-//13-Mar-2017
-// try to find can i modify my parent.
-
-
-
-
-
-
-
-
-
-var dna_data=new (function(){
-    this.count=43;
-    this.description='Complex storage system contains '+this.count+' segments.';
-    this.data=new Array(this.count).fill(0).map(Math.random);
-})();
-
-dna_data.data.map(function(v,i,arr){
-    arr[i]+=1;
-    return arr;
-})
-console.log(dna_data.data)
-
-var sm=15;
-var rem = sm % 10;
-                    console.log(String.fromCharCode(65+rem));
+    console.log(A,B,C,(x+y+z));
+}
 </script>
-</body>
-</html>

@@ -27,8 +27,8 @@ function DateRangePicker(title, subtitle, callBack, startdate, enddate) {
 	var dPara = d.createElement("p");
 	div.appendChild(dPara);
 	var t = new Date(),
-		date_to = enddate || new Date(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59),
-		date_from = startdate || new Date(t.getFullYear() - 1, t.getMonth() + 1, 0, 23, 59, 59);
+		date_to = enddate || new Date(Date.UTC(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59)),
+		date_from = startdate || new Date(Date.UTC(t.getFullYear() - 1, t.getMonth() + 1, 1, 0, 0, 0));
 
 	var mL = function(ix) {
 		return ix > 9 ? ix : '0' + ix;
@@ -37,15 +37,14 @@ function DateRangePicker(title, subtitle, callBack, startdate, enddate) {
 	//start date
 	var calStart = d.createElement('input');
 	calStart.type = "date";
-	calStart.value = date_from.getUTCFullYear() + "-" + mL(date_from.getUTCMonth() + 1) + "-" + mL(date_from.getUTCDate());;
+	calStart.value = date_from.toISOString().slice(0, 10);
 	dPara.appendChild(calStart);
 	dPara.appendChild(d.createTextNode(" to "));
 	//end date
 	var calEnd = d.createElement('input');
 	calEnd.type = "date";
-	calEnd.value = date_to.getUTCFullYear() + "-" + mL(date_to.getUTCMonth() + 1) + "-" + mL(date_to.getUTCDate());;
+	calEnd.value = date_to.toISOString().slice(0, 10);
 	dPara.appendChild(calEnd);
-
 	var btn = d.createElement("button");
 	btn.appendChild(d.createTextNode("Submit"));
 	div.appendChild(btn);

@@ -1,9 +1,4 @@
 function UsgsEarthquake() {
-	Plugin.apply(this, arguments);
-	Canvas.apply(this, Array.prototype.slice.call(arguments, 1));
-
-	var storage = this.settings.storage;
-
 	var cb_method = this._name + '_cb_' + new Date().getMilliseconds();
 	window[cb_method] = function(data) {
 		if (data.metadata && data.metadata.status == 200 && data.metadata.count > 0) {
@@ -19,10 +14,7 @@ function UsgsEarthquake() {
 					'lat': fea.geometry.coordinates[1]
 				});
 			});
-			localStorage.setItem(storage.data, JSON.stringify(events));
-			window.dispatchEvent(new CustomEvent(storage.event, {
-				'detail': events
-			}));
+			Application.addData(events);
 		} else {
 			console.log("Invalid response found from USGS", data);
 		}
@@ -33,19 +25,16 @@ function UsgsEarthquake() {
 		script.src = '//earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + start + '&endtime=' + end + '&minmagnitude=6&callback=' + cb_method
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
-	this.view = function(param) {
-		loadScript('library/ui', function() {
 
-
+	Application.UIButton('data', 'USGS Earthquake', function(e) {
+		loadScript('js/library/ui.js', function() {
 			new DateRangePicker('USGS Earthquake', 'Please select date range to fetch data:', function(startdate, enddate) {
 				var st = new Date(startdate),
 					ed = new Date(enddate);
 				_fetchData(st.getFullYear() + '-' + (st.getMonth() + 1) + '-' + st.getDate(), ed.getFullYear() + '-' + (ed.getMonth() + 1) + '-' + ed.getDate());
 			});
 		});
-	}
-
-
-
-	this.addData("USGS Earthquake");
+	});
 }
+
+new UsgsEarthquake();

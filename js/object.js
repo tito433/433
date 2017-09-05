@@ -84,29 +84,15 @@ Object.defineProperty(Image.prototype, 'isOk', {
 	}
 });
 
-window.loadScript = function(u, c) {
-	if (typeof u !== "string") throw "Invalid js[" + Object.prototype.toString.call(u) + "] name to load.";
-
-	if (!u.endsWith('.js')) {
-		u = u + '.js';
-	}
-
-	var newJs = u.startsWith('http') ? u : 'js/' + u;
-	var scripts = document.getElementsByTagName('script');
-	for (var i = 0, ln = scripts.length; i < ln; i++) {
-		if (scripts[i].src.endsWith(newJs)) {
-			return c.call(null);
+window.loadScript = function(src, callback) {
+	var s = document.createElement('script');
+	s.type = 'text/' + (src.type || 'javascript');
+	s.src = src.src || src;
+	s.async = false;
+	s.onreadystatechange = s.onload = function() {
+		if (typeof callback === 'function') {
+			callback();
 		}
-	}
-	var d = document,
-		j = d.createElement('script');
-	j.src = newJs;
-
-	if (c && typeof c === 'function') {
-		j.addEventListener('load', function cb(e) {
-			e.currentTarget.removeEventListener(e.type, cb);
-			return c.call(null);
-		}, false);
-	}
-	d.body.appendChild(j);
+	};
+	document.body.appendChild(s);
 }
