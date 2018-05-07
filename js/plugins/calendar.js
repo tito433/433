@@ -31,6 +31,7 @@ function Calendar() {
 			layout.add(month);
 		}
 		layout.table(tblCol, 2);
+		this.clear();
 		this.add(layout);
 	}
 	this.view = function() {

@@ -12,7 +12,7 @@ function SeqCal() {
 		if (!this.data || !(this.data instanceof Array) || (0 == this.data.length)) {
 			return false;
 		}
-
+		this.clear();
 		layout.clear();
 		var days = this.data.reduce(function(r, a) {
 			var dt = new Date(a.date),
